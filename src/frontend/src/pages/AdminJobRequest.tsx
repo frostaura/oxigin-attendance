@@ -3,7 +3,7 @@ import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table } from 
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
-const AdminJobRequest = () => {
+const AdminJobRequest: React.FC = () => {
   const navigate = useNavigate();
 
   // Sample table data

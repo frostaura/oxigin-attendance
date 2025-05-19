@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
-const ClientHome = () => {
+const AdminJobsHome: React.FC = () => {
   const navigate = useNavigate();
 
   // Table columns
@@ -39,30 +39,32 @@ const ClientHome = () => {
     <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
       <Card style={{ width: "80%", padding: 20 }}>
         <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px" }}>
-          <h2 style={{ margin: 0, textAlign: "center" }}>Home Page</h2>
+          <h2 style={{ margin: 0, alignItems: "center"}}>Job Home Page</h2>
         </Header>
 
-        <Content style={{ flex: 1, padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* Stacked Cards */}
-          <Card title="Jobs Pending Confirmation">
-            <Table columns={jobColumns} dataSource={jobData} pagination={false} />
-          </Card>
+        <Content style={{ flex: 1, padding: 20 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, width: "100%" }}>
+            <Card title="Jobs Pending Confirmation">
+              <Table columns={jobColumns} dataSource={jobData} pagination={false} />
+            </Card>
 
-          <Card title="Jobs Pending My Approval">
-            <Table columns={jobColumns} dataSource={jobData} pagination={false} />
-          </Card>
+            <Card title="Jobs Pending My Approval">
+              <Table columns={jobColumns} dataSource={jobData} pagination={false} />
+            </Card>
 
-          <Card title="Upcoming Jobs">
-            <Table columns={upcomingJobColumns} dataSource={upcomingJobData} pagination={false} />
-          </Card>
+            <Card title="Upcoming Jobs">
+              <Table columns={upcomingJobColumns} dataSource={upcomingJobData} pagination={false} />
+            </Card>
+          </div>
         </Content>
 
+        {/* Bottom Right Buttons */}
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: "auto" }}>
-          <Button type="primary" onClick={() => navigate("/clientjobrequest")}>Request Job</Button>
+          <Button type="primary" onClick={() => navigate("/adminjobrequest")}>Submit Job Request</Button>
         </div>
       </Card>
     </Layout>
   );
 };
 
-export default ClientHome;
+export default AdminJobsHome;

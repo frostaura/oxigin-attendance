@@ -4,8 +4,8 @@ import { Form, Input, Button, Typography, Card } from "antd";
 
 const { Title, Text } = Typography;
 
-const AdminSignIn = () => {
-  const handleLogin = (values) => {
+const AdminSignIn: React.FC = () => {
+  const handleLogin = (values: { email: string; password: string }) => {
     console.log("Login Data:", values);
   };
 

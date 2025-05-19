@@ -1,10 +1,15 @@
 import { Button, Layout, Avatar, Menu, Dropdown } from "antd";
 import { LeftOutlined, RobotOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
+import { ReactNode } from "react";
 
 const { Header, Content } = Layout;
 
-const AppLayout = ({ children }) => {
+interface AppLayoutProps {
+  children: ReactNode;
+}
+
+const AppLayout = ({ children }: AppLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 

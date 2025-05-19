@@ -5,23 +5,33 @@ import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
-const ManageEmployees = () => {
+interface Employee {
+  key: string;
+  employeeId: string;
+  name: string;
+  surname: string;
+  idNumber: string;
+  address: string;
+  contact: string;
+}
+
+const ManageEmployees: React.FC = () => {
   const navigate = useNavigate();
-  const [editingKey, setEditingKey] = useState(null);
-  const [employees, setEmployees] = useState([
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>([
     { key: "1", employeeId: "E001", name: "John", surname: "Doe", idNumber: "123456789", address: "123 Street, NY", contact: "555-1234" },
     { key: "2", employeeId: "E002", name: "Jane", surname: "Smith", idNumber: "987654321", address: "456 Avenue, LA", contact: "555-5678" },
   ]);
 
-  const [newEmployee, setNewEmployee] = useState(null);
+  const [newEmployee, setNewEmployee] = useState<Employee | null>(null);
 
   // Start editing an existing employee
-  const handleEdit = (key) => {
+  const handleEdit = (key: string) => {
     setEditingKey(key);
   };
 
   // Save changes to existing or new employee
-  const handleSave = (key) => {
+  const handleSave = (key: string) => {
     if (newEmployee?.key === key) {
       setEmployees([...employees, newEmployee]); // Persist the new employee
       setNewEmployee(null);
@@ -30,7 +40,7 @@ const ManageEmployees = () => {
   };
 
   // Delete an employee row
-  const handleDelete = (key) => {
+  const handleDelete = (key: string) => {
     setEmployees(employees.filter((emp) => emp.key !== key));
   };
 
@@ -52,7 +62,7 @@ const ManageEmployees = () => {
   };
 
   // Handle input change for both new and existing employees
-  const handleInputChange = (key, field, value) => {
+  const handleInputChange = (key: string, field: keyof Employee, value: string) => {
     if (editingKey === key) {
       if (newEmployee?.key === key) {
         setNewEmployee({ ...newEmployee, [field]: value });
@@ -69,7 +79,7 @@ const ManageEmployees = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
-      render: (text, record) =>
+      render: (text: string, record: Employee) =>
         editingKey === record.key ? (
           <Input value={record.name} onChange={(e) => handleInputChange(record.key, "name", e.target.value)} />
         ) : (
@@ -80,7 +90,7 @@ const ManageEmployees = () => {
       title: "Surname",
       dataIndex: "surname",
       key: "surname",
-      render: (text, record) =>
+      render: (text: string, record: Employee) =>
         editingKey === record.key ? (
           <Input value={record.surname} onChange={(e) => handleInputChange(record.key, "surname", e.target.value)} />
         ) : (
@@ -91,7 +101,7 @@ const ManageEmployees = () => {
       title: "ID Number",
       dataIndex: "idNumber",
       key: "idNumber",
-      render: (text, record) =>
+      render: (text: string, record: Employee) =>
         editingKey === record.key ? (
           <Input value={record.idNumber} onChange={(e) => handleInputChange(record.key, "idNumber", e.target.value)} />
         ) : (
@@ -102,7 +112,7 @@ const ManageEmployees = () => {
       title: "Address",
       dataIndex: "address",
       key: "address",
-      render: (text, record) =>
+      render: (text: string, record: Employee) =>
         editingKey === record.key ? (
           <Input value={record.address} onChange={(e) => handleInputChange(record.key, "address", e.target.value)} />
         ) : (
@@ -113,7 +123,7 @@ const ManageEmployees = () => {
       title: "Contact Number",
       dataIndex: "contact",
       key: "contact",
-      render: (text, record) =>
+      render: (text: string, record: Employee) =>
         editingKey === record.key ? (
           <Input value={record.contact} onChange={(e) => handleInputChange(record.key, "contact", e.target.value)} />
         ) : (
@@ -123,7 +133,7 @@ const ManageEmployees = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) =>
+      render: (_: any, record: Employee) =>
         editingKey === record.key ? (
           <div style={{ display: "flex", gap: 10 }}>
             <Button type="text" icon={<CheckOutlined style={{ color: "green" }} />} onClick={() => handleSave(record.key)} />

@@ -4,11 +4,26 @@ import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
-const AdminEmployeesHome = () => {
+interface Employee {
+  key: number;
+  id: string;
+  name: string;
+  contact: string;
+}
+
+interface Attendance {
+  key: number;
+  jobId: string;
+  jobName: string;
+  company: string;
+  date: string;
+}
+
+const AdminEmployeesHome: React.FC = () => {
   const navigate = useNavigate();
 
   // Sample data for available employees
-  const employeeData = [
+  const employeeData: Employee[] = [
     { key: 1, id: "E001", name: "John Doe", contact: "123-456-7890" },
     { key: 2, id: "E002", name: "Jane Smith", contact: "987-654-3210" },
   ];
@@ -21,7 +36,7 @@ const AdminEmployeesHome = () => {
   ];
 
   // Sample data for attendance registers
-  const attendanceData = [
+  const attendanceData: Attendance[] = [
     { key: 1, jobId: "J1001", jobName: "Construction Work", company: "XYZ Ltd.", date: "2025-03-20" },
     { key: 2, jobId: "J1002", jobName: "Plumbing Task", company: "ABC Corp.", date: "2025-03-21" },
   ];
