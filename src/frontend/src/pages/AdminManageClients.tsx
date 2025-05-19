@@ -5,22 +5,32 @@ import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
-const AdminManageClients = () => {
+interface Client {
+  key: string;
+  companyId: string;
+  companyName: string;
+  registrationNo: string;
+  address: string;
+  contact: string;
+  email: string;
+}
+
+const AdminManageClients: React.FC = () => {
   const navigate = useNavigate();
-  const [editingKey, setEditingKey] = useState(null);
-  const [clients, setClients] = useState([
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [clients, setClients] = useState<Client[]>([
     { key: "1", companyId: "C001", companyName: "Tech Solutions", registrationNo: "123456789", address: "123 Tech St, Silicon Valley", contact: "555-1234", email: "contact@techsolutions.com" },
     { key: "2", companyId: "C002", companyName: "Creative Designs", registrationNo: "987654321", address: "456 Design Ave, NYC", contact: "555-5678", email: "contact@creativedesigns.com" },
   ]);
 
-  const [newClient, setNewClient] = useState(null);
-  const [searchValue, setSearchValue] = useState("");
+  const [newClient, setNewClient] = useState<Client | null>(null);
+  const [searchValue, setSearchValue] = useState<string>("");
 
-  const handleEdit = (key) => {
+  const handleEdit = (key: string) => {
     setEditingKey(key);
   };
 
-  const handleSave = (key) => {
+  const handleSave = (key: string) => {
     if (newClient?.key === key) {
       setClients([...clients, newClient]);
       setNewClient(null);
@@ -28,7 +38,7 @@ const AdminManageClients = () => {
     setEditingKey(null);
   };
 
-  const handleDelete = (key) => {
+  const handleDelete = (key: string) => {
     setClients(clients.filter((client) => client.key !== key));
   };
 
@@ -48,7 +58,7 @@ const AdminManageClients = () => {
     }
   };
 
-  const handleInputChange = (key, field, value) => {
+  const handleInputChange = (key: string, field: keyof Client, value: string) => {
     if (editingKey === key) {
       if (newClient?.key === key) {
         setNewClient({ ...newClient, [field]: value });
@@ -60,7 +70,7 @@ const AdminManageClients = () => {
     }
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
@@ -70,12 +80,11 @@ const AdminManageClients = () => {
   );
 
   const columns = [
-  
     {
       title: "Company Name",
       dataIndex: "companyName",
       key: "companyName",
-      render: (text, record) =>
+      render: (text: string, record: Client) =>
         editingKey === record.key ? (
           <Input value={record.companyName} onChange={(e) => handleInputChange(record.key, "companyName", e.target.value)} />
         ) : (
@@ -86,7 +95,7 @@ const AdminManageClients = () => {
       title: "Registration No.",
       dataIndex: "registrationNo",
       key: "registrationNo",
-      render: (text, record) =>
+      render: (text: string, record: Client) =>
         editingKey === record.key ? (
           <Input value={record.registrationNo} onChange={(e) => handleInputChange(record.key, "registrationNo", e.target.value)} />
         ) : (
@@ -97,7 +106,7 @@ const AdminManageClients = () => {
       title: "Address",
       dataIndex: "address",
       key: "address",
-      render: (text, record) =>
+      render: (text: string, record: Client) =>
         editingKey === record.key ? (
           <Input value={record.address} onChange={(e) => handleInputChange(record.key, "address", e.target.value)} />
         ) : (
@@ -108,7 +117,7 @@ const AdminManageClients = () => {
       title: "Contact Number",
       dataIndex: "contact",
       key: "contact",
-      render: (text, record) =>
+      render: (text: string, record: Client) =>
         editingKey === record.key ? (
           <Input value={record.contact} onChange={(e) => handleInputChange(record.key, "contact", e.target.value)} />
         ) : (
@@ -119,7 +128,7 @@ const AdminManageClients = () => {
       title: "Email Address",
       dataIndex: "email",
       key: "email",
-      render: (text, record) =>
+      render: (text: string, record: Client) =>
         editingKey === record.key ? (
           <Input value={record.email} onChange={(e) => handleInputChange(record.key, "email", e.target.value)} />
         ) : (
@@ -129,7 +138,7 @@ const AdminManageClients = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (_, record) =>
+      render: (_: any, record: Client) =>
         editingKey === record.key ? (
           <div style={{ display: "flex", gap: 10 }}>
             <Button type="text" icon={<CheckOutlined style={{ color: "green" }} />} onClick={() => handleSave(record.key)} />

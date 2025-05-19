@@ -5,10 +5,20 @@ import { useNavigate } from "react-router-dom";
 const { Header, Content } = Layout;
 const { Option } = Select;
 
-const EmployeeHome = () => {
+interface Job {
+  key: string;
+  jobName: string;
+  location: string;
+  date: string;
+  time: string;
+  workerType: string;
+  checked?: boolean;
+}
+
+const EmployeeHome: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState("Check in");
-  const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState([
+  const [selectedJob, setSelectedJob] = useState<string>("Check in");
+  const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState<Job[]>([
     {
       key: "1",
       jobName: "Fix Plumbing",
@@ -29,16 +39,16 @@ const EmployeeHome = () => {
     },
   ]);
 
-  const [upcomingJobs, setUpcomingJobs] = useState([
+  const [upcomingJobs, setUpcomingJobs] = useState<Job[]>([
     { key: "1", jobName: "Roof Repair", location: "NYC", date: "2025-04-03", time: "9:00 AM", workerType: "Roofer" },
     { key: "2", jobName: "Flooring", location: "LA", date: "2025-04-05", time: "1:00 PM", workerType: "Floor Specialist" },
   ]);
 
-  const handleJobChange = (value) => {
+  const handleJobChange = (value: string) => {
     setSelectedJob(value);
   };
 
-  const handleCheckboxChange = (record) => {
+  const handleCheckboxChange = (record: Job) => {
     const updatedJobs = jobsAwaitingConfirmation.map((job) =>
       job.key === record.key ? { ...job, checked: !job.checked } : job
     );
@@ -80,7 +90,7 @@ const EmployeeHome = () => {
     {
       title: "Select",
       key: "select",
-      render: (_, record) => (
+      render: (_: any, record: Job) => (
         <Checkbox checked={record.checked} onChange={() => handleCheckboxChange(record)} />
       ),
     },

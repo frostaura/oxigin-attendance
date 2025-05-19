@@ -4,20 +4,27 @@ import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
-const AdminJobAllocations = () => {
+interface Employee {
+  id: string;
+  name: string;
+  contact: string;
+  checked: boolean;
+}
+
+const AdminJobAllocations: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [availableEmployees, setAvailableEmployees] = useState([
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [availableEmployees, setAvailableEmployees] = useState<Employee[]>([
     { id: "E001", name: "John Doe", contact: "555-1234", checked: false },
     { id: "E002", name: "Jane Smith", contact: "555-5678", checked: false },
   ]);
-  const [allocatedEmployees, setAllocatedEmployees] = useState([]);
+  const [allocatedEmployees, setAllocatedEmployees] = useState<Employee[]>([]);
 
-  const handleJobChange = (value) => {
+  const handleJobChange = (value: string) => {
     setSelectedJob(value);
   };
 
-  const handleCheckboxChange = (employee) => {
+  const handleCheckboxChange = (employee: Employee) => {
     const updatedAvailable = availableEmployees.map((emp) =>
       emp.id === employee.id ? { ...emp, checked: !emp.checked } : emp
     );
@@ -55,7 +62,7 @@ const AdminJobAllocations = () => {
         {
           title: "Select",
           key: "select",
-          render: (_, record) => (
+          render: (_: any, record: Employee) => (
             <Checkbox checked={record.checked} onChange={() => handleCheckboxChange(record)} />
           ),
         },

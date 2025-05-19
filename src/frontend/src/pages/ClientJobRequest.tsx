@@ -3,7 +3,13 @@ import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table } from 
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
-const ClientJobRequest = () => {
+interface Worker {
+  key: string;
+  name: string;
+  role: string;
+}
+
+const ClientJobRequest: React.FC = () => {
   const navigate = useNavigate();
 
   // Sample table data
@@ -12,7 +18,7 @@ const ClientJobRequest = () => {
     { title: "Role", dataIndex: "role", key: "role" },
   ];
 
-  const dataSource = [
+  const dataSource: Worker[] = [
     { key: "1", name: "John Doe", role: "Electrician" },
     { key: "2", name: "Jane Smith", role: "Plumber" },
   ];

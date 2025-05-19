@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
-const BaseUserHome = () => {
+const BaseUserHome: React.FC = () => {
   const navigate = useNavigate();
 
   return (

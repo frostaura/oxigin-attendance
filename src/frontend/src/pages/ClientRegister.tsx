@@ -4,8 +4,8 @@ import { Form, Input, Button, Typography, Card } from "antd";
 
 const { Title, Text } = Typography;
 
-const ClientRegister = () => {
-  const handleRegister = (values) => {
+const ClientRegister: React.FC = () => {
+  const handleRegister = (values: { companyname: string; registrationnumber: string; fullname: string; address: string; contactnumber: string; email: string; password: string; confirm: string }) => {
     console.log("Registration Data:", values);
   };
 

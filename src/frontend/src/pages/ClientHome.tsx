@@ -4,7 +4,16 @@ import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
 
-const AdminClientHome = () => {
+interface JobData {
+  key: string;
+  jobId: string;
+  purchaseOrder: string;
+  jobName: string;
+  requestor: string;
+  contact: string;
+}
+
+const ClientHome: React.FC = () => {
   const navigate = useNavigate();
 
   // Table columns
@@ -25,50 +34,44 @@ const AdminClientHome = () => {
   ];
 
   // Sample data
-  const jobData = [
+  const jobData: JobData[] = [
     { key: "1", jobId: "1234", purchaseOrder: "PO4567", jobName: "Fix Plumbing", requestor: "John Doe", contact: "555-1234" },
     { key: "2", jobId: "5678", purchaseOrder: "PO7890", jobName: "Install Wiring", requestor: "Jane Smith", contact: "555-5678" },
   ];
 
-  const upcomingJobData = [
+  const upcomingJobData: JobData[] = [
     { key: "1", jobId: "91011", purchaseOrder: "PO1112", jobName: "Roof Repair", location: "NYC", date: "2025-04-01" },
     { key: "2", jobId: "13141", purchaseOrder: "PO1314", jobName: "Flooring", location: "LA", date: "2025-04-05" },
   ];
 
   return (
     <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "80%", padding: 20, position: "relative" }}>
+      <Card style={{ width: "80%", padding: 20 }}>
         <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px" }}>
-          <h2 style={{ margin: 0, textAlign: "center" }}>Client Home Page</h2>
+          <h2 style={{ margin: 0, textAlign: "center" }}>Home Page</h2>
         </Header>
 
-        <Content style={{ flex: 1, padding: 20, display: "flex", gap: 20, alignItems: "stretch" }}>
-          <div style={{ display: "flex", width: "100%", gap: 20 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 20, flex: 1 }}>
-              <Card title="Jobs Pending Client Confirmation" style={{ flex: 1 }}>
-                <Table columns={jobColumns} dataSource={jobData} pagination={false} />
-              </Card>
-              <Card title="Jobs Pending My Approval" style={{ flex: 1 }}>
-                <Table columns={jobColumns} dataSource={jobData} pagination={false} />
-              </Card>
-            </div>
-          </div>
+        <Content style={{ flex: 1, padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Stacked Cards */}
+          <Card title="Jobs Pending Confirmation">
+            <Table columns={jobColumns} dataSource={jobData} pagination={false} />
+          </Card>
+
+          <Card title="Jobs Pending My Approval">
+            <Table columns={jobColumns} dataSource={jobData} pagination={false} />
+          </Card>
+
+          <Card title="Upcoming Jobs">
+            <Table columns={upcomingJobColumns} dataSource={upcomingJobData} pagination={false} />
+          </Card>
         </Content>
 
-        {/* Align the button with the tables */}
-        <div style={{
-          position: "absolute", 
-          bottom: 20, 
-          right: 20, 
-          width: "calc(100% - 40px)", 
-          display: "flex", 
-          justifyContent: "flex-end"
-        }}>
-          <Button type="primary" onClick={() => navigate("/adminmanageclients")}>Manage Clients</Button>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: "auto" }}>
+          <Button type="primary" onClick={() => navigate("/clientjobrequest")}>Request Job</Button>
         </div>
       </Card>
     </Layout>
   );
 };
 
-export default AdminClientHome;
+export default ClientHome;

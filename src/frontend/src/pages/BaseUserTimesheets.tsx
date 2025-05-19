@@ -3,22 +3,40 @@ import { Layout, Card, Input, Table, Checkbox, Button } from "antd";
 
 const { Header, Content } = Layout;
 
-const BaseUserTimesheets = () => {
-  const [jobDate, setJobDate] = useState(null);
-  const [jobsOnDate, setJobsOnDate] = useState([
+interface Job {
+  key: string;
+  jobId: string;
+  purchaseOrderNo: string;
+  jobName: string;
+  companyName: string;
+  checked: boolean;
+}
+
+interface Timesheet {
+  key: string;
+  date: string;
+  employeeId: string;
+  timeIn: string;
+  timeOut: string;
+  hoursWorked: string;
+}
+
+const BaseUserTimesheets: React.FC = () => {
+  const [jobDate, setJobDate] = useState<string | null>(null);
+  const [jobsOnDate, setJobsOnDate] = useState<Job[]>([
     { key: "1", jobId: "J001", purchaseOrderNo: "PO001", jobName: "Job A", companyName: "Company 1", checked: false },
     { key: "2", jobId: "J002", purchaseOrderNo: "PO002", jobName: "Job B", companyName: "Company 2", checked: false },
   ]);
-  const [timesheetData, setTimesheetData] = useState([
+  const [timesheetData, setTimesheetData] = useState<Timesheet[]>([
     { key: "1", date: "2025-03-20", employeeId: "E001", timeIn: "08:00", timeOut: "16:00", hoursWorked: "8" },
     { key: "2", date: "2025-03-20", employeeId: "E002", timeIn: "09:00", timeOut: "17:00", hoursWorked: "8" },
   ]);
 
-  const handleJobDateChange = (e) => {
+  const handleJobDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setJobDate(e.target.value);
   };
 
-  const handleCheckboxChange = (record) => {
+  const handleCheckboxChange = (record: Job) => {
     const updatedJobs = jobsOnDate.map((job) =>
       job.key === record.key ? { ...job, checked: !job.checked } : { ...job, checked: false }
     );
@@ -33,7 +51,7 @@ const BaseUserTimesheets = () => {
     {
       title: "Select",
       key: "select",
-      render: (_, record) => (
+      render: (_: any, record: Job) => (
         <Checkbox checked={record.checked} onChange={() => handleCheckboxChange(record)} />
       ),
     },
@@ -61,7 +79,7 @@ const BaseUserTimesheets = () => {
           <label style={{ display: "block", fontWeight: "bold", marginBottom: 5, fontSize: "16px" }}>
             Job Date:
           </label>
-          <Input type="date" value={jobDate} onChange={handleJobDateChange} style={{ width: "100%", padding: 8 }} />
+          <Input type="date" value={jobDate || ''} onChange={handleJobDateChange} style={{ width: "100%", padding: 8 }} />
         </div>
 
 

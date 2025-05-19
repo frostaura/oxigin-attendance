@@ -4,10 +4,10 @@ import { Form, Input, Button, Typography, Card } from "antd";
 
 const { Title } = Typography;
 
-const EmployeeRegister = () => {
+const EmployeeRegister: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: any) => {
     console.log("Employee Data:", values);
     navigate(-1); // Go back one page
   };
