@@ -54,5 +54,27 @@ namespace OxiginAttendance.Controllers
             }
             return BadRequest(new { message = "Failed to track attendance" });
         }
+
+        [HttpPost("notify")]
+        public async Task<IActionResult> Notify([FromBody] NotificationDto notificationDto)
+        {
+            var result = await _siteManagerService.SendNotificationAsync(notificationDto);
+            if (result)
+            {
+                return Ok(new { message = "Notification sent successfully" });
+            }
+            return BadRequest(new { message = "Failed to send notification" });
+        }
+
+        [HttpPost("reminder")]
+        public async Task<IActionResult> Reminder([FromBody] ReminderDto reminderDto)
+        {
+            var result = await _siteManagerService.SendReminderAsync(reminderDto);
+            if (result)
+            {
+                return Ok(new { message = "Reminder sent successfully" });
+            }
+            return BadRequest(new { message = "Failed to send reminder" });
+        }
     }
 }

@@ -112,5 +112,19 @@ namespace OxiginAttendance.Controllers
             var attendance = await _adminService.GetAttendanceAsync();
             return Ok(attendance);
         }
+
+        [HttpGet("employee-checkins")]
+        public async Task<ActionResult<IEnumerable<CheckInRecord>>> GetEmployeeCheckIns()
+        {
+            var checkIns = await _adminService.GetEmployeeCheckInsAsync();
+            return Ok(checkIns);
+        }
+
+        [HttpPost("job-allocations")]
+        public async Task<ActionResult> ManageJobAllocations([FromBody] JobAllocation jobAllocation)
+        {
+            await _adminService.ManageJobAllocationsAsync(jobAllocation);
+            return Ok();
+        }
     }
 }

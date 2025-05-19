@@ -11,5 +11,8 @@ namespace Backend.Models
         public TimeSpan TimeIn { get; set; }
         public TimeSpan TimeOut { get; set; }
         public double HoursWorked { get; set; }
+        public string JobRole { get; set; }
+        public string Location { get; set; }
+        public string ApprovalStatus { get; set; }
     }
 }

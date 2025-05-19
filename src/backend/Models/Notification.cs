@@ -9,6 +9,7 @@ namespace OxiginAttendance.Models
         public string Content { get; set; }
         public DateTime SentAt { get; set; }
         public NotificationType Type { get; set; }
+        public string NotificationType { get; set; }
     }
 
     public enum NotificationType

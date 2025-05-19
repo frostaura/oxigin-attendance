@@ -10,5 +10,7 @@ namespace Backend.Models
         public string EventName { get; set; }
         public string Location { get; set; }
         public List<Employee> AllocatedEmployees { get; set; }
+        public string EventDetails { get; set; }
+        public string EventCoordinator { get; set; }
     }
 }
