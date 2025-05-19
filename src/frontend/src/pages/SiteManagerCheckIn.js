@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Layout, Card, Input, Button, Table, Select } from "antd";
 import { useNavigate } from "react-router-dom";
+import checkInHistory from "../models/CheckInHistory";
 
 const { Header, Content } = Layout;
 const {Option} = Select;
@@ -11,10 +12,6 @@ const SiteManagerCheckIn = () => {
   const [selectedEmployee, setSelectedEmployee] = useState("Employee ID");
   const [jobId, setJobId] = useState("");
   const [employeeId, setEmployeeId] = useState("");
-  const [checkInHistory, setCheckInHistory] = useState([
-    { key: "1", jobId: "J001", employeeId: "E001", employeeName: "John Doe", timeIn: "2025-03-20 08:00" },
-    { key: "2", jobId: "J002", employeeId: "E002", employeeName: "Jane Smith", timeIn: "2025-03-20 08:30" },
-  ]);
 
   const handleCheckIn = () => {
     const newCheckIn = {

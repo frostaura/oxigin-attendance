@@ -2,12 +2,7 @@ import React from "react";
 import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-
-interface Worker {
-  key: string;
-  name: string;
-  role: string;
-}
+import { Worker } from "../models/Worker";
 
 const ClientJobRequest: React.FC = () => {
   const navigate = useNavigate();
