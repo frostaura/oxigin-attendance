@@ -1,23 +1,10 @@
 import React from "react";
 import { Layout, Table, Button, Card } from "antd";
 import { useNavigate } from "react-router-dom";
+import Employee from "../models/Employee";
+import Attendance from "../models/Attendance";
 
 const { Header, Content } = Layout;
-
-interface Employee {
-  key: number;
-  id: string;
-  name: string;
-  contact: string;
-}
-
-interface Attendance {
-  key: number;
-  jobId: string;
-  jobName: string;
-  company: string;
-  date: string;
-}
 
 const AdminEmployeesHome: React.FC = () => {
   const navigate = useNavigate();

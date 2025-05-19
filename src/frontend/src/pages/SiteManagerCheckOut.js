@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Layout, Card, Input, Button, Table } from "antd";
 import { useNavigate } from "react-router-dom";
+import checkOutHistory from "../models/CheckOutHistory";
 
 const { Header, Content } = Layout;
 
@@ -8,10 +9,6 @@ const SiteManagerCheckOut = () => {
   const navigate = useNavigate();
   const [jobId, setJobId] = useState("");
   const [employeeId, setEmployeeId] = useState("");
-  const [checkOutHistory, setCheckOutHistory] = useState([
-    { key: "1", jobId: "J001", employeeId: "E001", employeeName: "John Doe", timeOut: "2025-03-20 08:00" },
-    { key: "2", jobId: "J002", employeeId: "E002", employeeName: "Jane Smith", timeOut: "2025-03-20 08:30" },
-  ]);
 
   const handleCheckOut = () => {
     const newCheckOut = {

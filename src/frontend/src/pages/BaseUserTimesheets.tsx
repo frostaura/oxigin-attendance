@@ -1,25 +1,9 @@
 import React, { useState } from "react";
 import { Layout, Card, Input, Table, Checkbox, Button } from "antd";
+import Job from "../models/Job";
+import Timesheet from "../models/Timesheet";
 
 const { Header, Content } = Layout;
-
-interface Job {
-  key: string;
-  jobId: string;
-  purchaseOrderNo: string;
-  jobName: string;
-  companyName: string;
-  checked: boolean;
-}
-
-interface Timesheet {
-  key: string;
-  date: string;
-  employeeId: string;
-  timeIn: string;
-  timeOut: string;
-  hoursWorked: string;
-}
 
 const BaseUserTimesheets: React.FC = () => {
   const [jobDate, setJobDate] = useState<string | null>(null);

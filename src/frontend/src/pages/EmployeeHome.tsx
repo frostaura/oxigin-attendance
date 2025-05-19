@@ -1,19 +1,10 @@
 import React, { useState } from "react";
 import { Layout, Card, Table, Select, Button, Checkbox, Input } from "antd";
 import { useNavigate } from "react-router-dom";
+import Job from "../models/Job";
 
 const { Header, Content } = Layout;
 const { Option } = Select;
-
-interface Job {
-  key: string;
-  jobName: string;
-  location: string;
-  date: string;
-  time: string;
-  workerType: string;
-  checked?: boolean;
-}
 
 const EmployeeHome: React.FC = () => {
   const navigate = useNavigate();

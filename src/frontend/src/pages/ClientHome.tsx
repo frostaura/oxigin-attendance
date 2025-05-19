@@ -1,17 +1,9 @@
 import React from "react";
 import { Layout, Card, Button, Table } from "antd";
 import { useNavigate } from "react-router-dom";
+import JobData from "../models/JobData";
 
 const { Header, Content } = Layout;
-
-interface JobData {
-  key: string;
-  jobId: string;
-  purchaseOrder: string;
-  jobName: string;
-  requestor: string;
-  contact: string;
-}
 
 const ClientHome: React.FC = () => {
   const navigate = useNavigate();
