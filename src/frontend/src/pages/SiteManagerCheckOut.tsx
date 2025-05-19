@@ -5,13 +5,21 @@ import checkOutHistory from "../models/CheckOutHistory";
 
 const { Header, Content } = Layout;
 
-const SiteManagerCheckOut = () => {
+interface CheckOut {
+  key: string;
+  jobId: string;
+  employeeId: string;
+  employeeName: string;
+  timeOut: string;
+}
+
+const SiteManagerCheckOut: React.FC = () => {
   const navigate = useNavigate();
-  const [jobId, setJobId] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
+  const [jobId, setJobId] = useState<string>("");
+  const [employeeId, setEmployeeId] = useState<string>("");
 
   const handleCheckOut = () => {
-    const newCheckOut = {
+    const newCheckOut: CheckOut = {
       key: `${checkOutHistory.length + 1}`,
       jobId: jobId,
       employeeId: employeeId,

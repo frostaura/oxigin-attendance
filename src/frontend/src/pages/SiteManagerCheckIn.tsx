@@ -4,17 +4,25 @@ import { useNavigate } from "react-router-dom";
 import checkInHistory from "../models/CheckInHistory";
 
 const { Header, Content } = Layout;
-const {Option} = Select;
+const { Option } = Select;
 
-const SiteManagerCheckIn = () => {
+interface CheckIn {
+  key: string;
+  jobId: string;
+  employeeId: string;
+  employeeName: string;
+  timeIn: string;
+}
+
+const SiteManagerCheckIn: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState("Job ID");
-  const [selectedEmployee, setSelectedEmployee] = useState("Employee ID");
-  const [jobId, setJobId] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
+  const [selectedJob, setSelectedJob] = useState<string>("Job ID");
+  const [selectedEmployee, setSelectedEmployee] = useState<string>("Employee ID");
+  const [jobId, setJobId] = useState<string>("");
+  const [employeeId, setEmployeeId] = useState<string>("");
 
   const handleCheckIn = () => {
-    const newCheckIn = {
+    const newCheckIn: CheckIn = {
       key: `${checkInHistory.length + 1}`,
       jobId: jobId,
       employeeId: employeeId,
@@ -32,7 +40,8 @@ const SiteManagerCheckIn = () => {
     { title: "Employee Name", dataIndex: "employeeName", key: "employeeName" },
     { title: "Time In", dataIndex: "timeIn", key: "timeIn" },
   ];
-  const handleJobChange = (value) => {
+
+  const handleJobChange = (value: string) => {
     setSelectedJob(value);
   };
 
@@ -50,24 +59,24 @@ const SiteManagerCheckIn = () => {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <div style={{ display: "flex", gap: 10, flex: 1 }}>
               <div style={{ flex: 1, minWidth: "70px" }}>
-              <Select
-              value={selectedJob}
-              onChange={handleJobChange}
-              style={{ width: "100%", marginBottom: "20px" }}
-            >
-              <Option value="Job 1">Job 1</Option>
-              <Option value="Job 2">Job 2</Option>
-            </Select>
+                <Select
+                  value={selectedJob}
+                  onChange={handleJobChange}
+                  style={{ width: "100%", marginBottom: "20px" }}
+                >
+                  <Option value="Job 1">Job 1</Option>
+                  <Option value="Job 2">Job 2</Option>
+                </Select>
               </div>
               <div style={{ flex: 1, minWidth: "70px" }}>
-              <Select
-              value={selectedEmployee}
-              onChange={handleJobChange}
-              style={{ width: "100%", marginBottom: "20px" }}
-            >
-              <Option value="E001">Job 1</Option>
-              <Option value="E002">Job 2</Option>
-            </Select>
+                <Select
+                  value={selectedEmployee}
+                  onChange={handleJobChange}
+                  style={{ width: "100%", marginBottom: "20px" }}
+                >
+                  <Option value="E001">Job 1</Option>
+                  <Option value="E002">Job 2</Option>
+                </Select>
               </div>
             </div>
             <Button type="primary" onClick={handleCheckIn} style={{ marginLeft: "20px" }}>Check In</Button>

@@ -5,9 +5,21 @@ import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
-const ClientAdditionalWorkerType = () => {
-  const [workers, setWorkers] = useState([{ key: 0 }]);
-  const [workerOptions, setWorkerOptions] = useState(["Electrician", "Plumber", "Carpenter", "Painter"]); // Default options
+interface Worker {
+  key: number;
+}
+
+interface Column {
+  title: string;
+  dataIndex: string;
+  key: string;
+  width: string;
+  render?: (text: any, record: Worker) => JSX.Element;
+}
+
+const ClientAdditionalWorkerType: React.FC = () => {
+  const [workers, setWorkers] = useState<Worker[]>([{ key: 0 }]);
+  const [workerOptions, setWorkerOptions] = useState<string[]>(["Electrician", "Plumber", "Carpenter", "Painter"]); // Default options
   const navigate = useNavigate();
 
   // Function to add a new worker type row
@@ -16,18 +28,18 @@ const ClientAdditionalWorkerType = () => {
   };
 
   // Function to remove a worker type row
-  const removeWorkerRow = (key) => {
+  const removeWorkerRow = (key: number) => {
     setWorkers(workers.filter((worker) => worker.key !== key));
   };
 
   // Function to handle adding new options when typing in the dropdown
-  const handleWorkerTypeChange = (value) => {
+  const handleWorkerTypeChange = (value: string | string[]) => {
     if (typeof value === "string" && !workerOptions.includes(value)) {
       setWorkerOptions([...workerOptions, value]); // Add new worker type
     }
   };
 
-  const columns = [
+  const columns: Column[] = [
     {
       title: "Worker Type",
       dataIndex: "workerType",

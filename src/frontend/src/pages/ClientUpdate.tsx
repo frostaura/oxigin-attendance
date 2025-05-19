@@ -4,8 +4,19 @@ import { Form, Input, Button, Typography, Card } from "antd";
 
 const { Title, Text } = Typography;
 
-const UpdateClient = () => {
-  const handleRegister = (values) => {
+interface FormValues {
+  companyname: string;
+  registrationnumber: string;
+  fullname: string;
+  address: string;
+  contactnumber: string;
+  email: string;
+  password: string;
+  confirm: string;
+}
+
+const UpdateClient: React.FC = () => {
+  const handleRegister = (values: FormValues) => {
     console.log("Updated Data:", values);
   };
 
