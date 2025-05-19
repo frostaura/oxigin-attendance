@@ -54,5 +54,27 @@ namespace Backend.Controllers
             }
             return BadRequest(new { message = "Failed to reject request" });
         }
+
+        [HttpPost("log-job-request")]
+        public async Task<IActionResult> LogJobRequest([FromBody] JobRequest jobRequest)
+        {
+            var result = await _clientService.LogJobRequestAsync(jobRequest);
+            if (result)
+            {
+                return Ok(new { message = "Job request logged successfully" });
+            }
+            return BadRequest(new { message = "Failed to log job request" });
+        }
+
+        [HttpPost("collaborative-approval")]
+        public async Task<IActionResult> CollaborativeApproval([FromBody] CollaborativeApprovalDto approvalDto)
+        {
+            var result = await _clientService.CollaborativeApprovalAsync(approvalDto);
+            if (result)
+            {
+                return Ok(new { message = "Collaborative approval/rejection successful" });
+            }
+            return BadRequest(new { message = "Failed to perform collaborative approval/rejection" });
+        }
     }
 }

@@ -12,5 +12,7 @@ namespace Backend.Models
         public string Location { get; set; }
         public string ApprovalStatus { get; set; }
         public string ClientInformation { get; set; }
+        public bool IsClientApproved { get; set; }
+        public bool IsSiteManagerApproved { get; set; }
     }
 }

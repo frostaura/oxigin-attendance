@@ -57,5 +57,23 @@ namespace Backend.Controllers
             }
             return BadRequest(new { message = "Check-in failed" });
         }
+
+        [HttpGet("notifications")]
+        public async Task<IActionResult> GetNotifications()
+        {
+            var notifications = await _employeeService.GetNotificationsAsync();
+            return Ok(notifications);
+        }
+
+        [HttpPost("register-employee")]
+        public async Task<IActionResult> RegisterEmployee([FromBody] EmployeeRegistrationDto registrationDto)
+        {
+            var result = await _employeeService.RegisterEmployeeAsync(registrationDto);
+            if (result)
+            {
+                return Ok(new { message = "Employee registration successful" });
+            }
+            return BadRequest(new { message = "Employee registration failed" });
+        }
     }
 }

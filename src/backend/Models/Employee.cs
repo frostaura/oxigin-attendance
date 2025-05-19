@@ -17,5 +17,7 @@ namespace Backend.Models
         public DateTime CheckInTime { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public bool ReceiveSmsNotifications { get; set; }
+        public bool ReceiveEmailNotifications { get; set; }
     }
 }
