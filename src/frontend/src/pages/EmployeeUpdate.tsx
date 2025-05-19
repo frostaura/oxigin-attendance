@@ -4,10 +4,23 @@ import { Form, Input, Button, Typography, Card } from "antd";
 
 const { Title } = Typography;
 
-const EmployeeUpdate = () => {
+interface EmployeeFormValues {
+  employeeNumber: string;
+  name: string;
+  surname: string;
+  idNumber: string;
+  address: string;
+  contactNumber: string;
+  bankName: string;
+  accountHolderName: string;
+  branchCode: string;
+  accountNumber: string;
+}
+
+const EmployeeUpdate: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = (values) => {
+  const handleSubmit = (values: EmployeeFormValues) => {
     console.log("Employee Data:", values);
     navigate(-1); // Go back one page
   };
