@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\Apps\**" />
+    <EmbeddedResource Remove="Models\Apps\**" />
+    <None Remove="Models\Apps\**" />
+    <Compile Remove="Models\Auth\OktaUser.cs" />
+    <Compile Remove="Models\Atlassian\ExportView.cs" />
+    <Compile Remove="Models\Atlassian\CreatePageRequest.cs" />
+    <Compile Remove="Models\Atlassian\Links.cs" />
+    <Compile Remove="Models\Atlassian\ProfilePicture.cs" />
+    <Compile Remove="Models\Atlassian\CreatedBy.cs" />
+    <Compile Remove="Models\Atlassian\Body.cs" />
+    <Compile Remove="Models\Atlassian\Version.cs" />
+    <Compile Remove="Models\Atlassian\Root.cs" />
+    <Compile Remove="Models\Atlassian\Editor.cs" />
+    <Compile Remove="Models\Atlassian\Space.cs" />
+    <Compile Remove="Models\Atlassian\By.cs" />
+    <Compile Remove="Models\Atlassian\Expandable.cs" />
+    <Compile Remove="Models\Atlassian\Data.cs" />
+    <Compile Remove="Models\Atlassian\History.cs" />
+    <Compile Remove="Models\Atlassian\NewPage.cs" />
+    <Compile Remove="Models\Atlassian\Container.cs" />
+    <Compile Remove="Models\Atlassian\Result.cs" />
+    <Compile Remove="Models\Atlassian\ErrorResponse.cs" />
+    <Compile Remove="Models\Atlassian\View.cs" />
+    <Compile Remove="Models\Atlassian\Storage.cs" />
+    <Compile Remove="Models\Cognative\ChatChoice.cs" />
+    <Compile Remove="Models\RoleRequirements\Role.cs" />
+    <Compile Remove="Models\NeuroFlow\NeuroFlowApp.cs" />
+    <Compile Remove="Models\Cognative\Message.cs" />
+    <Compile Remove="Models\Cognative\ChatResponse.cs" />
+    <Compile Remove="Models\Cognative\PromptResponse.cs" />
+    <Compile Remove="Models\Cognative\PromptRequest.cs" />
+    <None Remove="Models\" />
+    <None Remove="Enums\" />
+    <None Remove="Consts\" />
+    <None Remove="Models\SmartContract\" />
+    <None Remove="Extensions\" />
+    <None Remove="Extensions\SmartContract\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Models\Entities\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Enums\" />
+    <Folder Include="Consts\" />
+    <Folder Include="Models\SmartContract\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Extensions\SmartContract\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="TonSdk.Contracts" Version="0.3.2" />
+    <PackageReference Include="TonSdk.Client" Version="0.3.11" />
+  </ItemGroup>
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CS8618</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CS8602</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CS8603</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);S2068</NoWarn>
+  </PropertyGroup>
+</Project>
