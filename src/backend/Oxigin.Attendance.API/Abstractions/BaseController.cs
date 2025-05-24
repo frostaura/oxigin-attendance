@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Abstract base controller for all API controllers in Oxigin Attendance.
+// Provides logger injection and common controller setup.
+using Microsoft.AspNetCore.Mvc;
 using Oxigin.Attendance.Core.Extensions;
 
 namespace Oxigin.Attendance.API.Abstractions;
 
+/// <summary>
+/// Base controller class providing logger and route setup for derived controllers.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public abstract class BaseController : ControllerBase

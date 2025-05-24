@@ -1,5 +1,4 @@
-﻿using Oxigin.Attendance.Core.Gateways;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Oxigin.Attendance.Shared.Models.Config;
 using Oxigin.Attendance.Core.Interfaces.Managers;
@@ -7,7 +6,6 @@ using Oxigin.Attendance.Datastore.Extensions;
 using Oxigin.Attendance.Core.Services.Managers;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Oxigin.Attendance.Shared.Models.Configs;
-using Oxigin.Attendance.Core.Interfaces.Gateways;
 
 namespace Oxigin.Attendance.Core.Extensions
 {
@@ -27,29 +25,12 @@ namespace Oxigin.Attendance.Core.Extensions
       var services = serviceCollection
           .AddHttpClient()
           .AddDatastoreServices(config)
-          .AddGateways(config)
           .AddUtilities(config)
           .AddServices(config);
 
       return services;
     }
 
-    /// <summary>
-    /// Add gateways.
-    /// </summary>
-    /// <param name="serviceCollection">The application service collection.</param>
-    /// <param name="config">Application configuration.</param>
-    /// <returns>The application service collection for allowing the Fluent usage.</returns>
-    private static IServiceCollection AddGateways(this IServiceCollection serviceCollection, ConfigurationManager config)
-    {
-      serviceCollection.Configure<ResiliencePolicyConfig>(config.GetSection(ResiliencePolicyConfig.Option));
-      serviceCollection.Configure<TonApiConfig>(config.GetSection(TonApiConfig.Option));
-      serviceCollection.Configure<FireblocksApiConfig>(config.GetSection(FireblocksApiConfig.Option));
-      serviceCollection.TryAddTransient<ITonApiGateway, TonApiGateway>();
-      serviceCollection.TryAddTransient<IFireblocksApiGateway, FireblocksApiGateway>();
-      return serviceCollection;
-    }
-  
     /// <summary>
     /// Add utilities.
     /// </summary>
@@ -60,7 +41,6 @@ namespace Oxigin.Attendance.Core.Extensions
     {
       serviceCollection.Configure<LazyCacheConfig>(config.GetSection(LazyCacheConfig.Option));
       serviceCollection.AddLazyCache();
-      serviceCollection.TryAddSingleton<IMemoryCacheManager, MemoryCacheManager>();
       return serviceCollection;
     }
 
@@ -74,7 +54,6 @@ namespace Oxigin.Attendance.Core.Extensions
     {
       serviceCollection.Configure<LazyCacheConfig>(config.GetSection(LazyCacheConfig.Option));
       serviceCollection.AddLazyCache();
-      serviceCollection.TryAddSingleton<IMemoryCacheManager, MemoryCacheManager>();
       return serviceCollection;
     }
 
@@ -88,11 +67,7 @@ namespace Oxigin.Attendance.Core.Extensions
     {
       return serviceCollection
           .Configure<ApplicationConfig>(config.GetSection("ApplicationConfig"))
-          .Configure<MerchantConfig>(config.GetSection(MerchantConfig.Option))
-          .AddScoped<IAffiliateManager, TonAffiliateManager>()
-          .AddScoped<ITransactionsManager, TransactionsManager>()
-          .AddScoped<ILotteryManager, LotteryManager>()
-          .AddScoped<IPayoutManager, PayoutManager>();
+          .Configure<MerchantConfig>(config.GetSection(MerchantConfig.Option));
     }
   }
 }
