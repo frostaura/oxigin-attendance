@@ -12,14 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{89DDD0
 		..\..\Dockerfile.Frontend = ..\..\Dockerfile.Frontend
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{FC8E594F-83CD-43E8-9B78-8D66BC5DA148}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "t1", "t1", "{AE984514-D957-4508-8308-DF1BB8141B89}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "t2", "t2", "{B4833CB4-A939-4D9E-B393-F1C4EC445642}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "t3", "t3", "{1CC22832-9F33-476A-8E65-7AC4FE9987AE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oxigin.Attendance.Datastore", "Oxigin.Attendance.Datastore\Oxigin.Attendance.Datastore.csproj", "{6184EA9C-B740-46B6-8588-85FFF048B5CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oxigin.Attendance.Shared", "Oxigin.Attendance.Shared\Oxigin.Attendance.Shared.csproj", "{6A05BAED-47BE-469A-8B26-C9DE0701588A}"
@@ -27,10 +19,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{9CC5895D-F2F4-4FDB-874C-61F9511566BE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oxigin.Attendance.API", "Oxigin.Attendance.API\Oxigin.Attendance.API.csproj", "{53F9FA7F-C4C0-4E64-BC0D-112E59D343FC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oxigin.Attendance.Core.Test.T1", "..\..\test\t1\Oxigin.Attendance.Core.Test.T1\Oxigin.Attendance.Core.Test.T1.csproj", "{672DC657-B352-47E1-8FDA-0CE6167CFF50}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oxigin.Attendance.Core.Test.T2", "Oxigin.Attendance.Core.Test.T2\Oxigin.Attendance.Core.Test.T2.csproj", "{2A8EB14E-CEFA-49AE-B443-95327081915A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,14 +42,6 @@ Global
 		{53F9FA7F-C4C0-4E64-BC0D-112E59D343FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53F9FA7F-C4C0-4E64-BC0D-112E59D343FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53F9FA7F-C4C0-4E64-BC0D-112E59D343FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{672DC657-B352-47E1-8FDA-0CE6167CFF50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{672DC657-B352-47E1-8FDA-0CE6167CFF50}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{672DC657-B352-47E1-8FDA-0CE6167CFF50}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{672DC657-B352-47E1-8FDA-0CE6167CFF50}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2A8EB14E-CEFA-49AE-B443-95327081915A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2A8EB14E-CEFA-49AE-B443-95327081915A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2A8EB14E-CEFA-49AE-B443-95327081915A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2A8EB14E-CEFA-49AE-B443-95327081915A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,8 +54,6 @@ Global
 		{6184EA9C-B740-46B6-8588-85FFF048B5CD} = {9CC5895D-F2F4-4FDB-874C-61F9511566BE}
 		{6A05BAED-47BE-469A-8B26-C9DE0701588A} = {9CC5895D-F2F4-4FDB-874C-61F9511566BE}
 		{53F9FA7F-C4C0-4E64-BC0D-112E59D343FC} = {9CC5895D-F2F4-4FDB-874C-61F9511566BE}
-		{672DC657-B352-47E1-8FDA-0CE6167CFF50} = {AE984514-D957-4508-8308-DF1BB8141B89}
-		{2A8EB14E-CEFA-49AE-B443-95327081915A} = {B4833CB4-A939-4D9E-B393-F1C4EC445642}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A01C1384-3741-47C7-B537-88802BC16133}
