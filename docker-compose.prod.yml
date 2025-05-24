@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: oxigin
+      POSTGRES_PASSWORD: oxiginpw
+      POSTGRES_DB: oxigin_attendance
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    image: frostaura/oxigin-attendance-backend:latest
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=oxigin_attendance;Username=oxigin;Password=oxiginpw"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  frontend:
+    image: frostaura/oxigin-attendance-frontend:latest
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
