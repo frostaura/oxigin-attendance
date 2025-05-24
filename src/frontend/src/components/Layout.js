@@ -1,15 +1,10 @@
-import { Button, Layout as AntLayout, Avatar, Menu, Dropdown } from "antd";
+import { Button, Layout, Avatar, Menu, Dropdown } from "antd";
 import { LeftOutlined, RobotOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import type { ReactNode } from "react";
 
-const { Header, Content } = AntLayout;
+const { Header, Content } = Layout;
 
-interface AppLayoutProps {
-  children: ReactNode;
-}
-
-const AppLayout = ({ children }: AppLayoutProps) => {
+const AppLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,17 +12,21 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const showBackButton = !hideBackButtonOn.includes(location.pathname);
 
   // Simulated user initials (replace with actual user data)
-  const userInitials = "JD";
+  const userInitials = "JD"; 
 
   const menu = (
     <Menu>
-      <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => navigate("/clientupdate")}>Update Details</Menu.Item>
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => navigate("/")}>Log Out</Menu.Item>
+      <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => navigate("/clientupdate")}>
+        Update Details
+      </Menu.Item>
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => navigate("/")}>
+        Log Out
+      </Menu.Item>
     </Menu>
   );
 
   return (
-    <AntLayout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Header
         style={{
           background: "#fff",
@@ -47,20 +46,24 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             style={{ marginRight: "auto" }}
           />
         )}
+
         {/* Centered Title */}
         <h2 style={{ margin: 0, lineHeight: "1", textAlign: "center", flex: 1 }}>Oxigin Attendance</h2>
+
         {/* Right Section - Robot Button & Profile Dropdown */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {/* Robot Button */}
           <Button shape="circle" icon={<RobotOutlined />} />
+
           {/* Profile Dropdown */}
           <Dropdown overlay={menu} trigger={["click"]}>
             <Avatar style={{ backgroundColor: "#1890ff", cursor: "pointer" }}>{userInitials}</Avatar>
           </Dropdown>
         </div>
       </Header>
+
       <Content style={{ padding: 20 }}>{children}</Content>
-    </AntLayout>
+    </Layout>
   );
 };
 

@@ -1,4 +1,4 @@
-# Frontend.Dockerfile
+# Frontend.Dockerfile (for React/TypeScript Vite project)
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY src/frontend/package*.json ./
