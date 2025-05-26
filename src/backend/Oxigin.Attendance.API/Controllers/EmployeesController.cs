@@ -1,4 +1,4 @@
-// Controller for employee features: registration, authentication, job assignments, and check-ins.
+// Controller for employee features: authentication, job assignments, and check-ins.
 using Microsoft.AspNetCore.Mvc;
 using Oxigin.Attendance.API.Abstractions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
@@ -7,7 +7,7 @@ using Oxigin.Attendance.Shared.Models.Entities;
 namespace Oxigin.Attendance.API.Controllers;
 
 /// <summary>
-/// Provides endpoints for employee operations: register, authenticate, assigned jobs, check-in, and history.
+/// Provides endpoints for employee operations: authenticate, assigned jobs, check-in, and history.
 /// </summary>
 [ApiController]
 [Route("[controller]")]
@@ -25,13 +25,6 @@ public class EmployeesController : BaseController
     {
         _employeeManager = employeeManager;
     }
-
-    /// <summary>
-    /// Register a new employee.
-    /// </summary>
-    [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] EmployeeRegistration registration, CancellationToken token)
-        => Ok(await _employeeManager.RegisterAsync(registration, token));
 
     /// <summary>
     /// Authenticate an employee.
