@@ -1,7 +1,8 @@
 ﻿// Abstract base controller for all API controllers in Oxigin Attendance.
 // Provides logger injection and common controller setup.
+
+using FrostAura.Libraries.Core.Extensions.Validation;
 using Microsoft.AspNetCore.Mvc;
-using Oxigin.Attendance.Core.Extensions;
 
 namespace Oxigin.Attendance.API.Abstractions;
 

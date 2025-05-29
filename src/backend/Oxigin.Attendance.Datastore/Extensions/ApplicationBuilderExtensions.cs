@@ -4,69 +4,68 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 
-namespace Oxigin.Attendance.Datastore.Extensions
+namespace Oxigin.Attendance.Datastore.Extensions;
+
+/// <summary>
+/// Application builder extensions.
+/// </summary>
+public static class ApplicationBuilderExtensions
 {
     /// <summary>
-    /// Application builder extensions.
+    /// Initialize database context sync.
     /// </summary>
-    public static class ApplicationBuilderExtensions
+    /// <param name="app">Application builder.</param>
+    /// <returns>Application builder.</returns>
+    public static IApplicationBuilder UseDataResources<TCaller>(this IApplicationBuilder app)
     {
-        /// <summary>
-        /// Initialize database context sync.
-        /// </summary>
-        /// <param name="app">Application builder.</param>
-        /// <returns>Application builder.</returns>
-        public static IApplicationBuilder UseDataResources<TCaller>(this IApplicationBuilder app)
+        var RESILIENT_ALLOWED_ATTEMPTS = 3;
+        var RESILIENT_BACKOFF = TimeSpan.FromSeconds(5);
+
+        for (int i = 1; i <= RESILIENT_ALLOWED_ATTEMPTS; i++)
         {
-            var RESILIENT_ALLOWED_ATTEMPTS = 3;
-            var RESILIENT_BACKOFF = TimeSpan.FromSeconds(5);
-
-            for (int i = 1; i <= RESILIENT_ALLOWED_ATTEMPTS; i++)
+            try
             {
-                try
-                {
-                    InitializeDatabasesAsync<TCaller>(app).GetAwaiter().GetResult();
+                InitializeDatabasesAsync<TCaller>(app).GetAwaiter().GetResult();
 
-                    break;
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine($"Database migration failed on try {i}: {e.Message}.");
-                    Thread.Sleep(RESILIENT_BACKOFF);
-                }
+                break;
             }
-
-            return app;
+            catch (Exception e)
+            {
+                Debug.WriteLine($"Database migration failed on try {i}: {e.Message}.");
+                Thread.Sleep(RESILIENT_BACKOFF);
+            }
         }
 
-        /// <summary>
-        /// Initialize database context async.
-        /// </summary>
-        /// <param name="app">Application builder.</param>
-        /// <returns>Application builder.</returns>
-        private static async Task<IApplicationBuilder> InitializeDatabasesAsync<TCaller>(this IApplicationBuilder app)
+        return app;
+    }
+
+    /// <summary>
+    /// Initialize database context async.
+    /// </summary>
+    /// <param name="app">Application builder.</param>
+    /// <returns>Application builder.</returns>
+    private static async Task<IApplicationBuilder> InitializeDatabasesAsync<TCaller>(this IApplicationBuilder app)
+    {
+        using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
         {
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var logger = serviceScope
-                    .ServiceProvider
-                    .GetRequiredService<ILogger<TCaller>>();
-                var dbContext = serviceScope
-                    .ServiceProvider
-                    .GetRequiredService<DatastoreContext>();
+            var logger = serviceScope
+                .ServiceProvider
+                .GetRequiredService<ILogger<TCaller>>();
+            var dbContext = serviceScope
+                .ServiceProvider
+                .GetRequiredService<DatastoreContext>();
 
-                logger.LogInformation($"Migrating database '{nameof(dbContext)}' => '{dbContext.Database.GetDbConnection().ConnectionString}'.");
+            logger.LogInformation($"Migrating database '{nameof(dbContext)}' => '{dbContext.Database.GetDbConnection().ConnectionString}'.");
 
-                dbContext
-                    .Database
-                    .Migrate();
+            dbContext
+                .Database
+                .Migrate();
 
-                // Seed data goes here.
+            // Seed data goes here.
 
-                await dbContext.SaveChangesAsync();
-            }
-
-            return app;
+            await dbContext.SaveChangesAsync();
         }
+
+        return app;
     }
 }

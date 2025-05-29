@@ -2,34 +2,33 @@
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace Oxigin.Attendance.Datastore.Factories.DesignTime
+namespace Oxigin.Attendance.Datastore.Factories.DesignTime;
+
+/// <summary>
+/// DB context factory for running migrations in design time.
+/// This allows for running migrations in the .Data project independently.
+/// </summary>
+public class DatastoreContextDesignTimeFactory : IDesignTimeDbContextFactory<DatastoreContext>
 {
-	/// <summary>
-    /// DB context factory for running migrations in design time.
-    /// This allows for running migrations in the .Data project independently.
+    /// <summary>
+    /// Factory method for producing the design time db context
     /// </summary>
-    public class DatastoreContextDesignTimeFactory : IDesignTimeDbContextFactory<DatastoreContext>
+    /// <param name="args"></param>
+    /// <returns>Database context.</returns>
+    public DatastoreContext CreateDbContext(string[] args)
     {
-        /// <summary>
-        /// Factory method for producing the design time db context
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns>Database context.</returns>
-        public DatastoreContext CreateDbContext(string[] args)
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Migrations.json")
-                .Build();
-            var builder = new DbContextOptionsBuilder<DatastoreContext>();
-            var connectionString = configuration
-                .GetConnectionString("DatastoreConnection");
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.Migrations.json")
+            .Build();
+        var builder = new DbContextOptionsBuilder<DatastoreContext>();
+        var connectionString = configuration
+            .GetConnectionString("DatastoreConnection");
 
-            builder.UseNpgsql(connectionString);
+        builder.UseNpgsql(connectionString);
 
-            Console.WriteLine($"Used connection string for configuration db: {connectionString}");
+        Console.WriteLine($"Used connection string for configuration db: {connectionString}");
 
-            return new DatastoreContext(builder.Options);
-        }
+        return new DatastoreContext(builder.Options);
     }
 }

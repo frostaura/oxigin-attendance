@@ -1,9 +1,11 @@
-namespace Oxigin.Attendance.Shared.Enums
+namespace Oxigin.Attendance.Shared.Enums;
+
+/// <summary>
+/// Supported user types.
+/// </summary>
+public enum UserType
 {
-    public enum UserType
-    {
-        Employee,
-        Staff,
-        Client
-    }
+    Worker,
+    Client,
+    Admin
 }

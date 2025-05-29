@@ -2,31 +2,30 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
-namespace Oxigin.Attendance.Shared.Models.Abstractions
+namespace Oxigin.Attendance.Shared.Models.Abstractions;
+
+/// <summary>
+/// A base for all entities with auto-generated unique identifiers.
+/// </summary>
+public abstract class BaseEntity
 {
     /// <summary>
-    /// A base for all entities with auto-generated unique identifiers.
+    /// Unique identifier of entity.
     /// </summary>
-    public abstract class BaseEntity
-    {
-        /// <summary>
-        /// Unique identifier of entity.
-        /// </summary>
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
-        /// <summary>
-        /// Whether or not the entity is flagged as deleted.
-        /// </summary>
-        [Required]
-        [JsonIgnore]
-        public bool Deleted { get; set; } = false;
+    /// <summary>
+    /// Whether or not the entity is flagged as deleted.
+    /// </summary>
+    [Required]
+    [JsonIgnore]
+    public bool Deleted { get; set; } = false;
 
-        /// <summary>
-        /// The time at which the entity was created.
-        /// </summary>
-        [Required]
-        [JsonIgnore]
-        public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
-    }
+    /// <summary>
+    /// The time at which the entity was created.
+    /// </summary>
+    [Required]
+    [JsonIgnore]
+    public DateTime TimeStamp { get; set; } = DateTime.UtcNow;
 }

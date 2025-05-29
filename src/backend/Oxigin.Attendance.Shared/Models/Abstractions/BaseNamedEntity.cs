@@ -2,18 +2,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
-namespace Oxigin.Attendance.Shared.Models.Abstractions
+namespace Oxigin.Attendance.Shared.Models.Abstractions;
+
+/// <summary>
+/// A base for all entities with auto-generated unique identifiers and names.
+/// </summary>
+[DebuggerDisplay("Name: {Name}")]
+public class BaseNamedEntity : BaseEntity
 {
     /// <summary>
-    /// A base for all entities with auto-generated unique identifiers and names.
+    /// Entity name / short description.
     /// </summary>
-    [DebuggerDisplay("Name: {Name}")]
-    public class BaseNamedEntity : BaseEntity
-    {
-        /// <summary>
-        /// Entity name / short description.
-        /// </summary>
-        [Required(AllowEmptyStrings = false, ErrorMessage = $"A valid name is required.")]
-        public string Name { get; set; } = string.Empty;
-    }
+    [Required(AllowEmptyStrings = false, ErrorMessage = $"A valid name is required.")]
+    public string Name { get; set; } = string.Empty;
 }

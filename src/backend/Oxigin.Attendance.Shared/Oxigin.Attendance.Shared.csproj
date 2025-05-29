@@ -51,10 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Enums\" />
-    <Folder Include="Consts\" />
-    <Folder Include="Models\SmartContract\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Extensions\SmartContract\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="TonSdk.Contracts" Version="0.3.2" />

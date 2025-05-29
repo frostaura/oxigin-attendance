@@ -75,3 +75,9 @@ This system is designed to manage staff allocation, client event requests, and a
 This platform enables smooth coordination between clients, employees, site managers, and administrative staff to schedule, approve, allocate, and monitor staffing for client events. Automated notifications and attendance tracking help ensure operational efficiency and accountability.
 
 ---
+
+## Documentation
+| Content | Description
+| -- | -- |
+| [Backend Project](./.docs/backend.md) | The backend project, developed in Dotnet 9 to serve as the system's API, handle DB connectivity, auth etc.|
+| [Frontend Project](./.docs/frontend.md) | The frontend project, developed with ReactJS and serves as the user interface for allowing for the various use cases the system requires.

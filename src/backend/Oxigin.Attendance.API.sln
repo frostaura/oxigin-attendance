@@ -7,8 +7,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{89DDD0FA-F833-445B-8010-C3A3EEE562C7}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\docker-compose.yml = ..\..\docker-compose.yml
-		..\..\Dockerfile.Backend = ..\..\Dockerfile.Backend
-		..\..\Dockerfile.Frontend = ..\..\Dockerfile.Frontend
+		..\..\Backend.Dockerfile = ..\..\Backend.Dockerfile
+		..\..\Frontend.Dockerfile = ..\..\Frontend.Dockerfile
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oxigin.Attendance.Datastore", "Oxigin.Attendance.Datastore\Oxigin.Attendance.Datastore.csproj", "{6184EA9C-B740-46B6-8588-85FFF048B5CD}"
