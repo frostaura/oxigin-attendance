@@ -10,6 +10,7 @@ public interface IDatastoreContext
 {
     DbSet<User> Users { get; set; }
     DbSet<UserSession> UserSessions { get; set; }
+    DbSet<JobRequest> JobRequests { get; set; }
 
     int SaveChanges();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
