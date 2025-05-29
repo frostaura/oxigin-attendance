@@ -7,26 +7,26 @@ using Oxigin.Attendance.Shared.Models.Responses;
 namespace Oxigin.Attendance.API.Controllers;
 
 /// <summary>
-/// Controller for client-related use cases (job requests, approvals, etc).
+/// Controller for job-related use cases (job requests, approvals, etc).
 /// </summary>
 [ApiController]
 [Route("[controller]")]
-public class ClientsController : BaseController
+public class JobController : BaseController
 {
     /// <summary>
-    /// The manager for client-related use cases.
+    /// The manager for job-related use cases.
     /// </summary>
-    private readonly IClientsManager _clientsManager;
+    private readonly IJobManager _jobManager;
 
     /// <summary>
-    /// Constructor for ClientsController.
+    /// Constructor for JobController.
     /// </summary>
-    /// <param name="clientsManager">Manager for client use cases.</param>
+    /// <param name="jobManager">Manager for job use cases.</param>
     /// <param name="logger">Logger instance.</param>
-    public ClientsController(IClientsManager clientsManager, ILogger<ClientsController> logger)
+    public JobController(IJobManager jobManager, ILogger<JobController> logger)
         : base(logger)
     {
-        _clientsManager = clientsManager;
+        _jobManager = jobManager;
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public class ClientsController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> GetJobRequestsAsync(CancellationToken token)
     {
-        var result = await _clientsManager.GetJobRequestsAsync(token);
+        var result = await _jobManager.GetJobRequestsAsync(token);
 
         return Ok(result);
     }
@@ -55,7 +55,7 @@ public class ClientsController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> CreateJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
     {
-        var result = await _clientsManager.CreateJobRequestAsync(request, token);
+        var result = await _jobManager.CreateJobRequestAsync(request, token);
 
         return Ok(result);
     }
@@ -71,7 +71,7 @@ public class ClientsController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> ApproveJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
     {
-        var result = await _clientsManager.ApproveJobRequestAsync(request, token);
+        var result = await _jobManager.ApproveJobRequestAsync(request, token);
 
         return Ok(result);
     }
@@ -87,7 +87,7 @@ public class ClientsController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> RejectJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
     {
-        var result = await _clientsManager.RejectJobRequestAsync(request, token);
+        var result = await _jobManager.RejectJobRequestAsync(request, token);
 
         return Ok(result);
     }

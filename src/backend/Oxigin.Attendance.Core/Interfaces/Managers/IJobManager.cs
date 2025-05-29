@@ -5,7 +5,7 @@ namespace Oxigin.Attendance.Core.Interfaces.Managers;
 /// <summary>
 /// Interface for client-related use cases (job requests, approvals, etc).
 /// </summary>
-public interface IClientsManager
+public interface IJobManager
 {
     /// <summary>
     /// Retrieve all job requests for the current client or context.
