@@ -10,7 +10,7 @@ public class UserSigninResponse
     /// <summary>
     /// The unique session id for a signed in user.
     /// </summary>
-    public int SessionId { get; set; }
+    public Guid SessionId { get; set; }
     /// <summary>
     /// The signed in user's context.
     /// </summary>

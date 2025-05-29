@@ -13,7 +13,7 @@ public abstract class BaseEntity
     /// Unique identifier of entity.
     /// </summary>
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Whether or not the entity is flagged as deleted.

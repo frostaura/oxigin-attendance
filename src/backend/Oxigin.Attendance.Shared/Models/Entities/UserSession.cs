@@ -13,7 +13,7 @@ public class UserSession : BaseEntity
     /// The unique id of the user associated with this session.
     /// </summary>
     [Required(ErrorMessage = $"A valid user id is required.")]
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     /// <summary>
     /// The context for the user that is mapped to this session.
     /// </summary>

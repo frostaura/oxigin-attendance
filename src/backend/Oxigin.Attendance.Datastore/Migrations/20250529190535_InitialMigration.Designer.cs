@@ -12,8 +12,8 @@ using Oxigin.Attendance.Datastore;
 namespace Oxigin.Attendance.Datastore.Migrations
 {
     [DbContext(typeof(DatastoreContext))]
-    [Migration("20250529180925_RemoveNameFromSessionMigration")]
-    partial class RemoveNameFromSessionMigration
+    [Migration("20250529190535_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,9 @@ namespace Oxigin.Attendance.Datastore.Migrations
 
             modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ContactNr")
                         .IsRequired()
@@ -68,11 +66,9 @@ namespace Oxigin.Attendance.Datastore.Migrations
 
             modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.UserSession", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("boolean");
@@ -80,8 +76,8 @@ namespace Oxigin.Attendance.Datastore.Migrations
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
