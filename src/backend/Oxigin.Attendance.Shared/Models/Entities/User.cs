@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using Oxigin.Attendance.Shared.Enums;
 using Oxigin.Attendance.Shared.Models.Abstractions;
 
@@ -10,6 +10,7 @@ namespace Oxigin.Attendance.Shared.Models.Entities;
 /// An entity representing the users table in the database.
 /// </summary>
 [Table("Users")]
+[Index(nameof(Email), IsUnique = true)]
 public class User : BaseNamedEntity
 {
     /// <summary>
@@ -32,7 +33,6 @@ public class User : BaseNamedEntity
     /// </summary>
     [Required(AllowEmptyStrings = false, ErrorMessage = $"A valid password is required.")]
     public string Password { get; set; }
-
     /// <summary>
     /// A collection of the user's sessions.
     /// </summary>

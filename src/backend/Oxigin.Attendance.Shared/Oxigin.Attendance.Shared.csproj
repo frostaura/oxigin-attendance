@@ -53,6 +53,7 @@
     <Folder Include="Enums\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="TonSdk.Contracts" Version="0.3.2" />
     <PackageReference Include="TonSdk.Client" Version="0.3.11" />
   </ItemGroup>

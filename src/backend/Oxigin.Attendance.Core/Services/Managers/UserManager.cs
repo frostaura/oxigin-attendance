@@ -70,4 +70,22 @@ public class UserManager : IUserManager
         // Otherwise respond with the fetched user context.
         return new UserSigninResponse { User = user, SessionId = session.Id };
     }
+
+    /// <summary>
+    /// Sign up a user given a user entity.
+    /// </summary>
+    /// <param name="user">The user entity containing user details.</param>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>The created user entity.</returns>
+    public async Task<User> SignUpAsync(User user, CancellationToken token)
+    {
+        user.ThrowIfNull(nameof(user));
+        
+        // Hash the password before saving
+        user.Password = user.Password.HashString();
+        
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync(token);
+        return user;
+    }
 }

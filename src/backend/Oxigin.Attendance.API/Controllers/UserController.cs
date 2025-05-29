@@ -1,9 +1,7 @@
-using FrostAura.Libraries.Core.Extensions.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Oxigin.Attendance.API.Abstractions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Shared.Models.Requests;
-using Oxigin.Attendance.Shared.Models.Responses;
 
 namespace Oxigin.Attendance.API.Controllers;
 
@@ -24,7 +22,7 @@ public class LotteryController : BaseController
     public LotteryController(IUserManager userManager, ILogger<LotteryController> logger)
         : base(logger)
     {
-        _userManager = userManager.ThrowIfNull(nameof(userManager));
+        _userManager = userManager;
     }
 
     /// <summary>
@@ -41,5 +39,19 @@ public class LotteryController : BaseController
         if (response.IsSuccess) return Unauthorized();
 
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Sign up a new user given a User entity.
+    /// </summary>
+    /// <param name="user">The user entity to register.</param>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>An IActionResult indicating success or failure.</returns>
+    [HttpPost("SignUp")]
+    public async Task<IActionResult> SignUpAsync([FromBody] Oxigin.Attendance.Shared.Models.Entities.User user, CancellationToken token)
+    {
+        var createdUser = await _userManager.SignUpAsync(user, token);
+        if (createdUser == null) return BadRequest();
+        return Ok(createdUser);
     }
 }
