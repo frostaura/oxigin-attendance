@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Oxigin.Attendance.Core.Interfaces.Data;
+using Oxigin.Attendance.Shared.Models.Config;
 using Oxigin.Attendance.Shared.Models.Entities;
 
 namespace Oxigin.Attendance.Core.Services.Data
@@ -17,12 +19,19 @@ namespace Oxigin.Attendance.Core.Services.Data
         private readonly ILogger<EmailNotificationsData> _logger;
 
         /// <summary>
+        /// SMTP configuration settings.
+        /// </summary>
+        private readonly SmtpConfig _smtpConfig;
+
+        /// <summary>
         /// Constructor for EmailNotificationsData.
         /// </summary>
         /// <param name="logger">Logger instance.</param>
-        public EmailNotificationsData(ILogger<EmailNotificationsData> logger)
+        /// <param name="smtpConfig">SMTP configuration options.</param>
+        public EmailNotificationsData(ILogger<EmailNotificationsData> logger, IOptions<SmtpConfig> smtpConfig)
         {
             _logger = logger;
+            _smtpConfig = smtpConfig.Value;
         }
 
         /// <summary>
@@ -33,14 +42,12 @@ namespace Oxigin.Attendance.Core.Services.Data
         /// <param name="token">A token allowing cancelling downstream operations.</param>
         public async Task SendNotificationAsync(User recipient, string message, CancellationToken token)
         {
-            return; // TODO: Remove after testing. This is just to make testing go faster.
-
-            // Basic SMTP email sending (replace with your SMTP config)
-            var smtpHost = "smtp.example.com"; // TODO: Replace with your SMTP server
-            var smtpPort = 587; // or 25/465 depending on your server
-            var smtpUser = "your-smtp-username"; // TODO: Replace with your SMTP username
-            var smtpPass = "your-smtp-password"; // TODO: Replace with your SMTP password
-            var fromEmail = "noreply@oxigin.com"; // TODO: Replace with your sender email
+            // Use SMTP config from injected options
+            var smtpHost = _smtpConfig.Host;
+            var smtpPort = _smtpConfig.Port;
+            var smtpUser = _smtpConfig.User;
+            var smtpPass = _smtpConfig.Pass;
+            var fromEmail = _smtpConfig.From;
 
             var mail = new MailMessage(fromEmail, recipient.Email)
             {

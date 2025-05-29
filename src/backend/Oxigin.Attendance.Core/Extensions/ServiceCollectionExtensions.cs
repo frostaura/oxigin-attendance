@@ -4,8 +4,8 @@ using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Core.Services.Managers;
 using Oxigin.Attendance.Datastore.Extensions;
 using Oxigin.Attendance.Core.Interfaces.Data;
-using Oxigin.Attendance.Core.Services.Data;
 using EmailNotificationsData = Oxigin.Attendance.Core.Services.Data.EmailNotificationsData;
+using Oxigin.Attendance.Shared.Models.Config;
 
 namespace Oxigin.Attendance.Core.Extensions;
 
@@ -39,7 +39,7 @@ public static class ServiceCollectionExtensions
   /// <returns>The application service collection for allowing the Fluent usage.</returns>
   private static IServiceCollection AddConfigs(this IServiceCollection serviceCollection, ConfigurationManager config)
   {
-    // serviceCollection.Configure<LazyCacheConfig>(config.GetSection(LazyCacheConfig.Option));
+    serviceCollection.Configure<SmtpConfig>(config.GetSection("Smtp"));
     return serviceCollection;
   }
 
