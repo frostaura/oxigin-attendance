@@ -28,13 +28,13 @@ Migrations would need to be added again when the database provider is switched. 
 
 > dotnet tool install --global dotnet-ef
 
-Now switch your terminal's working directory to the `src/backend/dotnet-server` root.
+Now switch your terminal's working directory to the `src/backend/Oxigin.Attendance.Datastore` root.
 
-> dotnet ef migrations add InitialDbMigration -c DatastoreContext -o Migrations --project Oxigin.Attendance.Datastore.csproj
+> dotnet ef migrations add InitialDbMigration -c DatastoreContext -o Migrations
 
 At this point you can view the migration code file(s) under the 'src/backend/Oxigin.Attendance.Datastore/Migrations' directory and double-check if the relationships between your entities are as expected before running the next step.
 
-> dotnet ef database update -c Oxigin.Attendance.Datastore.csproj --project Oxigin.Attendance.Datastore.csproj
+> dotnet ef database update -c DatastoreContext
 
 ### Using the DB In-code
 The database context is DI-injectable via `IDatastoreContext`. For example:
