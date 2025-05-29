@@ -26,14 +26,13 @@ import BaseUserHome from "./pages/BaseUserHome";
 import BaseUserTimesheets from "./pages/BaseUserTimesheets";
 import EmployeeUpdate from "./pages/EmployeeUpdate";
 
-
-function App () {
+const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<ClientSignIn />} />
-      <Route path="/adminsignin" element={<AdminSignIn/>} />
-      <Route path="/clientregister" element={<ClientRegister />} />
+        <Route path="/" element={<ClientSignIn />} />
+        <Route path="/adminsignin" element={<AdminSignIn/>} />
+        <Route path="/clientregister" element={<ClientRegister />} />
         
         <Route
           path="/*"
@@ -70,5 +69,4 @@ function App () {
   );
 };
 
-
-export default App;
+export default App; 

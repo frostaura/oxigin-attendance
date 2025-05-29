@@ -4,8 +4,13 @@ import { Form, Input, Button, Typography, Card } from "antd";
 
 const { Title, Text } = Typography;
 
-const AdminSignIn = () => {
-  const handleLogin = (values) => {
+interface LoginFormValues {
+  email: string;
+  password: string;
+}
+
+const ClientSignIn: React.FC = () => {
+  const handleLogin = (values: LoginFormValues): void => {
     console.log("Login Data:", values);
   };
 
@@ -17,7 +22,7 @@ const AdminSignIn = () => {
         {/* Logo Placeholder */}
         <div style={{ width: 80, height: 80, borderRadius: "50%", backgroundColor: "#ddd", margin: "10px auto" }}></div>
 
-        <Form layout="vertical" onFinish={handleLogin}>
+        <Form<LoginFormValues> layout="vertical" onFinish={handleLogin}>
           <Form.Item label="Email" name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
             <Input type="email" placeholder="Enter your email" />
           </Form.Item>
@@ -30,9 +35,12 @@ const AdminSignIn = () => {
             Login
           </Button>
         </Form>
+
+        <Text style={{ marginTop: 10, display: "block" }}>Don't have an account?</Text>
+        <Link to="/clientregister">Register</Link>
       </Card>
     </div>
   );
 };
 
-export default AdminSignIn;
+export default ClientSignIn; 

@@ -1,11 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
+import { ClientRegistrationFormValues } from "../types";
 
 const { Title, Text } = Typography;
 
-const ClientRegister = () => {
-  const handleRegister = (values) => {
+const ClientRegister: React.FC = () => {
+  const [form] = Form.useForm<ClientRegistrationFormValues>();
+
+  const handleRegister = (values: ClientRegistrationFormValues) => {
     console.log("Registration Data:", values);
   };
 
@@ -14,28 +17,35 @@ const ClientRegister = () => {
       <Card style={{ width: 400, textAlign: "center", padding: "20px 24px"}}>
         <Title level={2} style={{ marginBottom: 20 }}>Register</Title>
   
-        <Form layout="vertical" onFinish={handleRegister}>
-          <Form.Item label="Company Name" name="companyname" rules={[{ required: true, message: "Company name is required." }]}>
+        <Form form={form} layout="vertical" onFinish={handleRegister}>
+          <Form.Item label="Company Name" name="companyName" rules={[{ required: true, message: "Company name is required." }]}>
             <Input placeholder="Company name" />
           </Form.Item>
   
-          <Form.Item label="Registration Number" name="registrationnumber" rules={[{ required: true, message: "Registration number is required." }]}>
+          <Form.Item label="Registration Number" name="registrationNumber" rules={[{ required: true, message: "Registration number is required." }]}>
             <Input placeholder="Company registration number" />
           </Form.Item>
   
-          <Form.Item label="Full Name" name="fullname" rules={[{ required: true, message: "Full name is required." }]}>
-            <Input placeholder="Full name" />
+          <Form.Item label="First Name" name="firstName" rules={[{ required: true, message: "First name is required." }]}>
+            <Input placeholder="First name" />
+          </Form.Item>
+
+          <Form.Item label="Last Name" name="lastName" rules={[{ required: true, message: "Last name is required." }]}>
+            <Input placeholder="Last name" />
           </Form.Item>
   
           <Form.Item label="Address" name="address" rules={[{ required: true, message: "Please enter your address!" }]}>
             <Input.TextArea placeholder="Enter your address" rows={3} />
           </Form.Item>
   
-          <Form.Item label="Contact Number" name="contactnumber" rules={[{ required: true, message: "Please enter your contact number!" }]}>
+          <Form.Item label="Phone" name="phone" rules={[{ required: true, message: "Please enter your contact number!" }]}>
             <Input placeholder="Enter your contact number" />
           </Form.Item>
   
-          <Form.Item label="Email" name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
+          <Form.Item label="Email" name="email" rules={[
+            { required: true, message: "Please enter your email!" },
+            { type: "email", message: "Please enter a valid email!" }
+          ]}>
             <Input type="email" placeholder="Enter your email" />
           </Form.Item>
   
@@ -43,7 +53,7 @@ const ClientRegister = () => {
             <Input.Password placeholder="Enter your password" />
           </Form.Item>
   
-          <Form.Item label="Confirm Password" name="confirm" dependencies={['password']} 
+          <Form.Item label="Confirm Password" name="confirmPassword" dependencies={['password']} 
             rules={[
               { required: true, message: "Please confirm your password!" },
               ({ getFieldValue }) => ({
@@ -71,4 +81,4 @@ const ClientRegister = () => {
   );
 }
   
-  export default ClientRegister;
+export default ClientRegister; 
