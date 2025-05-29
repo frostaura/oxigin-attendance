@@ -50,6 +50,7 @@ public class UserManager : IUserManager
             request.ThrowIfNull(nameof(request));
 
             // Hash the originally-provided password from the user since we store that password in the DB, not the plain text one.
+            request.Email = request.Email.ToLower();
             var hashedPassword = request
                 .Password
                 .ThrowIfNullOrWhitespace(request.Password)
@@ -107,6 +108,7 @@ public class UserManager : IUserManager
         
             // Hash the password before saving
             user.Password = user.Password.HashString();
+            user.Email = user.Email.ToLower();
         
             _db.Users.Add(user);
             await _db.SaveChangesAsync(token);
