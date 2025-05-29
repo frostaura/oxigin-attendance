@@ -29,7 +29,7 @@ const EmployeeUpdate: React.FC = () => {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px" }}>
       <Card style={{ width: 450, textAlign: "center", padding: "20px 24px" }}>
-        <Title level={2} style={{ marginBottom: 20 }}>Update Details</Title>
+        <Title level={4} style={{ marginBottom: 20 }}>Update Details</Title>
 
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           {/* Employee Information */}
