@@ -4,6 +4,9 @@ using Oxigin.Attendance.Shared.Models.Abstractions;
 
 namespace Oxigin.Attendance.Shared.Models.Entities;
 
+/// <summary>
+/// An entity representing a session for a user.
+/// </summary>
 public class UserSession : BaseEntity
 {
     /// <summary>

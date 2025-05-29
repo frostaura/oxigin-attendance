@@ -8,6 +8,7 @@ using Oxigin.Attendance.Shared.Exceptions;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Requests;
 using Oxigin.Attendance.Shared.Models.Responses;
+using UnauthorizedAccessException = System.UnauthorizedAccessException;
 
 namespace Oxigin.Attendance.Core.Services.Managers;
 
@@ -53,13 +54,14 @@ public class UserManager : IUserManager
                 .Password
                 .ThrowIfNullOrWhitespace(request.Password)
                 .HashString();
+            
             // Attempt to fetch a user from the DB with the matching email and hashed password. This will be null if there is no matching user.
             var user = await _db
                 .Users
-                .FirstOrDefaultAsync(u => u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase) && u.Password.Equals(hashedPassword), token);
-
+                .FirstOrDefaultAsync(u => u.Email == request.Email && u.Password == hashedPassword, token);
+            
             // If there were no matching user, the sign in request failed.
-            if (user == null) return new UserSigninResponse { IsSuccess = false };
+            if (user == null) throw new UnauthorizedAccessException("No user found with the provided email and password.");
         
             // Create a session for the user.
             var session = new UserSession

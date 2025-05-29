@@ -8,10 +8,6 @@ namespace Oxigin.Attendance.Shared.Models.Responses;
 public class UserSigninResponse
 {
     /// <summary>
-    /// Whether the sign in request succeeded.
-    /// </summary>
-    public bool IsSuccess { get; set; }
-    /// <summary>
     /// The unique session id for a signed in user.
     /// </summary>
     public int SessionId { get; set; }

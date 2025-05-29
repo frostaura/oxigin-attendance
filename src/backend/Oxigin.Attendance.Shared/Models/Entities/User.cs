@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Oxigin.Attendance.Shared.Enums;
 using Oxigin.Attendance.Shared.Models.Abstractions;
@@ -36,5 +37,6 @@ public class User : BaseNamedEntity
     /// <summary>
     /// A collection of the user's sessions.
     /// </summary>
+    [JsonIgnore]
     public virtual ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
 }

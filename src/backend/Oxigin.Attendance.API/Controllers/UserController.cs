@@ -59,6 +59,7 @@ public class LotteryController : BaseController
     /// <returns>An IActionResult indicating success or failure.</returns>
     [HttpPost("SignUp")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserSession))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> SignUpAsync([FromBody] User user, CancellationToken token)
     {
         try
