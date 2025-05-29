@@ -1,14 +1,25 @@
 import React, { useState } from "react";
-import { Layout, Card, Table, Select, Button, Checkbox, Input } from "antd";
+import { Layout, Card, Table, Select, Button, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
+import type { ColumnsType } from "antd/es/table";
 
 const { Header, Content } = Layout;
 const { Option } = Select;
 
-const EmployeeHome = () => {
+interface JobData {
+  key: string;
+  jobName: string;
+  location: string;
+  date: string;
+  time: string;
+  workerType: string;
+  checked?: boolean;
+}
+
+const EmployeeHome: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState("Check in");
-  const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState([
+  const [selectedJob, setSelectedJob] = useState<string>("Check in");
+  const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState<JobData[]>([
     {
       key: "1",
       jobName: "Fix Plumbing",
@@ -29,16 +40,16 @@ const EmployeeHome = () => {
     },
   ]);
 
-  const [upcomingJobs, setUpcomingJobs] = useState([
+  const [upcomingJobs, setUpcomingJobs] = useState<JobData[]>([
     { key: "1", jobName: "Roof Repair", location: "NYC", date: "2025-04-03", time: "9:00 AM", workerType: "Roofer" },
     { key: "2", jobName: "Flooring", location: "LA", date: "2025-04-05", time: "1:00 PM", workerType: "Floor Specialist" },
   ]);
 
-  const handleJobChange = (value) => {
+  const handleJobChange = (value: string) => {
     setSelectedJob(value);
   };
 
-  const handleCheckboxChange = (record) => {
+  const handleCheckboxChange = (record: JobData) => {
     const updatedJobs = jobsAwaitingConfirmation.map((job) =>
       job.key === record.key ? { ...job, checked: !job.checked } : job
     );
@@ -51,7 +62,7 @@ const EmployeeHome = () => {
     setJobsAwaitingConfirmation(jobsAwaitingConfirmation.filter((job) => !job.checked));
   };
 
-  const jobColumns = [
+  const jobColumns: ColumnsType<JobData> = [
     {
       title: "Job Name",
       dataIndex: "jobName",
@@ -86,7 +97,7 @@ const EmployeeHome = () => {
     },
   ];
 
-  const upcomingJobColumns = [
+  const upcomingJobColumns: ColumnsType<JobData> = [
     {
       title: "Job Name",
       dataIndex: "jobName",
@@ -117,13 +128,15 @@ const EmployeeHome = () => {
   return (
     <Layout style={{ minHeight: "100vh", padding: "20px" }}>
       <Card style={{ width: "100%", padding: "20px" }}>
-      <Header style={{ textAlign: "center", marginBottom: "20px", background: "transparent" }}>
-  <h2>Home Page</h2>
-</Header>
-
+        <Header style={{ textAlign: "center", marginBottom: "20px", background: "transparent" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h2>Home Page</h2>
+            <Button onClick={() => navigate("/employeeupdate")}>Update Profile</Button>
+          </div>
+        </Header>
 
         <Content>
-        <div style={{ width: "100%", marginBottom: "20px" }}>
+          <div style={{ width: "100%", marginBottom: "20px" }}>
             <Select
               value={selectedJob}
               onChange={handleJobChange}
@@ -144,14 +157,14 @@ const EmployeeHome = () => {
             </Card>
 
             <div style={{ width: "100%", textAlign: "right", marginBottom: "20px" }}>
-            <Button
-              type="primary"
-              onClick={approveJob}
-              disabled={!jobsAwaitingConfirmation.some((job) => job.checked)}
-            >
-              Approve Selected Jobs
-            </Button>
-          </div>
+              <Button
+                type="primary"
+                onClick={approveJob}
+                disabled={!jobsAwaitingConfirmation.some((job) => job.checked)}
+              >
+                Approve Selected Jobs
+              </Button>
+            </div>
           </div>
 
           <div style={{ width: "100%", marginBottom: "20px" }}>
@@ -171,4 +184,4 @@ const EmployeeHome = () => {
   );
 };
 
-export default EmployeeHome;
+export default EmployeeHome; 

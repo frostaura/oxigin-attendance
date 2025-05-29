@@ -1,42 +1,54 @@
 import React, { useState } from "react";
-import { Layout, Card, Input, Button, Table, Select } from "antd";
+import { Layout, Card, Button, Table, Select } from "antd";
 import { useNavigate } from "react-router-dom";
+import type { ColumnsType } from "antd/es/table";
 
 const { Header, Content } = Layout;
-const {Option} = Select;
+const { Option } = Select;
 
-const SiteManagerCheckIn = () => {
+interface CheckInRecord {
+  key: string;
+  jobId: string;
+  employeeId: string;
+  employeeName: string;
+  timeIn: string;
+}
+
+const SiteManagerCheckIn: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState("Job ID");
-  const [selectedEmployee, setSelectedEmployee] = useState("Employee ID");
-  const [jobId, setJobId] = useState("");
-  const [employeeId, setEmployeeId] = useState("");
-  const [checkInHistory, setCheckInHistory] = useState([
+  const [selectedJob, setSelectedJob] = useState<string>("Job ID");
+  const [selectedEmployee, setSelectedEmployee] = useState<string>("Employee ID");
+  const [checkInHistory, setCheckInHistory] = useState<CheckInRecord[]>([
     { key: "1", jobId: "J001", employeeId: "E001", employeeName: "John Doe", timeIn: "2025-03-20 08:00" },
     { key: "2", jobId: "J002", employeeId: "E002", employeeName: "Jane Smith", timeIn: "2025-03-20 08:30" },
   ]);
 
   const handleCheckIn = () => {
-    const newCheckIn = {
+    const newCheckIn: CheckInRecord = {
       key: `${checkInHistory.length + 1}`,
-      jobId: jobId,
-      employeeId: employeeId,
+      jobId: selectedJob,
+      employeeId: selectedEmployee,
       employeeName: "John Doe", // This can be dynamic if needed
       timeIn: new Date().toLocaleString(),
     };
     setCheckInHistory([...checkInHistory, newCheckIn]);
-    setJobId("");
-    setEmployeeId("");
+    setSelectedJob("Job ID");
+    setSelectedEmployee("Employee ID");
   };
 
-  const columns = [
+  const columns: ColumnsType<CheckInRecord> = [
     { title: "Job ID", dataIndex: "jobId", key: "jobId" },
     { title: "Employee ID", dataIndex: "employeeId", key: "employeeId" },
     { title: "Employee Name", dataIndex: "employeeName", key: "employeeName" },
     { title: "Time In", dataIndex: "timeIn", key: "timeIn" },
   ];
-  const handleJobChange = (value) => {
+
+  const handleJobChange = (value: string) => {
     setSelectedJob(value);
+  };
+
+  const handleEmployeeChange = (value: string) => {
+    setSelectedEmployee(value);
   };
 
   return (
@@ -53,24 +65,24 @@ const SiteManagerCheckIn = () => {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <div style={{ display: "flex", gap: 10, flex: 1 }}>
               <div style={{ flex: 1, minWidth: "70px" }}>
-              <Select
-              value={selectedJob}
-              onChange={handleJobChange}
-              style={{ width: "100%", marginBottom: "20px" }}
-            >
-              <Option value="Job 1">Job 1</Option>
-              <Option value="Job 2">Job 2</Option>
-            </Select>
+                <Select
+                  value={selectedJob}
+                  onChange={handleJobChange}
+                  style={{ width: "100%", marginBottom: "20px" }}
+                >
+                  <Option value="Job 1">Job 1</Option>
+                  <Option value="Job 2">Job 2</Option>
+                </Select>
               </div>
               <div style={{ flex: 1, minWidth: "70px" }}>
-              <Select
-              value={selectedEmployee}
-              onChange={handleJobChange}
-              style={{ width: "100%", marginBottom: "20px" }}
-            >
-              <Option value="E001">Job 1</Option>
-              <Option value="E002">Job 2</Option>
-            </Select>
+                <Select
+                  value={selectedEmployee}
+                  onChange={handleEmployeeChange}
+                  style={{ width: "100%", marginBottom: "20px" }}
+                >
+                  <Option value="E001">Employee 1</Option>
+                  <Option value="E002">Employee 2</Option>
+                </Select>
               </div>
             </div>
             <Button type="primary" onClick={handleCheckIn} style={{ marginLeft: "20px" }}>Check In</Button>
@@ -79,6 +91,9 @@ const SiteManagerCheckIn = () => {
           {/* Check-in History Table */}
           <Card title="Check-in History">
             <Table columns={columns} dataSource={checkInHistory} pagination={false} />
+            <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end" }}>
+              <Button onClick={() => navigate(-1)}>Back</Button>
+            </div>
           </Card>
         </Content>
       </Card>
@@ -86,4 +101,4 @@ const SiteManagerCheckIn = () => {
   );
 };
 
-export default SiteManagerCheckIn;
+export default SiteManagerCheckIn; 

@@ -1,14 +1,26 @@
 import React from "react";
 import { Layout, Card, Button, Table } from "antd";
 import { useNavigate } from "react-router-dom";
+import type { ColumnsType } from "antd/es/table";
 
 const { Header, Content } = Layout;
 
-const ClientHome = () => {
+interface JobData {
+  key: string;
+  jobId: string;
+  purchaseOrder: string;
+  jobName: string;
+  requestor?: string;
+  contact?: string;
+  location?: string;
+  date?: string;
+}
+
+const ClientHome: React.FC = () => {
   const navigate = useNavigate();
 
   // Table columns
-  const jobColumns = [
+  const jobColumns: ColumnsType<JobData> = [
     { title: "Job ID", dataIndex: "jobId", key: "jobId" },
     { title: "Purchase Order #", dataIndex: "purchaseOrder", key: "purchaseOrder" },
     { title: "Job Name", dataIndex: "jobName", key: "jobName" },
@@ -16,7 +28,7 @@ const ClientHome = () => {
     { title: "Contact", dataIndex: "contact", key: "contact" },
   ];
 
-  const upcomingJobColumns = [
+  const upcomingJobColumns: ColumnsType<JobData> = [
     { title: "Job ID", dataIndex: "jobId", key: "jobId" },
     { title: "Purchase Order #", dataIndex: "purchaseOrder", key: "purchaseOrder" },
     { title: "Job Name", dataIndex: "jobName", key: "jobName" },
@@ -25,12 +37,12 @@ const ClientHome = () => {
   ];
 
   // Sample data
-  const jobData = [
+  const jobData: JobData[] = [
     { key: "1", jobId: "1234", purchaseOrder: "PO4567", jobName: "Fix Plumbing", requestor: "John Doe", contact: "555-1234" },
     { key: "2", jobId: "5678", purchaseOrder: "PO7890", jobName: "Install Wiring", requestor: "Jane Smith", contact: "555-5678" },
   ];
 
-  const upcomingJobData = [
+  const upcomingJobData: JobData[] = [
     { key: "1", jobId: "91011", purchaseOrder: "PO1112", jobName: "Roof Repair", location: "NYC", date: "2025-04-01" },
     { key: "2", jobId: "13141", purchaseOrder: "PO1314", jobName: "Flooring", location: "LA", date: "2025-04-05" },
   ];
@@ -65,4 +77,4 @@ const ClientHome = () => {
   );
 };
 
-export default ClientHome;
+export default ClientHome; 
