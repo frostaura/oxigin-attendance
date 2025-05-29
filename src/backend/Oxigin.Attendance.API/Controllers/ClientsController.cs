@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Oxigin.Attendance.API.Abstractions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
-using Oxigin.Attendance.Shared.Exceptions;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Responses;
 
@@ -41,6 +40,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> GetJobRequestsAsync(CancellationToken token)
     {
         var result = await _clientsManager.GetJobRequestsAsync(token);
+
         return Ok(result);
     }
 
@@ -56,6 +56,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> CreateJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
     {
         var result = await _clientsManager.CreateJobRequestAsync(request, token);
+
         return Ok(result);
     }
 
@@ -71,6 +72,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> ApproveJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
     {
         var result = await _clientsManager.ApproveJobRequestAsync(request, token);
+
         return Ok(result);
     }
 
@@ -86,6 +88,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> RejectJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
     {
         var result = await _clientsManager.RejectJobRequestAsync(request, token);
+
         return Ok(result);
     }
 }

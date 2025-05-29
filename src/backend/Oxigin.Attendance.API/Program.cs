@@ -1,12 +1,16 @@
 ﻿// Program entry point for Oxigin Attendance API.
 // Configures services, middleware, and starts the web application.
+using Oxigin.Attendance.API.Abstractions;
 using Oxigin.Attendance.Core.Extensions;
 using Oxigin.Attendance.Datastore.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<StandardizedExceptionFilter>();
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
