@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Oxigin.Attendance.Shared.Enums;
 using Oxigin.Attendance.Shared.Models.Abstractions;
 
 namespace Oxigin.Attendance.Shared.Models.Entities;
 
-public class UserSession : BaseNamedEntity
+public class UserSession : BaseEntity
 {
     /// <summary>
     /// The unique id of the user associated with this session.

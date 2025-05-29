@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Oxigin.Attendance.Core.Extensions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Datastore.Interfaces;
+using Oxigin.Attendance.Shared.Exceptions;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Requests;
 using Oxigin.Attendance.Shared.Models.Responses;
@@ -43,49 +44,92 @@ public class UserManager : IUserManager
     /// <returns>A sign in response.</returns>
     public async Task<UserSigninResponse> SignInAsync(UserSigninRequest request, CancellationToken token)
     {
-        request.ThrowIfNull(nameof(request));
-
-        // Hash the originally-provided password from the user since we store that password in the DB, not the plain text one.
-        var hashedPassword = request
-            .Password
-            .ThrowIfNullOrWhitespace(request.Password)
-            .HashString();
-        // Attempt to fetch a user from the DB with the matching email and hashed password. This will be null if there is no matching user.
-        var user = await _db
-            .Users
-            .FirstOrDefaultAsync(u => u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase) && u.Password.Equals(hashedPassword), token);
-
-        // If there were no matching user, the sign in request failed.
-        if (user == null) return new UserSigninResponse { IsSuccess = false };
-        
-        // Create a session for the user.
-        var session = new UserSession
+        try
         {
-            UserId = user.Id
-        };
+            request.ThrowIfNull(nameof(request));
 
-        _db.UserSessions.Add(session);
-        await _db.SaveChangesAsync(token);
+            // Hash the originally-provided password from the user since we store that password in the DB, not the plain text one.
+            var hashedPassword = request
+                .Password
+                .ThrowIfNullOrWhitespace(request.Password)
+                .HashString();
+            // Attempt to fetch a user from the DB with the matching email and hashed password. This will be null if there is no matching user.
+            var user = await _db
+                .Users
+                .FirstOrDefaultAsync(u => u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase) && u.Password.Equals(hashedPassword), token);
 
-        // Otherwise respond with the fetched user context.
-        return new UserSigninResponse { User = user, SessionId = session.Id };
+            // If there were no matching user, the sign in request failed.
+            if (user == null) return new UserSigninResponse { IsSuccess = false };
+        
+            // Create a session for the user.
+            var session = new UserSession
+            {
+                UserId = user.Id
+            };
+
+            _db.UserSessions.Add(session);
+            await _db.SaveChangesAsync(token);
+
+            // Otherwise respond with the fetched user context.
+            return new UserSigninResponse { User = user, SessionId = session.Id };
+        }
+        catch (Exception e)
+        {
+            throw new StandardizedErrorException
+            {
+                Error = new StandardizedError
+                {
+                    Origin = nameof(UserManager),
+                    Message = "Unable to sign in, please try again later.",
+                    Data = new Dictionary<string, object>
+                    {
+                        { nameof(e.Message), e.Message },
+                        { nameof(e.StackTrace), e.StackTrace }
+                    }
+                }
+            };
+        }
     }
 
     /// <summary>
-    /// Sign up a user given a user entity.
+    /// Sign up a user given a user entity and get a fresh session for them.
     /// </summary>
     /// <param name="user">The user entity containing user details.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
-    /// <returns>The created user entity.</returns>
-    public async Task<User> SignUpAsync(User user, CancellationToken token)
+    /// <returns>The created user's new session.</returns>
+    public async Task<UserSession> SignUpAsync(User user, CancellationToken token)
     {
-        user.ThrowIfNull(nameof(user));
+        try
+        {
+            user.ThrowIfNull(nameof(user));
         
-        // Hash the password before saving
-        user.Password = user.Password.HashString();
+            // Hash the password before saving
+            user.Password = user.Password.HashString();
         
-        _db.Users.Add(user);
-        await _db.SaveChangesAsync(token);
-        return user;
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync(token);
+
+            var session = new UserSession { UserId = user.Id };
+        
+            _db.UserSessions.Add(session);
+            await _db.SaveChangesAsync(token);
+            return session;
+        }
+        catch (StandardizedErrorException e)
+        {
+            throw new StandardizedErrorException
+            {
+                Error = new StandardizedError
+                {
+                    Origin = nameof(UserManager),
+                    Message = "Unable to sign up, please try again later.",
+                    Data = new Dictionary<string, object>
+                    {
+                        { nameof(e.Message), e.Message },
+                        { nameof(e.StackTrace), e.StackTrace }
+                    }
+                }
+            };
+        }
     }
 }

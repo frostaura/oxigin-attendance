@@ -20,10 +20,10 @@ public interface IUserManager
     public Task<UserSigninResponse> SignInAsync(UserSigninRequest request, CancellationToken token);
 
     /// <summary>
-    /// Sign up a user given a user entity.
+    /// Sign up a user given a user entity and get a fresh session for them.
     /// </summary>
     /// <param name="user">The user entity containing user details.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
-    /// <returns>The created user entity.</returns>
-    Task<User> SignUpAsync(User user, CancellationToken token);
+    /// <returns>The created user's new session.</returns>
+    Task<UserSession> SignUpAsync(User user, CancellationToken token);
 }

@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Oxigin.Attendance.API.Abstractions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
+using Oxigin.Attendance.Shared.Exceptions;
+using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Requests;
+using Oxigin.Attendance.Shared.Models.Responses;
 
 namespace Oxigin.Attendance.API.Controllers;
 
@@ -30,15 +33,22 @@ public class LotteryController : BaseController
     /// </summary>
     /// <param name="request">The user's sign in request.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
-    /// <returns>A sign in response if successful, otherwise a 403.</returns>
+    /// <returns>A sign in response if successful, otherwise a bad request.</returns>
     [HttpPost("SignIn")]
-    public async Task<IActionResult> SignInAsync(UserSigninRequest request, CancellationToken token)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
+    public async Task<IActionResult> SignInAsync([FromBody] UserSigninRequest request, CancellationToken token)
     {
-        var response = await _userManager.SignInAsync(request, token);
-
-        if (response.IsSuccess) return Unauthorized();
-
-        return Ok(response);
+        try
+        {
+            var response = await _userManager.SignInAsync(request, token);
+            
+            return Ok(response);
+        }
+        catch (StandardizedErrorException e)
+        {
+            return BadRequest(e.Error);
+        }
     }
 
     /// <summary>
@@ -48,10 +58,18 @@ public class LotteryController : BaseController
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>An IActionResult indicating success or failure.</returns>
     [HttpPost("SignUp")]
-    public async Task<IActionResult> SignUpAsync([FromBody] Oxigin.Attendance.Shared.Models.Entities.User user, CancellationToken token)
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserSession))]
+    public async Task<IActionResult> SignUpAsync([FromBody] User user, CancellationToken token)
     {
-        var createdUser = await _userManager.SignUpAsync(user, token);
-        if (createdUser == null) return BadRequest();
-        return Ok(createdUser);
+        try
+        {
+            var response = await _userManager.SignUpAsync(user, token);
+            
+            return Ok(response);
+        }
+        catch (StandardizedErrorException e)
+        {
+            return BadRequest(e.Error);
+        }
     }
 }
