@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Oxigin.Attendance.Core.Extensions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Datastore.Interfaces;
+using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Requests;
 using Oxigin.Attendance.Shared.Models.Responses;
 
@@ -56,8 +57,17 @@ public class UserManager : IUserManager
 
         // If there were no matching user, the sign in request failed.
         if (user == null) return new UserSigninResponse { IsSuccess = false };
+        
+        // Create a session for the user.
+        var session = new UserSession
+        {
+            UserId = user.Id
+        };
+
+        _db.UserSessions.Add(session);
+        await _db.SaveChangesAsync(token);
 
         // Otherwise respond with the fetched user context.
-        return new UserSigninResponse { User = user };
+        return new UserSigninResponse { User = user, SessionId = session.Id };
     }
 }

@@ -9,6 +9,7 @@ namespace Oxigin.Attendance.Datastore.Interfaces;
 public interface IDatastoreContext
 {
     DbSet<User> Users { get; set; }
+    DbSet<UserSession> UserSessions { get; set; }
 
     int SaveChanges();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

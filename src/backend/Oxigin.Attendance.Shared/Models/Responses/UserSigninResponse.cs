@@ -14,7 +14,7 @@ public class UserSigninResponse
     /// <summary>
     /// The unique session id for a signed in user.
     /// </summary>
-    public string SessionId { get; set; }
+    public int SessionId { get; set; }
     /// <summary>
     /// The signed in user's context.
     /// </summary>
