@@ -2,6 +2,7 @@ using FrostAura.Libraries.Core.Extensions.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Oxigin.Attendance.Core.Extensions;
+using Oxigin.Attendance.Core.Interfaces.Data;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Datastore.Interfaces;
 using Oxigin.Attendance.Shared.Exceptions;
@@ -25,16 +26,22 @@ public class UserManager : IUserManager
     /// The context of the database.
     /// </summary>
     private readonly ILogger _logger;
+    /// <summary>
+    /// The notification manager for sending notifications.
+    /// </summary>
+    private readonly INotificationData _notificationData;
     
     /// <summary>
     /// Overloaded constructor to allow for injecting dependencies.
     /// </summary>
     /// <param name="db">The context of the database.</param>
     /// <param name="logger">The logger instance.</param>
-    public UserManager(IDatastoreContext db, ILogger<UserManager> logger)
+    /// <param name="notificationData">The notification manager instance.</param>
+    public UserManager(IDatastoreContext db, ILogger<UserManager> logger, INotificationData notificationData)
     {
         _db = db.ThrowIfNull(nameof(db));
         _logger = logger.ThrowIfNull(nameof(logger));
+        _notificationData = notificationData.ThrowIfNull(nameof(notificationData));
     }
     
     /// <summary>
@@ -69,10 +76,10 @@ public class UserManager : IUserManager
             {
                 UserId = user.Id
             };
-
             _db.UserSessions.Add(session);
             await _db.SaveChangesAsync(token);
-
+            // Send notification for new session/login
+            await _notificationData.SendNotificationAsync(user, "A new session has started for your account.", token);
             // Otherwise respond with the fetched user context.
             return new UserSigninResponse { User = user, SessionId = session.Id };
         }
@@ -112,11 +119,11 @@ public class UserManager : IUserManager
         
             _db.Users.Add(user);
             await _db.SaveChangesAsync(token);
-
             var session = new UserSession { UserId = user.Id };
-        
             _db.UserSessions.Add(session);
             await _db.SaveChangesAsync(token);
+            // Send welcome notification upon registration
+            await _notificationData.SendNotificationAsync(user, $"Welcome to Oxigin Attendance, {user.Name}!", token);
             return session;
         }
         catch (StandardizedErrorException e)

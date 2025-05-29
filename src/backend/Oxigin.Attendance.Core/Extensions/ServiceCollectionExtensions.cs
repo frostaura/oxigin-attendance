@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Core.Services.Managers;
 using Oxigin.Attendance.Datastore.Extensions;
+using Oxigin.Attendance.Core.Interfaces.Data;
+using Oxigin.Attendance.Core.Services.Data;
+using EmailNotificationsData = Oxigin.Attendance.Core.Services.Data.EmailNotificationsData;
 
 namespace Oxigin.Attendance.Core.Extensions;
 
@@ -49,6 +52,7 @@ public static class ServiceCollectionExtensions
   private static IServiceCollection AddServices(this IServiceCollection serviceCollection, ConfigurationManager config)
   {
     return serviceCollection
-      .AddScoped<IUserManager, UserManager>();
+      .AddScoped<IUserManager, UserManager>()
+      .AddScoped<INotificationData, EmailNotificationsData>();
   }
 }

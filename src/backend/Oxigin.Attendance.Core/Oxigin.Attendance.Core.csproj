@@ -34,9 +34,7 @@
     <None Remove="Contracts\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Interfaces\Data\" />
     <Folder Include="Interfaces\Engines\" />
-    <Folder Include="Services\Data\" />
     <Folder Include="Services\Engines\" />
   </ItemGroup>
   <PropertyGroup>
