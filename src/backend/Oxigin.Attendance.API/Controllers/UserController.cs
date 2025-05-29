@@ -10,7 +10,7 @@ namespace Oxigin.Attendance.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LotteryController : BaseController
+public class UserController : BaseController
 {
     /// <summary>
     /// A manager to facilitate user-related use-cases.
@@ -22,7 +22,7 @@ public class LotteryController : BaseController
     /// </summary>
     /// <param name="userManager">A manager to facilitate user-related use cases.</param>
     /// <param name="logger">The controller logger instance.</param>
-    public LotteryController(IUserManager userManager, ILogger<LotteryController> logger)
+    public UserController(IUserManager userManager, ILogger<UserController> logger)
         : base(logger)
     {
         _userManager = userManager;
