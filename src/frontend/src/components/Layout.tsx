@@ -14,7 +14,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const location = useLocation();
 
   const hideBackButtonOn = ["/", "/register"];
-  const showBackButton = !hideBackButtonOn.includes(location.pathname);
+  const showBackButton = !hideBackButtonOn.includes(location.pathname) && !location.pathname.includes("home");
 
   // Simulated user initials (replace with actual user data)
   const userInitials = "JD"; 
@@ -72,4 +72,4 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   );
 };
 
-export default AppLayout; 
+export default AppLayout;
