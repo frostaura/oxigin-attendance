@@ -94,7 +94,7 @@ const EmployeeRegister: React.FC = () => {
 
           <Form.Item label="Branch Code" name="branchCode" rules={[{ required: true, message: "Branch Code is required." }]}>
             <Input placeholder="Enter Branch Code" />
-          </Form.Item>
+          </Form.Item> 
 
           <Form.Item label="Account Number" name="accountNumber" rules={[{ required: true, message: "Account Number is required." }]}>
             <Input placeholder="Enter Account Number" />

@@ -18,7 +18,7 @@ export interface Client extends BaseUser {
 export interface Employee extends BaseUser {
   employeeId: string;
   role: 'employee' | 'site_manager' | 'admin';
-  type: 'employee';
+  type: 'employee'; 
 }
 
 // Job Types
@@ -137,3 +137,9 @@ export interface TimesheetData {
   totalHours?: number;
   status?: string;
 } 
+
+export interface ErrorResponse {
+  origin: string;
+  message: string;
+  data: Record<string, string>;
+}

@@ -1,6 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
+import { signIn } from "../authAPI";
 
 const { Title, Text } = Typography;
 
@@ -10,9 +11,21 @@ interface LoginFormValues {
 }
 
 const ClientSignIn: React.FC = () => {
-  const handleLogin = (values: LoginFormValues): void => {
-    console.log("Login Data:", values);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (values: LoginFormValues): Promise<void> => {
+    try {
+      const { signIn } = await import("../authAPI");
+      const user = await signIn(values.email, values.password);
+      console.log("Logged in user:", user);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
+  
+  
+
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
