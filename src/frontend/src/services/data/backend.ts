@@ -26,7 +26,9 @@ export async function PostAsync<T>(url: string, body: object): Promise<T>{
         },
         body: JSON.stringify(body)
     });
-    
+
+    if(!request.ok) throw new Error(await request.text());
+
     return await request.json() as T;
 }
 

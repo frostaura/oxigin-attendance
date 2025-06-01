@@ -7,6 +7,9 @@ import type { UserSigninResponse } from "../models/userModels";
 
 const { Title, Text } = Typography;
 
+// TODO: Add Oxigin icon to the round picture container.
+// TODO: Add a loader for when the signing process is happening.
+
 interface LoginFormValues {
   email: string;
   password: string;
@@ -16,24 +19,36 @@ const ClientSignIn: React.FC = () => {
   // Attempt to get the signed in user from localsotrage.
   const [userContext, setUserContext] = useState<UserSigninResponse | null>(GetLoggedInUserContext());
   const navigate = useNavigate();
+  const [processing, setProcessing] = useState(false);
   
   useEffect(() => {
     if(!userContext) return;
 
     // If somebody is signed in, redirect to their home page.
     debugger;
+    // TODO: Navigate to the correct home page based on the userContext userType.
+    setProcessing(true);
     navigate("/clienthome");
   }, [userContext]);
 
+  // Add form instance for reset functionality
+  const [form] = Form.useForm();
 
   const handleLogin = async (values: LoginFormValues): Promise<void> => {
     try {
+      setProcessing(true);
       const userContext = await SignInAsync(values.email, values.password);
 
       setUserContext(userContext);
     } catch (error) {
-      console.error("Login failed:", error);
-      alert(`Login Failed: ${JSON.stringify(error, null, 2)}`);
+      const errorContext = JSON.parse((error as any).message || "{}");
+
+      alert(errorContext.message || "An error occurred during sign-in. Please try again.");
+      // Reset and focus the password field on login failure
+      form.resetFields(["password"]);
+      form.getFieldInstance("password")?.focus?.();
+    } finally{
+      setProcessing(false);
     }
   };
 
@@ -45,7 +60,7 @@ const ClientSignIn: React.FC = () => {
         {/* Logo Placeholder */}
         <div style={{ width: 80, height: 80, borderRadius: "50%", backgroundColor: "#ddd", margin: "10px auto" }}></div>
 
-        <Form<LoginFormValues> layout="vertical" onFinish={handleLogin}>
+        <Form<LoginFormValues> form={form} layout="vertical" onFinish={handleLogin}>
           <Form.Item label="Email" name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
             <Input type="email" placeholder="Enter your email" />
           </Form.Item>
@@ -55,7 +70,7 @@ const ClientSignIn: React.FC = () => {
           </Form.Item>
 
           <Button type="primary" htmlType="submit" block>
-            Login
+            {processing ? "Signing In..." : "Sign In"}
           </Button>
         </Form>
 
@@ -66,4 +81,4 @@ const ClientSignIn: React.FC = () => {
   );
 };
 
-export default ClientSignIn; 
+export default ClientSignIn;
