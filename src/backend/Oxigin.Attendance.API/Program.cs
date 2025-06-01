@@ -16,6 +16,17 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddCoreServices(builder.Configuration);
 
+// Add CORS policy to allow all
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +38,10 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger(); // Enable Swagger for API documentation
 app.UseSwaggerUI(); // Enable Swagger UI
 app.UseHttpsRedirection(); // Redirect HTTP to HTTPS
+
+// Use CORS policy
+app.UseCors("AllowAll");
+
 app.UseAuthorization(); // Enable authorization middleware
 app.MapControllers(); // Map controller routes
 app.UseDataResources<Program>(); // Custom extension for data resources
