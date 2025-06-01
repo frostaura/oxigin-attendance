@@ -9,9 +9,8 @@ export interface User {
     name: string;
     contactNr: string;
     email: string;
-    //userType: UserType;
+    userType: number;
     password: string;
-    //sessions?: UserSession[];
 }
 
 /**

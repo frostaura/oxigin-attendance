@@ -2,16 +2,10 @@
 // Service functions for interacting with the backend API for Oxigin Attendance.
 // Provides utility methods for authentication checks and making POST requests.
 
+import type { UserSigninResponse } from "../../models/userModels";
+
 // Base URL for the backend API.
 const BASE_BACKEND_URL: string = "http://localhost:5275";
-
-/**
- * Check if the user is currently logged in by verifying the presence of a session ID in localStorage.
- * @returns {boolean} True if a session ID exists, otherwise false.
- */
-export function IsLoggedIn(): boolean {
-    return localStorage.getItem("sessionId") !== null;
-}
 
 /**
  * Send a POST request to the backend API with the provided URL and body.
@@ -34,4 +28,15 @@ export async function PostAsync<T>(url: string, body: object): Promise<T>{
     });
     
     return await request.json() as T;
+}
+
+/**
+ * Check if the user is currently logged in by verifying the presence of a session ID in localStorage.
+ * @returns {boolean} True if a session ID exists, otherwise false.
+ */
+export function GetLoggedInUserContext(): UserSigninResponse | null {
+    const session = localStorage.getItem("session");
+    const parsedSession = session ? JSON.parse(session) : null;
+
+    return parsedSession as UserSigninResponse;
 }
