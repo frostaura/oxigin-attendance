@@ -1,9 +1,10 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState } from "react";
+import type { ChangeEvent } from "react";
 import { Layout, Card, Table, Input, Button } from "antd";
 import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { EmployeeData } from "../types";
+import type { EmployeeData } from "../types";
 
 const { Header, Content } = Layout;
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
-import { EmployeeRegistrationFormValues } from "../types";
+import type { EmployeeRegistrationFormValues } from "../types";
 
 const { Title } = Typography;
 

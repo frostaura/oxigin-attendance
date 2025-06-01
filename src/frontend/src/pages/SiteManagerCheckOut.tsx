@@ -1,4 +1,5 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState } from "react";
+import type { ChangeEvent } from "react";
 import { Layout, Card, Input, Button, Table } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";

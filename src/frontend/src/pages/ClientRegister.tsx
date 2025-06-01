@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
-import { ClientRegistrationFormValues } from "../types";
+import type { ClientRegistrationFormValues } from "../types";
 
 const { Title, Text } = Typography;
 

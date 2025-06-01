@@ -1,8 +1,8 @@
 import React from "react";
 import { Form, Input, Button, Typography, Card } from "antd";
-import { ClientRegistrationFormValues } from "../types";
+import type { ClientRegistrationFormValues } from "../types";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const UpdateClient: React.FC = () => {
   const [form] = Form.useForm<ClientRegistrationFormValues>();
