@@ -27,6 +27,8 @@ import BaseUserTimesheets from "./pages/BaseUserTimesheets";
 import EmployeeUpdate from "./pages/EmployeeUpdate";
 import "./App.css";
 
+// TODO: Refactor routes to be enums for reusability instea 
+
 const App: React.FC = () => {
   return (
     <Router>

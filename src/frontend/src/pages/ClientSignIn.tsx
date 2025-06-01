@@ -24,11 +24,10 @@ const ClientSignIn: React.FC = () => {
   useEffect(() => {
     if(!userContext) return;
 
-    // If somebody is signed in, redirect to their home page.
-    debugger;
     // TODO: Navigate to the correct home page based on the userContext userType.
     setProcessing(true);
     navigate("/clienthome");
+    setProcessing(false);
   }, [userContext]);
 
   // Add form instance for reset functionality
@@ -57,8 +56,7 @@ const ClientSignIn: React.FC = () => {
       <Card style={{ width: 400, textAlign: "center", padding: 20 }}>
         <Title level={2}>Sign In</Title>
 
-        {/* Logo Placeholder */}
-        <div style={{ width: 80, height: 80, borderRadius: "50%", backgroundColor: "#ddd", margin: "10px auto" }}></div>
+        <div style={{ width: 100, height: 100, borderRadius: "50%", backgroundImage: "url(icon.JPG)", margin: "10px auto", backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain" }}></div>
 
         <Form<LoginFormValues> form={form} layout="vertical" onFinish={handleLogin}>
           <Form.Item label="Email" name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
