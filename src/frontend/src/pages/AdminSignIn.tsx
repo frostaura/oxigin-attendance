@@ -1,11 +1,15 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
-const AdminSignIn = () => {
-  const handleLogin = (values) => {
+interface AdminLoginFormValues {
+  email: string;
+  password: string;
+}
+
+const AdminSignIn: React.FC = () => {
+  const handleLogin = (values: AdminLoginFormValues): void => {
     console.log("Login Data:", values);
   };
 
@@ -17,7 +21,7 @@ const AdminSignIn = () => {
         {/* Logo Placeholder */}
         <div style={{ width: 80, height: 80, borderRadius: "50%", backgroundColor: "#ddd", margin: "10px auto" }}></div>
 
-        <Form layout="vertical" onFinish={handleLogin}>
+        <Form<AdminLoginFormValues> layout="vertical" onFinish={handleLogin}>
           <Form.Item label="Email" name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
             <Input type="email" placeholder="Enter your email" />
           </Form.Item>

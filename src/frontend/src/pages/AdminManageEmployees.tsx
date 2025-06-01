@@ -1,27 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { Layout, Card, Table, Input, Button } from "antd";
 import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import type { ColumnsType } from "antd/es/table";
+import { EmployeeData } from "../types";
 
 const { Header, Content } = Layout;
 
-const ManageEmployees = () => {
+interface EditableEmployeeData extends Omit<EmployeeData, 'phone'> {
+  surname: string;
+  idNumber: string;
+  address: string;
+  contact: string;
+}
+
+const ManageEmployees: React.FC = () => {
   const navigate = useNavigate();
-  const [editingKey, setEditingKey] = useState(null);
-  const [employees, setEmployees] = useState([
-    { key: "1", employeeId: "E001", name: "John", surname: "Doe", idNumber: "123456789", address: "123 Street, NY", contact: "555-1234" },
-    { key: "2", employeeId: "E002", name: "Jane", surname: "Smith", idNumber: "987654321", address: "456 Avenue, LA", contact: "555-5678" },
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [employees, setEmployees] = useState<EditableEmployeeData[]>([
+    { key: "1", id: "E001", name: "John", surname: "Doe", idNumber: "123456789", address: "123 Street, NY", contact: "555-1234", email: "", role: "employee", status: "active" },
+    { key: "2", id: "E002", name: "Jane", surname: "Smith", idNumber: "987654321", address: "456 Avenue, LA", contact: "555-5678", email: "", role: "employee", status: "active" },
   ]);
 
-  const [newEmployee, setNewEmployee] = useState(null);
+  const [newEmployee, setNewEmployee] = useState<EditableEmployeeData | null>(null);
+  const [searchValue, setSearchValue] = useState<string>("");
 
   // Start editing an existing employee
-  const handleEdit = (key) => {
+  const handleEdit = (key: string) => {
     setEditingKey(key);
   };
 
   // Save changes to existing or new employee
-  const handleSave = (key) => {
+  const handleSave = (key: string) => {
     if (newEmployee?.key === key) {
       setEmployees([...employees, newEmployee]); // Persist the new employee
       setNewEmployee(null);
@@ -30,7 +40,7 @@ const ManageEmployees = () => {
   };
 
   // Delete an employee row
-  const handleDelete = (key) => {
+  const handleDelete = (key: string) => {
     setEmployees(employees.filter((emp) => emp.key !== key));
   };
 
@@ -40,19 +50,22 @@ const ManageEmployees = () => {
       const newKey = (employees.length + 1).toString();
       setNewEmployee({
         key: newKey,
-        employeeId: "",
+        id: "",
         name: "",
         surname: "",
         idNumber: "",
         address: "",
         contact: "",
+        email: "",
+        role: "employee",
+        status: "pending",
       });
       setEditingKey(newKey);
     }
   };
 
   // Handle input change for both new and existing employees
-  const handleInputChange = (key, field, value) => {
+  const handleInputChange = (key: string, field: keyof EditableEmployeeData, value: string) => {
     if (editingKey === key) {
       if (newEmployee?.key === key) {
         setNewEmployee({ ...newEmployee, [field]: value });
@@ -64,7 +77,16 @@ const ManageEmployees = () => {
     }
   };
 
-  const columns = [
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+
+  const filteredEmployees = employees.filter(employee =>
+    employee.id.toLowerCase().includes(searchValue.toLowerCase()) ||
+    employee.name.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  const columns: ColumnsType<EditableEmployeeData> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -149,17 +171,26 @@ const ManageEmployees = () => {
         {/* Main Content */}
         <Content style={{ flex: 1, padding: 20 }}>
           <Card title="All Employees">
-            <Table columns={columns} dataSource={newEmployee ? [...employees, newEmployee] : employees} pagination={false} />
+            <Table columns={columns} dataSource={newEmployee ? [...filteredEmployees, newEmployee] : filteredEmployees} pagination={false} />
             
             {/* Bottom section */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
-              {/* Add Employee Button (Bottom Left) */}
-              <Button type="dashed" icon={<PlusOutlined />} onClick={handleAddEmployee} disabled={!!newEmployee}>
-                Add Employee
-              </Button>
+              <div style={{ display: "flex", gap: 10 }}>
+                {/* Back Button */}
+                <Button onClick={() => navigate(-1)}>Back</Button>
+                {/* Add Employee Button */}
+                <Button type="dashed" icon={<PlusOutlined />} onClick={handleAddEmployee} disabled={!!newEmployee}>
+                  Add Employee
+                </Button>
+              </div>
 
               {/* Search Box (Bottom Right) */}
-              <Input placeholder="Search Employee ID" style={{ borderColor: "#1890ff", borderWidth: 2, width: 200, padding: "8px" }} />
+              <Input 
+                placeholder="Search Employee ID or Name" 
+                style={{ borderColor: "#1890ff", borderWidth: 2, width: 200, padding: "8px" }}
+                value={searchValue}
+                onChange={handleSearchChange}
+              />
             </div>
           </Card>
         </Content>
@@ -168,4 +199,4 @@ const ManageEmployees = () => {
   );
 };
 
-export default ManageEmployees;
+export default ManageEmployees; 

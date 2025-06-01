@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Table, Form, Select, InputNumber, Button } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
@@ -5,23 +6,30 @@ import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
-const ClientAdditionalWorkerType = () => {
-  const [workers, setWorkers] = useState([{ key: 0 }]);
-  const [workerOptions, setWorkerOptions] = useState(["Electrician", "Plumber", "Carpenter", "Painter"]); // Default options
+interface Worker {
+  key: number;
+  workerType?: string;
+  workersNeeded?: number;
+  hoursNeeded?: number;
+}
+
+const ClientAdditionalWorkerType: React.FC = () => {
+  const [workers, setWorkers] = useState<Worker[]>([{ key: 0 }]);
+  const [workerOptions, setWorkerOptions] = useState<string[]>(["Electrician", "Plumber", "Carpenter", "Painter"]); // Default options
   const navigate = useNavigate();
 
   // Function to add a new worker type row
-  const addWorkerRow = () => {
+  const addWorkerRow = (): void => {
     setWorkers([...workers, { key: workers.length }]);
   };
 
   // Function to remove a worker type row
-  const removeWorkerRow = (key) => {
+  const removeWorkerRow = (key: number): void => {
     setWorkers(workers.filter((worker) => worker.key !== key));
   };
 
   // Function to handle adding new options when typing in the dropdown
-  const handleWorkerTypeChange = (value) => {
+  const handleWorkerTypeChange = (value: string | string[]): void => {
     if (typeof value === "string" && !workerOptions.includes(value)) {
       setWorkerOptions([...workerOptions, value]); // Add new worker type
     }
@@ -33,7 +41,7 @@ const ClientAdditionalWorkerType = () => {
       dataIndex: "workerType",
       key: "workerType",
       width: "50%",
-      render: (_, record) => (
+      render: (_: unknown, record: Worker) => (
         <Form.Item name={`workerType_${record.key}`} rules={[{ required: true, message: "Select worker type" }]}>
           <Select
             mode="tags"
@@ -55,7 +63,7 @@ const ClientAdditionalWorkerType = () => {
       dataIndex: "workersNeeded",
       key: "workersNeeded",
       width: "20%",
-      render: (_, record) => (
+      render: (_: unknown, record: Worker) => (
         <Form.Item name={`workersNeeded_${record.key}`} rules={[{ required: true, message: "Enter number" }]}>
           <InputNumber min={1} style={{ width: "100%" }} />
         </Form.Item>
@@ -66,7 +74,7 @@ const ClientAdditionalWorkerType = () => {
       dataIndex: "hoursNeeded",
       key: "hoursNeeded",
       width: "20%",
-      render: (_, record) => (
+      render: (_: unknown, record: Worker) => (
         <Form.Item name={`hoursNeeded_${record.key}`} rules={[{ required: true, message: "Enter hours" }]}>
           <InputNumber min={1} style={{ width: "100%" }} />
         </Form.Item>
@@ -76,7 +84,7 @@ const ClientAdditionalWorkerType = () => {
       title: "Action",
       key: "action",
       width: "10%",
-      render: (_, record) =>
+      render: (_: unknown, record: Worker) =>
         workers.length > 1 ? (
           <Button type="text" icon={<MinusCircleOutlined style={{ color: "red" }} />} onClick={() => removeWorkerRow(record.key)} />
         ) : null,

@@ -1,31 +1,63 @@
 import React, { useState } from "react";
 import { Layout, Card, Input, Table, Checkbox, Button } from "antd";
+import type { ColumnsType } from "antd/es/table";
 
 const { Header, Content } = Layout;
 
-const BaseUserTimesheets = () => {
-  const [jobDate, setJobDate] = useState(null);
-  const [jobsOnDate, setJobsOnDate] = useState([
+interface JobOnDate {
+  key: string;
+  jobId: string;
+  purchaseOrderNo: string;
+  jobName: string;
+  companyName: string;
+  checked: boolean;
+}
+
+interface TimesheetEntry {
+  key: string;
+  date: string;
+  employeeId: string;
+  timeIn: string;
+  timeOut: string;
+  hoursWorked: string;
+}
+
+const BaseUserTimesheets: React.FC = () => {
+  const [jobDate, setJobDate] = useState<string | null>(null);
+  const [jobsOnDate, setJobsOnDate] = useState<JobOnDate[]>([
     { key: "1", jobId: "J001", purchaseOrderNo: "PO001", jobName: "Job A", companyName: "Company 1", checked: false },
     { key: "2", jobId: "J002", purchaseOrderNo: "PO002", jobName: "Job B", companyName: "Company 2", checked: false },
   ]);
-  const [timesheetData, setTimesheetData] = useState([
+  const [timesheetData, setTimesheetData] = useState<TimesheetEntry[]>([
     { key: "1", date: "2025-03-20", employeeId: "E001", timeIn: "08:00", timeOut: "16:00", hoursWorked: "8" },
     { key: "2", date: "2025-03-20", employeeId: "E002", timeIn: "09:00", timeOut: "17:00", hoursWorked: "8" },
   ]);
 
-  const handleJobDateChange = (e) => {
+  const handleJobDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setJobDate(e.target.value);
   };
 
-  const handleCheckboxChange = (record) => {
+  const handleCheckboxChange = (record: JobOnDate) => {
     const updatedJobs = jobsOnDate.map((job) =>
       job.key === record.key ? { ...job, checked: !job.checked } : { ...job, checked: false }
     );
     setJobsOnDate(updatedJobs);
+
+    // Update timesheet data when a job is selected
+    if (!record.checked) {
+      const newTimesheetEntry: TimesheetEntry = {
+        key: `ts-${record.key}`,
+        date: jobDate || new Date().toISOString().split('T')[0],
+        employeeId: "E001", // This would come from user context in a real app
+        timeIn: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timeOut: "",
+        hoursWorked: "0"
+      };
+      setTimesheetData(prev => [...prev, newTimesheetEntry]);
+    }
   };
 
-  const columnsJobsOnDate = [
+  const columnsJobsOnDate: ColumnsType<JobOnDate> = [
     { title: "Job ID", dataIndex: "jobId", key: "jobId" },
     { title: "Purchase Order Number", dataIndex: "purchaseOrderNo", key: "purchaseOrderNo" },
     { title: "Job Name", dataIndex: "jobName", key: "jobName" },
@@ -39,7 +71,7 @@ const BaseUserTimesheets = () => {
     },
   ];
 
-  const columnsTimesheet = [
+  const columnsTimesheet: ColumnsType<TimesheetEntry> = [
     { title: "Date", dataIndex: "date", key: "date" },
     { title: "Employee ID", dataIndex: "employeeId", key: "employeeId" },
     { title: "Time In", dataIndex: "timeIn", key: "timeIn" },
@@ -57,13 +89,12 @@ const BaseUserTimesheets = () => {
 
         {/* Main Content */}
         <Content style={{ flex: 1, padding: 20 }}>
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ display: "block", fontWeight: "bold", marginBottom: 5, fontSize: "16px" }}>
-            Job Date:
-          </label>
-          <Input type="date" value={jobDate} onChange={handleJobDateChange} style={{ width: "100%", padding: 8 }} />
-        </div>
-
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ display: "block", fontWeight: "bold", marginBottom: 5, fontSize: "16px" }}>
+              Job Date:
+            </label>
+            <Input type="date" value={jobDate || ''} onChange={handleJobDateChange} style={{ width: "100%", padding: 8 }} />
+          </div>
 
           {/* Tables Container */}
           <Card style={{ display: "flex", justifyContent: "space-between", gap: "20px", marginTop: 20 }}>
@@ -75,7 +106,7 @@ const BaseUserTimesheets = () => {
                   dataSource={jobsOnDate}
                   pagination={false}
                   rowKey="key"
-                  scroll={{ y: 300 }}  // Allows for scrolling if there are too many rows
+                  scroll={{ y: 300 }}
                 />
               </Card>
             </div>
@@ -88,7 +119,7 @@ const BaseUserTimesheets = () => {
                   dataSource={timesheetData}
                   pagination={false}
                   rowKey="key"
-                  scroll={{ y: 300 }}  // Allows for scrolling if there are too many rows
+                  scroll={{ y: 300 }}
                 />
               </Card>
             </div>
@@ -104,4 +135,4 @@ const BaseUserTimesheets = () => {
   );
 };
 
-export default BaseUserTimesheets;
+export default BaseUserTimesheets; 

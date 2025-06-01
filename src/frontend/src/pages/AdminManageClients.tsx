@@ -1,26 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import { Layout, Card, Table, Input, Button } from "antd";
 import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import type { ColumnsType } from "antd/es/table";
+import { ClientData } from "../types";
 
 const { Header, Content } = Layout;
 
-const AdminManageClients = () => {
+interface EditableClientData extends Omit<ClientData, 'phone'> {
+  registrationNo: string;
+  address: string;
+  contact: string;
+}
+
+const AdminManageClients: React.FC = () => {
   const navigate = useNavigate();
-  const [editingKey, setEditingKey] = useState(null);
-  const [clients, setClients] = useState([
-    { key: "1", companyId: "C001", companyName: "Tech Solutions", registrationNo: "123456789", address: "123 Tech St, Silicon Valley", contact: "555-1234", email: "contact@techsolutions.com" },
-    { key: "2", companyId: "C002", companyName: "Creative Designs", registrationNo: "987654321", address: "456 Design Ave, NYC", contact: "555-5678", email: "contact@creativedesigns.com" },
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [clients, setClients] = useState<EditableClientData[]>([
+    { key: "1", id: "C001", name: "Tech Solutions", registrationNo: "123456789", address: "123 Tech St, Silicon Valley", contact: "555-1234", email: "contact@techsolutions.com", company: "Tech Solutions" },
+    { key: "2", id: "C002", name: "Creative Designs", registrationNo: "987654321", address: "456 Design Ave, NYC", contact: "555-5678", email: "contact@creativedesigns.com", company: "Creative Designs" },
   ]);
 
-  const [newClient, setNewClient] = useState(null);
-  const [searchValue, setSearchValue] = useState("");
+  const [newClient, setNewClient] = useState<EditableClientData | null>(null);
+  const [searchValue, setSearchValue] = useState<string>("");
 
-  const handleEdit = (key) => {
+  const handleEdit = (key: string) => {
     setEditingKey(key);
   };
 
-  const handleSave = (key) => {
+  const handleSave = (key: string) => {
     if (newClient?.key === key) {
       setClients([...clients, newClient]);
       setNewClient(null);
@@ -28,7 +36,7 @@ const AdminManageClients = () => {
     setEditingKey(null);
   };
 
-  const handleDelete = (key) => {
+  const handleDelete = (key: string) => {
     setClients(clients.filter((client) => client.key !== key));
   };
 
@@ -37,18 +45,19 @@ const AdminManageClients = () => {
       const newKey = (clients.length + 1).toString();
       setNewClient({
         key: newKey,
-        companyId: "",
-        companyName: "",
+        id: "",
+        name: "",
         registrationNo: "",
         address: "",
         contact: "",
         email: "",
+        company: "",
       });
       setEditingKey(newKey);
     }
   };
 
-  const handleInputChange = (key, field, value) => {
+  const handleInputChange = (key: string, field: keyof EditableClientData, value: string) => {
     if (editingKey === key) {
       if (newClient?.key === key) {
         setNewClient({ ...newClient, [field]: value });
@@ -60,24 +69,23 @@ const AdminManageClients = () => {
     }
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   };
 
   const filteredClients = clients.filter(client =>
-    client.companyName.toLowerCase().includes(searchValue.toLowerCase()) ||
-    client.companyId.toLowerCase().includes(searchValue.toLowerCase())
+    client.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+    client.id.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  const columns = [
-  
+  const columns: ColumnsType<EditableClientData> = [
     {
       title: "Company Name",
-      dataIndex: "companyName",
-      key: "companyName",
+      dataIndex: "name",
+      key: "name",
       render: (text, record) =>
         editingKey === record.key ? (
-          <Input value={record.companyName} onChange={(e) => handleInputChange(record.key, "companyName", e.target.value)} />
+          <Input value={record.name} onChange={(e) => handleInputChange(record.key, "name", e.target.value)} />
         ) : (
           text
         ),
@@ -159,10 +167,14 @@ const AdminManageClients = () => {
 
             {/* Bottom section */}
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
-              {/* Add Client Button (Bottom Left) */}
-              <Button type="dashed" icon={<PlusOutlined />} onClick={handleAddClient} disabled={!!newClient}>
-                Add Client
-              </Button>
+              <div style={{ display: "flex", gap: 10 }}>
+                {/* Back Button */}
+                <Button onClick={() => navigate(-1)}>Back</Button>
+                {/* Add Client Button */}
+                <Button type="dashed" icon={<PlusOutlined />} onClick={handleAddClient} disabled={!!newClient}>
+                  Add Client
+                </Button>
+              </div>
 
               {/* Search Box (Bottom Right) */}
               <Input
@@ -179,4 +191,4 @@ const AdminManageClients = () => {
   );
 };
 
-export default AdminManageClients;
+export default AdminManageClients; 
