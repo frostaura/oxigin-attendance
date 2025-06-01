@@ -25,6 +25,7 @@ import SiteManagerCheckOut from "./pages/SiteManagerCheckOut";
 import BaseUserHome from "./pages/BaseUserHome";
 import BaseUserTimesheets from "./pages/BaseUserTimesheets";
 import EmployeeUpdate from "./pages/EmployeeUpdate";
+import "./App.css";
 
 const App: React.FC = () => {
   return (
