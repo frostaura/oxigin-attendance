@@ -1,14 +1,37 @@
+// backend.ts
+// Service functions for interacting with the backend API for Oxigin Attendance.
+// Provides utility methods for authentication checks and making POST requests.
+
+// Base URL for the backend API.
 const BASE_BACKEND_URL: string = "http://localhost:5275";
 
+/**
+ * Check if the user is currently logged in by verifying the presence of a session ID in localStorage.
+ * @returns {boolean} True if a session ID exists, otherwise false.
+ */
+export function IsLoggedIn(): boolean {
+    return localStorage.getItem("sessionId") !== null;
+}
+
+/**
+ * Send a POST request to the backend API with the provided URL and body.
+ * Automatically includes the session ID from localStorage in the headers.
+ * @template T The expected response type.
+ * @param {string} url - The endpoint to send the request to (relative to the backend base URL).
+ * @param {object} body - The request payload to send as JSON.
+ * @returns {Promise<T>} The parsed JSON response from the backend.
+ */
 export async function PostAsync<T>(url: string, body: object): Promise<T>{
+    const sessionId = localStorage.getItem("sessionId");
     const finalUrl = `${BASE_BACKEND_URL}/${url}`;
     const request = await fetch(finalUrl, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "SessionId": sessionId || "",
         },
         body: JSON.stringify(body)
     });
     
     return await request.json() as T;
-} 
+}
