@@ -42,9 +42,8 @@ const ClientSignIn: React.FC = () => {
         navigate(Routes.BaseUserHome);
         break;
       case UserType.Unassigned:
-        navigate(Routes.UnassignedUser);
-        break;
       default:
+        navigate(Routes.UnassignedUser);
         break;
     }
 
