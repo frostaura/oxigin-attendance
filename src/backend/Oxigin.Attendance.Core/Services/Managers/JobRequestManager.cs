@@ -10,12 +10,12 @@ namespace Oxigin.Attendance.Core.Services.Managers;
 /// <summary>
 /// Implementation of client-related use cases (job requests, approvals, etc).
 /// </summary>
-public class JobManager : IJobManager
+public class JobRequestManager : IJobRequestManager
 {
     /// <summary>
     /// Logger instance for this manager.
     /// </summary>
-    private readonly ILogger<JobManager> _logger;
+    private readonly ILogger<JobRequestManager> _logger;
     /// <summary>
     /// The database context for accessing and persisting job requests and related entities.
     /// </summary>
@@ -26,7 +26,7 @@ public class JobManager : IJobManager
     /// </summary>
     /// <param name="db"></param>
     /// <param name="logger">Logger instance.</param>
-    public JobManager(IDatastoreContext db, ILogger<JobManager> logger)
+    public JobRequestManager(IDatastoreContext db, ILogger<JobRequestManager> logger)
     {
         _db = db;
         _logger = logger;
