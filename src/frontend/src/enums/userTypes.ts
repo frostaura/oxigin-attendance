@@ -1,8 +1,8 @@
 export enum UserType {
-    Unassigned = 1,
-    Employee = 2,
-    Client = 3,
-    Admin = 4,
-    SiteManager = 5,
-    BaseUser = 6
+    Unassigned = 0,
+    Employee = 1,
+    Client = 2,
+    Admin = 3,
+    SiteManager = 4,
+    BaseUser = 5
 }

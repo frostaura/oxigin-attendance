@@ -9,9 +9,6 @@ import { Routes } from "../enums/routes";
 
 const { Title, Text } = Typography;
 
-// TODO: Add Oxigin icon to the round picture container.
-// TODO: Add a loader for when the signing process is happening.
-
 interface LoginFormValues {
   email: string;
   password: string;
@@ -26,7 +23,6 @@ const ClientSignIn: React.FC = () => {
   useEffect(() => {
     if(!userContext) return;
 
-    // TODO: Navigate to the correct home page based on the userContext userType.
     setProcessing(true);
 
     switch(userContext.user.userType){
@@ -44,6 +40,9 @@ const ClientSignIn: React.FC = () => {
         break;
       case UserType.BaseUser:
         navigate(Routes.BaseUserHome);
+        break;
+      case UserType.Unassigned:
+        navigate(Routes.UnassignedUser);
         break;
       default:
         break;
