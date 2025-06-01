@@ -25,7 +25,7 @@ const ClientSignIn: React.FC = () => {
       console.log("Logged in user:", userContext);
     } catch (error) {
       console.error("Login failed:", error);
-      alert(`Login Failed: ${error.message}`)
+      alert(`Login Failed: ${JSON.stringify(error, null, 2)}`);
     }
   };
 
