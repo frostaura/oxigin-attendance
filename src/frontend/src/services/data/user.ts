@@ -2,8 +2,9 @@
 // Service functions and types for user authentication and user-related API calls.
 // Handles user sign-in and session management for the Oxigin Attendance frontend.
 
-import type { UserSigninResponse } from "../../models/userModels";
+import type { UserSignUpResponse, UserSigninResponse } from "../../models/userModels";
 import { PostAsync } from "./backend";
+//import { UserSigninResponse, UserSession } from "../models/userModels";
 
 /**
  * Sign in a user with the provided email and password.
@@ -20,3 +21,12 @@ export async function SignInAsync(email: string, password: string): Promise<User
 
     return response;
 }
+
+export async function SignUpAsync(name: string, contactNr: string, email: string, password: string): Promise<UserSignUpResponse> {
+    const response = await PostAsync<UserSignUpResponse>('User/SignUp', { name, contactNr, email, password });
+    localStorage.setItem("session", JSON.stringify(response));
+
+    return response;
+}
+
+

@@ -1,56 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
-import type { EmployeeRegistrationFormValues } from "../types";
+import { SignUpAsync } from "../services/data/user";
 
 const { Title } = Typography;
 
-interface ExtendedEmployeeRegistrationFormValues extends EmployeeRegistrationFormValues {
-  surname: string;
-  idNumber: string;
-  bankName: string;
-  accountHolderName: string;
-  branchCode: string;
-  accountNumber: string;
+interface EmployeeRegistrationFormValues {
+  name: string;
+  contactNr: string;
+  email: string;
+  password: string;
 }
 
 const EmployeeRegister: React.FC = () => {
   const navigate = useNavigate();
-  const [form] = Form.useForm<ExtendedEmployeeRegistrationFormValues>();
+  const [form] = Form.useForm<EmployeeRegistrationFormValues>();
+  const [processing, setProcessing] = useState(false);
 
-  const handleSubmit = (values: ExtendedEmployeeRegistrationFormValues) => {
-    console.log("Employee Data:", values);
-    navigate(-1); // Go back one page
+
+  const handleSignUp = async (values: EmployeeRegistrationFormValues) => {
+    try {
+      setProcessing(true); 
+      // Call the SignUpAsync function with the form values
+      await SignUpAsync(
+        values.name,
+        values.contactNr,
+        values.email,
+        values.password
+      );
+      console.log("Registration successful!");
+      navigate("/"); 
+    } catch (error) {
+      console.error("Registration failed:", error);
+      alert(`Registration Failed: ${JSON.stringify(error, null, 2)}`);
+      setProcessing(false);
+    }
   };
+  // TODO: Add appropriate alert for errors
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px" }}>
       <Card style={{ width: 450, textAlign: "center", padding: "20px 24px" }}>
         <Title level={2} style={{ marginBottom: 20 }}>Employee Register</Title>
 
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form form={form} layout="vertical" onFinish={handleSignUp}>
           {/* Employee Information */}
-          <Form.Item label="Employee ID" name="employeeId" rules={[{ required: true, message: "Employee ID is required." }]}>
-            <Input placeholder="Employee ID" />
+
+          <Form.Item label="Full Name" name="name" rules={[{ required: true, message: "First name is required." }]}>
+            <Input placeholder="Enter Full Name" />
           </Form.Item>
 
-          <Form.Item label="First Name" name="firstName" rules={[{ required: true, message: "First name is required." }]}>
-            <Input placeholder="Enter First Name" />
-          </Form.Item>
-
-          <Form.Item label="Last Name" name="lastName" rules={[{ required: true, message: "Last name is required." }]}>
-            <Input placeholder="Enter Last Name" />
-          </Form.Item>
-
-          <Form.Item label="ID Number" name="idNumber" rules={[{ required: true, message: "ID Number is required." }]}>
-            <Input placeholder="Enter ID Number" />
-          </Form.Item>
-
-          <Form.Item label="Address" name="address" rules={[{ required: true, message: "Please enter an Address." }]}>
-            <Input.TextArea placeholder="Enter Address" rows={2} />
-          </Form.Item>
-
-          <Form.Item label="Phone" name="phone" rules={[{ required: true, message: "Please enter a Contact Number." }]}>
+          <Form.Item label="Contact Number" name="contactNr" rules={[{ required: true, message: "ID Number is required." }]}>
             <Input placeholder="Enter Contact Number" />
           </Form.Item>
 
@@ -80,29 +80,9 @@ const EmployeeRegister: React.FC = () => {
           >
             <Input.Password placeholder="Confirm your password" />
           </Form.Item>
-
-          {/* Banking Details */}
-          <Title level={4} style={{ textAlign: "left", marginTop: 20 }}>Banking Details</Title>
-
-          <Form.Item label="Bank Name" name="bankName" rules={[{ required: true, message: "Bank Name is required." }]}>
-            <Input placeholder="Enter Bank Name" />
-          </Form.Item>
-
-          <Form.Item label="Account Holder Name" name="accountHolderName" rules={[{ required: true, message: "Account Holder Name is required." }]}>
-            <Input placeholder="Enter Account Holder Name" />
-          </Form.Item>
-
-          <Form.Item label="Branch Code" name="branchCode" rules={[{ required: true, message: "Branch Code is required." }]}>
-            <Input placeholder="Enter Branch Code" />
-          </Form.Item> 
-
-          <Form.Item label="Account Number" name="accountNumber" rules={[{ required: true, message: "Account Number is required." }]}>
-            <Input placeholder="Enter Account Number" />
-          </Form.Item>
-
           {/* Done Button */}
           <Button type="primary" htmlType="submit" block>
-            Done
+          {processing ? "Registering you..." : "Done"}
           </Button>
         </Form>
       </Card>

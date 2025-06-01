@@ -26,6 +26,7 @@ const ClientSignIn: React.FC = () => {
 
     // TODO: Navigate to the correct home page based on the userContext userType.
     setProcessing(true);
+    debugger;
     navigate("/clienthome");
     setProcessing(false);
   }, [userContext]);
