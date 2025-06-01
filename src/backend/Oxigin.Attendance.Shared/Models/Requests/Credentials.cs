@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Oxigin.Attendance.Shared.Models.Requests;
 
 [DebuggerDisplay("User: {Email}")]
-public class UserSigninRequest
+public class Credentials
 {
     /// <summary>
     /// The user's email address to sign in with.

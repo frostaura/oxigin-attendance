@@ -50,7 +50,7 @@ public class UserManager : IUserManager
     /// <param name="request">The user's sign in request.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>A sign in response.</returns>
-    public async Task<UserSigninResponse> SignInAsync(UserSigninRequest request, CancellationToken token)
+    public async Task<UserSigninResponse> SignInAsync(Credentials request, CancellationToken token)
     {
         try
         {
@@ -147,4 +147,46 @@ public class UserManager : IUserManager
             };
         }
     }
+
+    public async Task<UserSigninResponse> ChangePasswordAsync(Credentials request, CancellationToken token)
+    {
+        try
+        {
+            request.ThrowIfNull(nameof(request));
+        
+            // Hash the password before saving
+            request.Password = request.Password.HashString();
+            request.Email = request.Email.ToLower();
+
+            var user = await _db.Users.SingleOrDefaultAsync((User) => User.Email == request.Email);
+            user.Password = request.Password;
+            
+            await _db.SaveChangesAsync(token);
+            var session = new UserSession { UserId = user.Id };
+            _db.UserSessions.Add(session);
+            await _db.SaveChangesAsync(token);
+            return new UserSigninResponse
+            {
+                User = user,
+                SessionId = session.Id
+            };
+        }
+        catch (StandardizedErrorException e)
+        {
+            throw new StandardizedErrorException
+            {
+                Error = new StandardizedError
+                {
+                    Origin = nameof(UserManager),
+                    Message = "Unable to sign up, please try again later.",
+                    Data = new Dictionary<string, object>
+                    {
+                        { nameof(e.Message), e.Message },
+                        { nameof(e.StackTrace), e.StackTrace }
+                    }
+                }
+            };
+        }
+    }
+
 }

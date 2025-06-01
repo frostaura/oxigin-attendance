@@ -1,6 +1,8 @@
 // userModels.ts
 // Interfaces for user-related data structures in the Oxigin Attendance frontend.
 
+import type { UserType } from "../enums/userTypes";
+
 
 /**
  * User entity interface representing a user in the system.
@@ -10,7 +12,7 @@ export interface User {
     name: string;
     contactNr: string;
     email: string;
-    //userType: UserType;
+    userType: UserType;
     password: string;
     //sessions?: UserSession[];
 }

@@ -25,7 +25,9 @@ import SiteManagerCheckOut from "./pages/SiteManagerCheckOut";
 import BaseUserHome from "./pages/BaseUserHome";
 import BaseUserTimesheets from "./pages/BaseUserTimesheets";
 import EmployeeUpdate from "./pages/EmployeeUpdate";
+import UnassignedUser from "./pages/UnassignedUser";
 import "./App.css";
+import { Routes as AppRoutes } from "./enums/routes";
 
 // TODO: Refactor routes to be enums for reusability instea 
 
@@ -42,7 +44,8 @@ const App: React.FC = () => {
           element={
             <AppLayout>
               <Routes>
-                <Route path="/clienthome" element={<ClientHome />} />
+                <Route path={AppRoutes.UnassignedUser} element={<UnassignedUser/>} />
+                <Route path={AppRoutes.ClientHome} element={<ClientHome />} />
                 <Route path="/adminhome" element={<AdminHome />} />
                 <Route path="/clientupdate" element={<ClientUpdate />} />
                 <Route path="/adminjobrequest" element={<AdminJobRequest/>}/>
@@ -71,5 +74,6 @@ const App: React.FC = () => {
     </Router>
   );
 };
+
 
 export default App; 

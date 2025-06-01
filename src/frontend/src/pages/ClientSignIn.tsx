@@ -4,6 +4,8 @@ import { SignInAsync } from "../services/data/user";
 import { useEffect, useState } from "react";
 import { GetLoggedInUserContext } from "../services/data/backend";
 import type { UserSigninResponse } from "../models/userModels";
+import { UserType } from "../enums/userTypes";
+import { Routes } from "../enums/routes";
 
 const { Title, Text } = Typography;
 
@@ -26,8 +28,27 @@ const ClientSignIn: React.FC = () => {
 
     // TODO: Navigate to the correct home page based on the userContext userType.
     setProcessing(true);
-    debugger;
-    navigate("/clienthome");
+
+    switch(userContext.user.userType){
+      case UserType.Admin:
+        navigate(Routes.AdminHome);
+        break;
+      case UserType.Employee:
+        navigate(Routes.EmployeeHome);
+        break;
+      case UserType.Client:
+        navigate(Routes.ClientHome);
+        break;
+      case UserType.SiteManager:
+        navigate(Routes.SiteManagerHome);
+        break;
+      case UserType.BaseUser:
+        navigate(Routes.BaseUserHome);
+        break;
+      default:
+        break;
+    }
+
     setProcessing(false);
   }, [userContext]);
 

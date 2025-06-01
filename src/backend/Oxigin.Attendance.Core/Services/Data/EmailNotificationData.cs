@@ -42,6 +42,7 @@ namespace Oxigin.Attendance.Core.Services.Data
         /// <param name="token">A token allowing cancelling downstream operations.</param>
         public async Task SendNotificationAsync(User recipient, string message, CancellationToken token)
         {
+            return;
             // Use SMTP config from injected options
             var smtpHost = _smtpConfig.Host;
             var smtpPort = _smtpConfig.Port;

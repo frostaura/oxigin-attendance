@@ -17,7 +17,7 @@ public interface IUserManager
     /// <param name="request">The user's sign in request.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>A sign in response.</returns>
-    public Task<UserSigninResponse> SignInAsync(UserSigninRequest request, CancellationToken token);
+    public Task<UserSigninResponse> SignInAsync(Credentials request, CancellationToken token);
 
     /// <summary>
     /// Sign up a user given a user entity and get a fresh session for them.
@@ -26,4 +26,6 @@ public interface IUserManager
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The created user's new session.</returns>
     Task<UserSigninResponse> SignUpAsync(User user, CancellationToken token);
+    Task<UserSigninResponse> ChangePasswordAsync(Credentials request, CancellationToken token);
+    
 }
