@@ -9,7 +9,6 @@ import ClientJobRequest from "./pages/ClientJobRequest";
 import AdminJobRequest from "./pages/AdminJobRequest"; 
 import ClientAdditionalWorkerType from "./pages/ClientAdditionalWorkerType";
 import AdminAdditionalWorkerType from "./pages/AdminAdditionalWorkerType";
-import AdminSignIn from "./pages/AdminSignIn";
 import AdminHome from "./pages/AdminHome";
 import AdminJobsHome from "./pages/AdminJobsHome";
 import AdminEmployeesHome from "./pages/AdminEmployeesHome";
@@ -36,7 +35,6 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<ClientSignIn />} />
-        <Route path="/adminsignin" element={<AdminSignIn/>} />
         <Route path="/clientregister" element={<ClientRegister />} />
         
         <Route
