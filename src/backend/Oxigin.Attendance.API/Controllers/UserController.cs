@@ -35,7 +35,7 @@ public class UserController : BaseController
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>A sign in response if successful, otherwise a bad request.</returns>
     [HttpPost("SignIn")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserSigninResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> SignInAsync([FromBody] UserSigninRequest request, CancellationToken token)
     {

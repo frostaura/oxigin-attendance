@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
-import { signIn } from "../authAPI";
+import { SignInAsync } from "../services/data/user";
 
 const { Title, Text } = Typography;
 
@@ -12,7 +12,7 @@ interface LoginFormValues {
 const ClientSignIn: React.FC = () => {
   const handleLogin = async (values: LoginFormValues): Promise<void> => {
     try {
-      const user = await signIn(values.email, values.password);
+      const user = await SignInAsync(values.email, values.password);
       console.log("Logged in user:", user);
     } catch (error) {
       console.error("Login failed:", error);
