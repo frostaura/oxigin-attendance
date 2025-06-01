@@ -55,3 +55,4 @@ nunit-*.xml
 .DS_Store
 .idea
 build
+src/backend/Oxigin.Attendance.API.sln.DotSettings.user

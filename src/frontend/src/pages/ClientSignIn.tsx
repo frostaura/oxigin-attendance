@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
 import { SignInAsync } from "../services/data/user";
+import { useEffect } from "react";
 
 const { Title, Text } = Typography;
 
@@ -10,12 +11,21 @@ interface LoginFormValues {
 }
 
 const ClientSignIn: React.FC = () => {
+  useEffect(() => {
+    const context = localStorage.getItem("user");
+
+    console.log("User context from localStorage:", JSON.parse(context || "{}"));
+  }, []);
+
+
   const handleLogin = async (values: LoginFormValues): Promise<void> => {
     try {
-      const user = await SignInAsync(values.email, values.password);
-      console.log("Logged in user:", user);
+      const userContext = await SignInAsync(values.email, values.password);
+      localStorage.setItem("user", JSON.stringify(userContext));
+      console.log("Logged in user:", userContext);
     } catch (error) {
       console.error("Login failed:", error);
+      alert(`Login Failed: ${error.message}`)
     }
   };
 
