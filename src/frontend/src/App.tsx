@@ -26,17 +26,8 @@ import BaseUserHome from "./pages/BaseUserHome";
 import BaseUserTimesheets from "./pages/BaseUserTimesheets";
 import EmployeeUpdate from "./pages/EmployeeUpdate";
 import "./App.css";
-import { GetLoggedInUserContext } from "./services/data/backend";
-import type { UserSigninResponse } from "./models/userModels";
 
 const App: React.FC = () => {
-  const user: UserSigninResponse | null = GetLoggedInUserContext();
-
-  // If no user is logged in, redirect to the ClientSignIn page.
-  if (!user) {
-    return (<ClientSignIn />);
-  }
-
   return (
     <Router>
       <Routes>

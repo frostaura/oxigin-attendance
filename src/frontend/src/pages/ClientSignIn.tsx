@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
 import { SignInAsync } from "../services/data/user";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { GetLoggedInUserContext } from "../services/data/backend";
+import type { UserSigninResponse } from "../models/userModels";
 
 const { Title, Text } = Typography;
 
@@ -11,18 +13,24 @@ interface LoginFormValues {
 }
 
 const ClientSignIn: React.FC = () => {
+  // Attempt to get the signed in user from localsotrage.
+  const [userContext, setUserContext] = useState<UserSigninResponse | null>(GetLoggedInUserContext());
+  const navigate = useNavigate();
+  
   useEffect(() => {
-    const context = localStorage.getItem("user");
+    if(!userContext) return;
 
-    console.log("User context from localStorage:", JSON.parse(context || "{}"));
-  }, []);
+    // If somebody is signed in, redirect to their home page.
+    debugger;
+    navigate("/clienthome");
+  }, [userContext]);
 
 
   const handleLogin = async (values: LoginFormValues): Promise<void> => {
     try {
       const userContext = await SignInAsync(values.email, values.password);
-      localStorage.setItem("user", JSON.stringify(userContext));
-      console.log("Logged in user:", userContext);
+
+      setUserContext(userContext);
     } catch (error) {
       console.error("Login failed:", error);
       alert(`Login Failed: ${JSON.stringify(error, null, 2)}`);
