@@ -16,17 +16,21 @@ const BASE_BACKEND_URL: string = "http://localhost:5275";
  * @returns {Promise<T>} The parsed JSON response from the backend.
  */
 export async function PostAsync<T>(url: string, body: object): Promise<T>{
-    const sessionId = localStorage.getItem("sessionId");
+    const userContext = GetLoggedInUserContext();
+    const sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
     const finalUrl = `${BASE_BACKEND_URL}/${url}`;
     const request = await fetch(finalUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "SessionId": sessionId || "",
+            "SessionId": sessionId,
         },
         body: JSON.stringify(body)
     });
 
+    if(request.status !== 403) {
+        NavigateToSignInPage();
+    }
     if(!request.ok) throw new Error(await request.text());
 
     return await request.json() as T;
@@ -41,4 +45,12 @@ export function GetLoggedInUserContext(): UserSigninResponse | null {
     const parsedSession = session ? JSON.parse(session) : null;
 
     return parsedSession as UserSigninResponse;
+}
+
+/**
+ * 
+ */
+export function NavigateToSignInPage(): void{
+    localStorage.removeItem("session");
+    window.location.href = window.location.origin;
 }
