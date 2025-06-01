@@ -58,7 +58,7 @@ public class UserController : BaseController
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>An IActionResult indicating success or failure.</returns>
     [HttpPost("SignUp")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserSession))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserSigninResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> SignUpAsync([FromBody] User user, CancellationToken token)
     {

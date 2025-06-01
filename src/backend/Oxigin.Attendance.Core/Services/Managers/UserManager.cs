@@ -107,7 +107,7 @@ public class UserManager : IUserManager
     /// <param name="user">The user entity containing user details.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The created user's new session.</returns>
-    public async Task<UserSession> SignUpAsync(User user, CancellationToken token)
+    public async Task<UserSigninResponse> SignUpAsync(User user, CancellationToken token)
     {
         try
         {
@@ -124,7 +124,11 @@ public class UserManager : IUserManager
             await _db.SaveChangesAsync(token);
             // Send welcome notification upon registration
             await _notificationData.SendNotificationAsync(user, $"Welcome to Oxigin Attendance, {user.Name}!", token);
-            return session;
+            return new UserSigninResponse
+            {
+                User = user,
+                SessionId = session.Id
+            };
         }
         catch (StandardizedErrorException e)
         {
