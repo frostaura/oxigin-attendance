@@ -4,7 +4,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import type { Dayjs } from "dayjs";
-import { createJobsAsync } from "../services/data/job";
+import { createJobAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
 
 interface Worker {
@@ -62,7 +62,7 @@ const ClientJobRequest: React.FC = () => {
         approved: false
       };
 
-      await createJobsAsync(jobRequest);
+      await createJobAsync(jobRequest);
       message.success('Job request submitted successfully');
       navigate("/clienthome");
     } catch (error) {
