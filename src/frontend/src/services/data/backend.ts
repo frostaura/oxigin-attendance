@@ -101,6 +101,35 @@ export async function DeleteAsync<T>(url: string, sessionId?: string | null): Pr
 }
 
 /**
+ * Send a PUT request to the backend API with the provided URL and body.
+ * Automatically includes the session ID from localStorage in the headers.
+ * @template T The expected response type.
+ * @param {string} url - The endpoint to send the request to (relative to the backend base URL).
+ * @param {object} body - The request payload to send as JSON.
+ * @returns {Promise<T>} The parsed JSON response from the backend.
+ */
+export async function PutAsync<T>(url: string, body: object, sessionId?: string | null): Promise<T> {
+    if(!sessionId){
+        const userContext = await GetLoggedInUserContextAsync();
+        sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
+    }
+    const finalUrl = `${BASE_BACKEND_URL}/${url}`;
+    const request = await fetch(finalUrl, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "SessionId": sessionId,
+        },
+        body: JSON.stringify(body)
+    });
+    if(request.status === 403) {
+        NavigateToSignInPage();
+    }
+    if(!request.ok) throw new Error(await request.text());
+    return await request.json() as T;
+}
+
+/**
  * Check if the user is currently logged in by verifying the presence of a session ID in localStorage.
  * @returns {boolean} True if a session ID exists, otherwise false.
  */
