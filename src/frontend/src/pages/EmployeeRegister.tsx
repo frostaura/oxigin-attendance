@@ -13,6 +13,7 @@ interface EmployeeRegistrationFormValues {
 }
 
 const EmployeeRegister: React.FC = () => {
+  // TODO: We should have only one register and name it something like Register.
   const navigate = useNavigate();
   const [form] = Form.useForm<EmployeeRegistrationFormValues>();
   const [processing, setProcessing] = useState(false);
@@ -36,7 +37,6 @@ const EmployeeRegister: React.FC = () => {
       setProcessing(false);
     }
   };
-  // TODO: Add appropriate alert for errors
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px" }}>

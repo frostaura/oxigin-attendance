@@ -6,6 +6,7 @@ import type { ClientRegistrationFormValues } from "../types";
 const { Title, Text } = Typography;
 
 const ClientRegister: React.FC = () => {
+  // TODO: We should have only one register and name it something like Register.
   const [form] = Form.useForm<ClientRegistrationFormValues>();
 
   const handleRegister = (values: ClientRegistrationFormValues) => {

@@ -18,6 +18,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const showBackButton = !hideBackButtonOn.includes(location.pathname) && !location.pathname.includes("home");
   const [userInitials, setUserInitials] = useState<string>("");
 
+  // Infer the card title from the currently-signed-in user, if any.
   useEffect(() => {
     setTimeout(async () => {
       var userContext = await GetLoggedInUserContextAsync();

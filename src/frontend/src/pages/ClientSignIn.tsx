@@ -15,6 +15,7 @@ interface LoginFormValues {
 }
 
 const ClientSignIn: React.FC = () => {
+  // TODO: We should only have one sign in so renaming this to SignIn would be better.
   // Attempt to get the signed in user from localsotrage.
   const [userContext, setUserContext] = useState<UserSigninResponse | null>();
   const navigate = useNavigate();
