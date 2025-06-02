@@ -21,7 +21,7 @@ public class JobController : BaseController
 
     /// <summary>
     /// Overloaded constructor to allow for injecting dependencies.
-    /// </summary>
+    /// </summary> 
     /// <param name="jobRequestManager">Manager for job use cases.</param>
     /// <param name="logger">Logger instance.</param>
     public JobController(IJobRequestManager jobRequestManager, ILogger<JobController> logger, IDatastoreContext db)
@@ -56,14 +56,10 @@ public class JobController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> CreateJobRequestAsync([FromBody] Job request, CancellationToken token)
     {
-        // TODO: Grab the context of the requesting user.
         var signedInUser = await GetRequestingUserAsync(token);
 
         request.RequestorID = signedInUser.Id;
         request.ClientID = signedInUser.Client.Id;
-        //request.ClientID = signedInUser.Id;
-
-        // TODO: Assign the request id to that of the above user.
 
         var result = await _jobRequestManager.CreateJobRequestAsync(request, token);
 
