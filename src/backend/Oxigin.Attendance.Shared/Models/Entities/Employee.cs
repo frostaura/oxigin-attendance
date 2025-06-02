@@ -40,3 +40,4 @@ public class Employee : BaseEntity
     /// </summary>
     public string AccountNumber { get; set; }
 }
+

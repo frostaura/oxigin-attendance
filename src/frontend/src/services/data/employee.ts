@@ -2,7 +2,7 @@
 // Service functions for interacting with the EmployeeController backend API.
 // Provides utility methods for CRUD operations on employees.
 import type { Employee } from "../../models/employeeModels";
-import { GetAsync, PostAsync, DeleteAsync } from "./backend";
+import { GetAsync, PostAsync, PutAsync, DeleteAsync } from "./backend";
 
 /**
  * Get all employees.
@@ -36,7 +36,7 @@ export async function addEmployeeAsync(employee: Partial<Employee>): Promise<Emp
  * @returns {Promise<Employee>} The updated Employee entity.
  */
 export async function updateEmployeeAsync(employee: Employee): Promise<Employee> {
-    return await PostAsync<Employee>("Employee", employee); // If your backend expects PUT, adjust accordingly
+    return await PutAsync<Employee>("Employee", employee); // If your backend expects PUT, adjust accordingly
 }
 
 /**

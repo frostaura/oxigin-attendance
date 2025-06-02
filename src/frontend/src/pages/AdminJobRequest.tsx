@@ -3,7 +3,6 @@ import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table, Select
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import type { Dayjs } from "dayjs";
 import { getClientsAsync } from "../services/data/clients";
 import { createJobAsync } from "../services/data/job";
 import { GetLoggedInUserContextAsync } from "../services/data/backend";
