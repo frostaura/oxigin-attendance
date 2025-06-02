@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Select, Button, Checkbox, Card } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
+import type { Job } from "../models/jobModels";
+import { getJobsAsync } from "../services/data/job";
 
 const { Option } = Select;
 
@@ -15,11 +17,24 @@ interface Employee {
 const AdminJobAllocations: React.FC = () => {
   const navigate = useNavigate();
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [availableEmployees, setAvailableEmployees] = useState<Employee[]>([
     { id: "E001", name: "John Doe", contact: "555-1234", checked: false },
     { id: "E002", name: "Jane Smith", contact: "555-5678", checked: false },
   ]);
   const [allocatedEmployees, setAllocatedEmployees] = useState<Employee[]>([]);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const jobsData = await getJobsAsync();
+        setJobs(jobsData);
+      } catch (error) {
+        console.error("Failed to fetch jobs:", error);
+      }
+    };
+    fetchJobs();
+  }, []);
 
   const handleJobChange = (value: string) => {
     setSelectedJob(value);
@@ -66,8 +81,11 @@ const AdminJobAllocations: React.FC = () => {
           onChange={handleJobChange}
           value={selectedJob}
         >
-          <Option value="Job1">Job 1</Option>
-          <Option value="Job2">Job 2</Option>
+          {jobs.map(job => (
+            <Option key={job.id} value={job.id}>
+              {job.jobName} - {job.purchaseOrderNumber}
+            </Option>
+          ))}
         </Select>
         
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
