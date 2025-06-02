@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout, Card, Button, Table, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
+import { getJobRequestsAsync as getJobsAsync } from "../services/data/jobRequests";
+import type { Job } from "../types";
 
 const { Header, Content } = Layout;
 
@@ -64,6 +66,22 @@ const ClientHome: React.FC = () => {
     { title: "Location", dataIndex: "location", key: "location" },
     { title: "Date", dataIndex: "date", key: "date" },
   ];
+
+  // Fetch all data we need, and ensure the effect only runs once on mount ([]).
+  const [jobs, setJobs] = useState<Array<JobData>>([]);
+  useEffect(() => {
+    setTimeout(async () => {
+      const allJobs: Array<Job> = await getJobsAsync();
+      
+      // TODO: Map to JobData.
+
+      // Set the job data (setJobs) and ensure you bind the table to (jobs)
+
+      console.log("Fetched Jobs:", allJobs);
+
+      debugger;
+    });
+  }, []);
 
   return (
     <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>

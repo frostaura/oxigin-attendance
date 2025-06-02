@@ -6,7 +6,7 @@ import type { Job } from "../../types";
  * @param request The job request details
  * @returns The created job request from the server
  */
-export async function createJobRequestAsync(request: Job): Promise<Job> {
+export async function createJobsAsync(request: Job): Promise<Job> {
     const response = await PostAsync<Job>('Job', request);
     return response;
 }
