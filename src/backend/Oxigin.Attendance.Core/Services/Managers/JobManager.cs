@@ -3,19 +3,18 @@ using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Datastore.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Oxigin.Attendance.Shared.Enums;
 
 namespace Oxigin.Attendance.Core.Services.Managers;
 
 /// <summary>
 /// Implementation of client-related use cases (job requests, approvals, etc).
 /// </summary>
-public class JobRequestManager : IJobRequestManager
+public class JobManager : IJobRequestManager
 {
     /// <summary>
     /// Logger instance for this manager.
     /// </summary>
-    private readonly ILogger<JobRequestManager> _logger;
+    private readonly ILogger<JobManager> _logger;
     /// <summary>
     /// The database context for accessing and persisting job requests and related entities.
     /// </summary>
@@ -26,7 +25,7 @@ public class JobRequestManager : IJobRequestManager
     /// </summary>
     /// <param name="db"></param>
     /// <param name="logger">Logger instance.</param>
-    public JobRequestManager(IDatastoreContext db, ILogger<JobRequestManager> logger)
+    public JobManager(IDatastoreContext db, ILogger<JobManager> logger)
     {
         _db = db;
         _logger = logger;
@@ -37,11 +36,11 @@ public class JobRequestManager : IJobRequestManager
     /// </summary>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>A collection of job requests.</returns>
-    public async Task<IEnumerable<JobRequest>> GetJobRequestsAsync(CancellationToken token)
+    public async Task<IEnumerable<Job>> GetJobRequestsAsync(CancellationToken token)
     {
         try
         {
-            return await _db.JobRequests.Include(j => j.Client).ToListAsync(token);
+            return await _db.Jobs.ToListAsync(token);
         }
         catch (Exception ex)
         {
@@ -56,12 +55,12 @@ public class JobRequestManager : IJobRequestManager
     /// <param name="request">The job request entity containing event details, staff requirements, etc.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The created job request entity.</returns>
-    public async Task<JobRequest> CreateJobRequestAsync(JobRequest request, CancellationToken token)
+    public async Task<Job> CreateJobRequestAsync(Job request, CancellationToken token)
     {
         try
         {
-            request.Status = JobRequestStatus.Pending;
-            _db.JobRequests.Add(request);
+            request.Approved = false;
+            _db.Jobs.Add(request);
             await _db.SaveChangesAsync(token);
             return request;
         }
@@ -78,13 +77,13 @@ public class JobRequestManager : IJobRequestManager
     /// <param name="request">The job request entity to approve (should include the id and any relevant context).</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with approved status.</returns>
-    public async Task<JobRequest> ApproveJobRequestAsync(JobRequest request, CancellationToken token)
+    public async Task<Job> ApproveJobRequestAsync(Job request, CancellationToken token)
     {
         try
         {
-            var entity = await _db.JobRequests.FirstOrDefaultAsync(j => j.Id == request.Id, token);
+            var entity = await _db.Jobs.FirstOrDefaultAsync(j => j.Id == request.Id, token);
             if (entity == null) throw new InvalidOperationException("Job request not found");
-            entity.Status = JobRequestStatus.Approved;
+            entity.Approved = true;
             await _db.SaveChangesAsync(token);
             return entity;
         }
@@ -101,13 +100,13 @@ public class JobRequestManager : IJobRequestManager
     /// <param name="request">The job request entity to reject (should include the id and any relevant context).</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with rejected status.</returns>
-    public async Task<JobRequest> RejectJobRequestAsync(JobRequest request, CancellationToken token)
+    public async Task<Job> RejectJobRequestAsync(Job request, CancellationToken token)
     {
         try
         {
-            var entity = await _db.JobRequests.FirstOrDefaultAsync(j => j.Id == request.Id, token);
+            var entity = await _db.Jobs.FirstOrDefaultAsync(j => j.Id == request.Id, token);
             if (entity == null) throw new InvalidOperationException("Job request not found");
-            entity.Status = JobRequestStatus.Rejected;
+            entity.Approved = false;
             await _db.SaveChangesAsync(token);
             return entity;
         }

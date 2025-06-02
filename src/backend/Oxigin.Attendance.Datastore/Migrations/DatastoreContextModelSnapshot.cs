@@ -22,43 +22,54 @@ namespace Oxigin.Attendance.Datastore.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.JobRequest", b =>
+            modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.Job", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClientId")
+                    b.Property<bool>("Approved")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("ClientID")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("JobName")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("ScheduledAt")
+                    b.Property<string>("Location")
+                        .HasColumnType("text");
+
+                    b.Property<int>("NumHours")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NumWorkers")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PurchaseOrderNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RequestorID")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Time")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("StaffRequired")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                    b.HasIndex("ClientID");
 
-                    b.ToTable("JobRequests");
+                    b.HasIndex("RequestorID");
+
+                    b.ToTable("Jobs");
                 });
 
             modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.User", b =>
@@ -122,15 +133,23 @@ namespace Oxigin.Attendance.Datastore.Migrations
                     b.ToTable("UserSessions");
                 });
 
-            modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.JobRequest", b =>
+            modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.Job", b =>
                 {
                     b.HasOne("Oxigin.Attendance.Shared.Models.Entities.User", "Client")
                         .WithMany()
-                        .HasForeignKey("ClientId")
+                        .HasForeignKey("ClientID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Oxigin.Attendance.Shared.Models.Entities.User", "Requestor")
+                        .WithMany()
+                        .HasForeignKey("RequestorID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Client");
+
+                    b.Navigation("Requestor");
                 });
 
             modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.UserSession", b =>

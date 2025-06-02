@@ -11,7 +11,7 @@ namespace Oxigin.Attendance.API.Controllers;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
-public class JobRequestController : BaseController
+public class JobController : BaseController
 {
     /// <summary>
     /// The manager for job-related use cases.
@@ -23,7 +23,7 @@ public class JobRequestController : BaseController
     /// </summary>
     /// <param name="jobRequestManager">Manager for job use cases.</param>
     /// <param name="logger">Logger instance.</param>
-    public JobRequestController(IJobRequestManager jobRequestManager, ILogger<JobRequestController> logger)
+    public JobController(IJobRequestManager jobRequestManager, ILogger<JobController> logger)
         : base(logger)
     {
         _jobRequestManager = jobRequestManager;
@@ -35,7 +35,7 @@ public class JobRequestController : BaseController
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>A collection of job requests.</returns>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<JobRequest>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Job>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> GetJobRequestsAsync(CancellationToken token)
     {
@@ -51,9 +51,9 @@ public class JobRequestController : BaseController
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The created job request entity.</returns>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobRequest))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Job))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
-    public async Task<IActionResult> CreateJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
+    public async Task<IActionResult> CreateJobRequestAsync([FromBody] Job request, CancellationToken token)
     {
         var result = await _jobRequestManager.CreateJobRequestAsync(request, token);
 
@@ -67,9 +67,9 @@ public class JobRequestController : BaseController
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with approved status.</returns>
     [HttpPost("approve")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobRequest))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Job))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
-    public async Task<IActionResult> ApproveJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
+    public async Task<IActionResult> ApproveJobRequestAsync([FromBody] Job request, CancellationToken token)
     {
         var result = await _jobRequestManager.ApproveJobRequestAsync(request, token);
 
@@ -83,9 +83,9 @@ public class JobRequestController : BaseController
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with rejected status.</returns>
     [HttpPost("reject")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobRequest))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Job))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
-    public async Task<IActionResult> RejectJobRequestAsync([FromBody] JobRequest request, CancellationToken token)
+    public async Task<IActionResult> RejectJobRequestAsync([FromBody] Job request, CancellationToken token)
     {
         var result = await _jobRequestManager.RejectJobRequestAsync(request, token);
 
