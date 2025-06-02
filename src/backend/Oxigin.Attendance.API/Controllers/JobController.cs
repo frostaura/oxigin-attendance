@@ -60,6 +60,7 @@ public class JobController : BaseController
         var signedInUser = await GetRequestingUserAsync(token);
 
         request.RequestorID = signedInUser.Id;
+        request.ClientID = signedInUser.Client.Id;
         //request.ClientID = signedInUser.Id;
 
         // TODO: Assign the request id to that of the above user.
