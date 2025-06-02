@@ -16,6 +16,6 @@ export async function createJobRequestAsync(request: Job): Promise<Job> {
  * @returns A list of job requests
  */
 export async function getJobRequestsAsync(): Promise<Array<Job>> {
-    const response = await GetAsync<Array<Job>>('Job', {});
+    const response = await GetAsync<Array<Job>>('Job');
     return response;
 }

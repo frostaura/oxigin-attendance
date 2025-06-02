@@ -23,7 +23,7 @@ export interface Employee extends BaseUser {
 
 // Job Types
 export interface Job {
-  id: string;
+  id?: string;
   jobName: string;
   requestorName: string;
   purchaseOrderNumber: string;
@@ -32,9 +32,7 @@ export interface Job {
   numberOfWorkers: number;
   numberOfHours: number;
   approved: boolean;
-  clientId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  clientI?: string;
 }
 
 export interface JobAllocation {
