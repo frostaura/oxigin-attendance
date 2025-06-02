@@ -77,3 +77,10 @@ public async Task<UserSigninResponse> SignInAsync(UserSigninRequest request, Can
     return new UserSigninResponse { User = user };
 }
 ```
+
+### Resetting the DB
+On occasion, migrations may get confused and reprovisioning the DB is the easiest way. To do this, simply use your postgres extension on VS Code to connect to your Postgres server and run the following command on the DB-level.
+```sql
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+```
