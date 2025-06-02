@@ -57,6 +57,7 @@ public static class ServiceCollectionExtensions
       .AddScoped<IJobRequestManager, JobManager>()
       .AddScoped<IAdditionalWorkerManager, AdditionalWorkerManager>()
       .AddScoped<IEmployeeManager, EmployeeManager>()
-      .AddScoped<IClientManager, ClientManager>();
+      .AddScoped<IClientManager, ClientManager>()
+      .AddScoped<IJobAllocationManager, JobAllocationManager>();
   }
 }

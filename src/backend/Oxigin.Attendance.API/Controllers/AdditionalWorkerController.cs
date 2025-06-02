@@ -32,7 +32,7 @@ public class AdditionalWorkerController : BaseController
     public async Task<IActionResult> GetByJobId(Guid jobId, CancellationToken token)
     {
         var workers = await _additionalWorkerManager.GetByJobIdAsync(jobId, token);
-        return Ok(workers);
+        return Ok(workers.Where(w => !w.Deleted));
     }
 
     /// <summary>
@@ -59,5 +59,32 @@ public class AdditionalWorkerController : BaseController
     {
         await _additionalWorkerManager.RemoveAsync(id, token);
         return NoContent();
+    }
+
+    /// <summary>
+    /// Get all AdditionalWorker entities.
+    /// </summary>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>List of AdditionalWorker entities.</returns>
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken token)
+    {
+        var workers = await _additionalWorkerManager.GetAllAsync(token);
+        return Ok(workers.Where(w => !w.Deleted));
+    }
+
+    /// <summary>
+    /// Get an AdditionalWorker entity by its ID.
+    /// </summary>
+    /// <param name="id">The AdditionalWorker ID.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>The AdditionalWorker entity, or NotFound if it doesn't exist or is soft-deleted.</returns>
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken token)
+    {
+        var worker = await _additionalWorkerManager.GetByIdAsync(id, token);
+        if (worker == null || worker.Deleted)
+            return NotFound();
+        return Ok(worker);
     }
 }

@@ -39,7 +39,17 @@ public class AdditionalWorkerManager : IAdditionalWorkerManager
     /// <returns>List of AdditionalWorker entities.</returns>
     public async Task<IEnumerable<AdditionalWorker>> GetByJobIdAsync(Guid jobId, CancellationToken token)
     {
-        return await _db.AdditionalWorkers.Where(w => w.JobID == jobId).ToListAsync(token);
+        return await _db.AdditionalWorkers.Where(w => w.JobID == jobId && !w.Deleted).ToListAsync(token);
+    }
+
+    /// <summary>
+    /// Get all additional workers.
+    /// </summary>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>List of AdditionalWorker entities.</returns>
+    public async Task<IEnumerable<AdditionalWorker>> GetAllAsync(CancellationToken token)
+    {
+        return await _db.AdditionalWorkers.Where(w => !w.Deleted).ToListAsync(token);
     }
 
     /// <summary>
@@ -63,11 +73,22 @@ public class AdditionalWorkerManager : IAdditionalWorkerManager
     /// <returns>A task representing the asynchronous operation.</returns>
     public async Task RemoveAsync(Guid id, CancellationToken token)
     {
-        var worker = await _db.AdditionalWorkers.FirstOrDefaultAsync(w => w.Id == id, token);
+        var worker = await _db.AdditionalWorkers.FirstOrDefaultAsync(w => w.Id == id && !w.Deleted, token);
         if (worker != null)
         {
             _db.AdditionalWorkers.Remove(worker);
             await _db.SaveChangesAsync(token);
         }
+    }
+
+    /// <summary>
+    /// Get an additional worker by its ID.
+    /// </summary>
+    /// <param name="id">The AdditionalWorker ID.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>The AdditionalWorker entity, or null if not found.</returns>
+    public async Task<AdditionalWorker?> GetByIdAsync(Guid id, CancellationToken token)
+    {
+        return await _db.AdditionalWorkers.FirstOrDefaultAsync(w => w.Id == id && !w.Deleted, token);
     }
 }

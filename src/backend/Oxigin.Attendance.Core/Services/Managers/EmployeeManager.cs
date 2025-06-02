@@ -38,7 +38,7 @@ public class EmployeeManager : IEmployeeManager
     /// <returns>List of Employee entities.</returns>
     public async Task<IEnumerable<Employee>> GetAllAsync(CancellationToken token)
     {
-        return await _db.Employees.ToListAsync(token);
+        return await _db.Employees.Where(e => !e.Deleted).ToListAsync(token);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class EmployeeManager : IEmployeeManager
     /// <returns>The Employee entity, or null if not found.</returns>
     public async Task<Employee?> GetByIdAsync(Guid id, CancellationToken token)
     {
-        return await _db.Employees.FirstOrDefaultAsync(e => e.Id == id, token);
+        return await _db.Employees.FirstOrDefaultAsync(e => e.Id == id && !e.Deleted, token);
     }
 
     /// <summary>

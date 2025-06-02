@@ -30,4 +30,19 @@ public interface IAdditionalWorkerManager
     /// <param name="token">Cancellation token.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RemoveAsync(Guid id, CancellationToken token);
+
+    /// <summary>
+    /// Get all additional workers.
+    /// </summary>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>List of AdditionalWorker entities.</returns>
+    Task<IEnumerable<AdditionalWorker>> GetAllAsync(CancellationToken token);
+
+    /// <summary>
+    /// Get an additional worker by its ID.
+    /// </summary>
+    /// <param name="id">The AdditionalWorker ID.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>The AdditionalWorker entity, if found.</returns>
+    Task<AdditionalWorker?> GetByIdAsync(Guid id, CancellationToken token);
 }

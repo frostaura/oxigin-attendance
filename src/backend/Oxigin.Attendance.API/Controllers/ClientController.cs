@@ -41,7 +41,7 @@ public class ClientController : BaseController
         var signedInUser = await GetRequestingUserAsync(token);
         if (signedInUser == null) return Forbid();
         var clients = await _clientManager.GetAllAsync(token);
-        return Ok(clients);
+        return Ok(clients.Where(c => !c.Deleted));
     }
 
     /// <summary>
@@ -56,7 +56,8 @@ public class ClientController : BaseController
         var signedInUser = await GetRequestingUserAsync(token);
         if (signedInUser == null) return Forbid();
         var client = await _clientManager.GetByIdAsync(id, token);
-        if (client == null) return NotFound();
+        if (client == null || client.Deleted)
+            return NotFound();
         return Ok(client);
     }
 
