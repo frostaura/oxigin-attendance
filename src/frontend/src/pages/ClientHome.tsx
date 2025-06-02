@@ -81,6 +81,8 @@ const ClientHome: React.FC = () => {
 
       debugger;
     });
+
+    // TODO: Fetch jobs requiring approval and awaiting confirmation jobs here too. The methods are already defined in the job service.
   }, []);
 
   return (
