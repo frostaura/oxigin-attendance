@@ -7,12 +7,13 @@ import type { ClientData } from '../../types';
  */
 export async function getClientsAsync(): Promise<Array<ClientData>> {
     try {
-        const sessionStr = localStorage.getItem("session");
-        if (!sessionStr) {
-            throw new Error("No session found");
+        // Check if we have a session first
+        const session = localStorage.getItem("session");
+        if (!session) {
+            throw new Error("No active session found. Please sign in.");
         }
-        const session = JSON.parse(sessionStr);
-        const response = await GetAsync<Array<any>>('client', session.sessionId);
+
+        const response = await GetAsync<Array<any>>('Client');
         return response.map(client => ({
             key: client.id,
             id: client.id,
@@ -24,6 +25,9 @@ export async function getClientsAsync(): Promise<Array<ClientData>> {
         }));
     } catch (error) {
         console.error('Error in getClientsAsync:', error);
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch clients: ${error.message}`);
+        }
         throw error;
     }
 } 

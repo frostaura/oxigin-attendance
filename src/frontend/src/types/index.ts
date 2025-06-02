@@ -106,9 +106,12 @@ export interface BaseUser {
     id: string;
     name: string;
     email: string;
-    phone?: string;
-    company?: string;
+    company: string;
+    phone: string;
     status?: string;
+    registrationNo?: string;
+    address?: string;
+    contactNo?: string;
   }
   
   export interface TimesheetData {

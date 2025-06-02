@@ -40,14 +40,22 @@ const AdminJobRequest: React.FC = () => {
         setClients(fetchedClients);
       } catch (error) {
         console.error("Error fetching clients:", error);
-        message.error('Failed to fetch clients. Please try again later.');
+        if (error instanceof Error) {
+          message.error(error.message);
+        } else {
+          message.error('Failed to fetch clients. Please try again later.');
+        }
+        // If there's no session, redirect to login
+        if (error instanceof Error && error.message.includes('No active session')) {
+          navigate('/');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchClients();
-  }, []);
+  }, [navigate]);
 
   // Sample table data
   const columns: ColumnsType<Worker> = [
@@ -92,7 +100,7 @@ const AdminJobRequest: React.FC = () => {
           >
             {clients.map(client => (
               <Select.Option key={client.id} value={client.id}>
-                {client.company}
+                {client.company || client.name}
               </Select.Option>
             ))}
           </Select>
