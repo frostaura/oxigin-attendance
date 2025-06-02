@@ -22,7 +22,7 @@ export interface Employee extends BaseUser {
 }
 
 // Job Types
-export interface JobRequest {
+export interface Job {
   id: string;
   jobName: string;
   requestorName: string;
