@@ -24,11 +24,6 @@ const ClientHome: React.FC = () => {
   const navigate = useNavigate();
   const [jobsPendingApproval, setJobsPendingApproval] = useState<JobData[]>([]);
 
-  const [upcomingJobData] = useState<JobData[]>([
-    { key: "1", jobId: "91011", purchaseOrder: "PO1112", jobName: "Roof Repair", location: "NYC", date: "2025-04-01" },
-    { key: "2", jobId: "13141", purchaseOrder: "PO1314", jobName: "Flooring", location: "LA", date: "2025-04-05" },
-  ]);
-
   // Add state for jobs awaiting confirmation
   const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState<Job[]>([]);
 
