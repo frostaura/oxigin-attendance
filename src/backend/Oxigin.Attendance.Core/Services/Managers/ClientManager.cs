@@ -38,7 +38,7 @@ public class ClientManager : IClientManager
     /// <returns>List of Client entities.</returns>
     public async Task<IEnumerable<Client>> GetAllAsync(CancellationToken token)
     {
-        return await _db.Clients.ToListAsync(token);
+        return await _db.Clients.Where(c => !c.Deleted).ToListAsync(token);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ public class ClientManager : IClientManager
     /// <returns>The Client entity, or null if not found.</returns>
     public async Task<Client?> GetByIdAsync(Guid id, CancellationToken token)
     {
-        return await _db.Clients.FirstOrDefaultAsync(c => c.Id == id, token);
+        return await _db.Clients.FirstOrDefaultAsync(c => c.Id == id && !c.Deleted, token);
     }
 
     /// <summary>

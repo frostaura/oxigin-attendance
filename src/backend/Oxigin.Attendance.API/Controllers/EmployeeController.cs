@@ -41,7 +41,7 @@ public class EmployeeController : BaseController
         var signedInUser = await GetRequestingUserAsync(token);
         if (signedInUser == null) return Forbid();
         var employees = await _employeeManager.GetAllAsync(token);
-        return Ok(employees);
+        return Ok(employees.Where(e => !e.Deleted));
     }
 
     /// <summary>
@@ -56,7 +56,8 @@ public class EmployeeController : BaseController
         var signedInUser = await GetRequestingUserAsync(token);
         if (signedInUser == null) return Forbid();
         var employee = await _employeeManager.GetByIdAsync(id, token);
-        if (employee == null) return NotFound();
+        if (employee == null || employee.Deleted)
+            return NotFound();
         return Ok(employee);
     }
 
