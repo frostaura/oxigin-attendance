@@ -72,6 +72,35 @@ export async function GetAsync<T>(url: string, sessionId?: string | null): Promi
 }
 
 /**
+ * Send a DELETE request to the backend API with the provided URL.
+ * Automatically includes the session ID from localStorage in the headers.
+ * @template T The expected response type.
+ * @param {string} url - The endpoint to send the request to (relative to the backend base URL).
+ * @returns {Promise<T>} The parsed JSON response from the backend.
+ */
+export async function DeleteAsync<T>(url: string, sessionId?: string | null): Promise<T> {
+    if(!sessionId){
+        const userContext = await GetLoggedInUserContextAsync();
+        sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
+    }
+    const finalUrl = `${BASE_BACKEND_URL}/${url}`;
+    const request = await fetch(finalUrl, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "SessionId": sessionId,
+        }
+    });
+    if(request.status === 403) {
+        NavigateToSignInPage();
+    }
+    if(!request.ok) throw new Error(await request.text());
+    // If the backend returns no content, just return undefined
+    if(request.status === 204) return undefined as T;
+    return await request.json() as T;
+}
+
+/**
  * Check if the user is currently logged in by verifying the presence of a session ID in localStorage.
  * @returns {boolean} True if a session ID exists, otherwise false.
  */

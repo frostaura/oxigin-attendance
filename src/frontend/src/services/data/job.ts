@@ -6,7 +6,7 @@ import { PostAsync, GetAsync } from "./backend";
  * @param request The job request details
  * @returns The created job request from the server
  */
-export async function createJobsAsync(request: Job): Promise<Job> {
+export async function createJobAsync(request: Job): Promise<Job> {
     const response = await PostAsync<Job>('Job', request);
     return response;
 }
@@ -15,7 +15,7 @@ export async function createJobsAsync(request: Job): Promise<Job> {
  * Gets all job requests for the current user.
  * @returns A list of job requests
  */
-export async function getJobRequestsAsync(): Promise<Array<Job>> {
+export async function getJobsAsync(): Promise<Array<Job>> {
     const response = await GetAsync<Array<Job>>('Job');
     return response;
 }
@@ -25,7 +25,7 @@ export async function getJobRequestsAsync(): Promise<Array<Job>> {
  * @param request The job request to approve (must include id)
  * @returns The updated job request with approved status
  */
-export async function approveJobRequestAsync(request: Job): Promise<Job> {
+export async function approveJobAsync(request: Job): Promise<Job> {
     const response = await PostAsync<Job>('Job/approve', request);
     return response;
 }
@@ -35,7 +35,7 @@ export async function approveJobRequestAsync(request: Job): Promise<Job> {
  * @param request The job request to reject (must include id)
  * @returns The updated job request with rejected status
  */
-export async function rejectJobRequestAsync(request: Job): Promise<Job> {
+export async function rejectJobAsync(request: Job): Promise<Job> {
     const response = await PostAsync<Job>('Job/reject', request);
     return response;
 }

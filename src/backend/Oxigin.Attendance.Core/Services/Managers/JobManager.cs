@@ -126,7 +126,7 @@ public class JobManager : IJobRequestManager
     public async Task<IEnumerable<Job>> GetJobsRequiringApprovalAsync(User user, CancellationToken token)
     {
         // Example: jobs where Approved is false and user is the client or site manager
-        return await _db.Jobs.Where(j => !j.Approved && (j.ClientID != user.client.Id || j.RequestorID == user.Id)).ToListAsync(token);
+        return await _db.Jobs.Where(j => !j.Approved && (j.ClientID != user.ClientID || j.RequestorID == user.Id)).ToListAsync(token);
     }
 
     /// <summary>

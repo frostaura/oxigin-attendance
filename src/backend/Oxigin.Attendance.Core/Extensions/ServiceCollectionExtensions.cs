@@ -55,6 +55,8 @@ public static class ServiceCollectionExtensions
       .AddScoped<IUserManager, UserManager>()
       .AddScoped<INotificationData, EmailNotificationsData>()
       .AddScoped<IJobRequestManager, JobManager>()
-      .AddScoped<IAdditionalWorkerManager, AdditionalWorkerManager>();
+      .AddScoped<IAdditionalWorkerManager, AdditionalWorkerManager>()
+      .AddScoped<IEmployeeManager, EmployeeManager>()
+      .AddScoped<IClientManager, ClientManager>();
   }
 }
