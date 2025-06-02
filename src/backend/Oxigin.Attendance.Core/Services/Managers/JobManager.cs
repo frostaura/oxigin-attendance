@@ -116,4 +116,28 @@ public class JobManager : IJobRequestManager
             throw;
         }
     }
+
+    /// <summary>
+    /// Get all jobs that require approval by the given user (e.g., site manager or client).
+    /// </summary>
+    /// <param name="user">The user for whom to find jobs requiring approval.</param>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>A collection of jobs requiring approval.</returns>
+    public async Task<IEnumerable<Job>> GetJobsRequiringApprovalAsync(User user, CancellationToken token)
+    {
+        // Example: jobs where Approved is false and user is the client or site manager
+        return await _db.Jobs.Where(j => !j.Approved && (j.ClientID == user.Id || j.RequestorID == user.Id)).ToListAsync(token);
+    }
+
+    /// <summary>
+    /// Get all jobs that are awaiting confirmation by the given user (e.g., worker or client).
+    /// </summary>
+    /// <param name="user">The user for whom to find jobs awaiting confirmation.</param>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>A collection of jobs awaiting confirmation.</returns>
+    public async Task<IEnumerable<Job>> GetJobsAwaitingConfirmationAsync(User user, CancellationToken token)
+    {
+        // Example: jobs where Approved is true but some other confirmation is needed (customize as needed)
+        return await _db.Jobs.Where(j => j.Approved && (j.ClientID == user.Id || j.RequestorID == user.Id)).ToListAsync(token);
+    }
 }

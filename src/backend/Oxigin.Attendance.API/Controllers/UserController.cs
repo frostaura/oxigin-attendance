@@ -124,4 +124,26 @@ public class UserController : BaseController
             return BadRequest(e.Error);
         }
     }
+
+    /// <summary>
+    /// Updates an existing user's details.
+    /// </summary>
+    /// <param name="user">The user entity with updated details.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>The updated user entity or error.</returns>
+    [HttpPatch]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(User))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
+    public async Task<IActionResult> UpdateUserAsync([FromBody] User user, CancellationToken token)
+    {
+        try
+        {
+            var updatedUser = await _userManager.UpdateUserAsync(user, token);
+            return Ok(updatedUser);
+        }
+        catch (StandardizedErrorException e)
+        {
+            return BadRequest(e.Error);
+        }
+    }
 }

@@ -229,4 +229,43 @@ public class UserManager : IUserManager
         }
     }
 
+    /// <summary>
+    /// Updates an existing user's details in the database.
+    /// </summary>
+    /// <param name="user">The user entity with updated details.</param>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>The updated user entity.</returns>
+    public async Task<User> UpdateUserAsync(User user, CancellationToken token)
+    {
+        try
+        {
+            user.ThrowIfNull(nameof(user));
+            var dbUser = await _db.Users.SingleOrDefaultAsync(u => u.Id == user.Id, token);
+            if (dbUser == null) throw new StandardizedErrorException { Error = new StandardizedError { Origin = nameof(UserManager), Message = "User not found." } };
+            dbUser.Name = user.Name;
+            dbUser.ContactNr = user.ContactNr;
+            dbUser.Email = user.Email;
+            dbUser.UserType = user.UserType;
+            // Do not update password here for security reasons
+            await _db.SaveChangesAsync(token);
+            return dbUser;
+        }
+        catch (Exception e)
+        {
+            throw new StandardizedErrorException
+            {
+                Error = new StandardizedError
+                {
+                    Origin = nameof(UserManager),
+                    Message = "Unable to update user, please try again later.",
+                    Data = new Dictionary<string, object>
+                    {
+                        { nameof(e.Message), e.Message },
+                        { nameof(e.StackTrace), e.StackTrace ?? string.Empty }
+                    }
+                }
+            };
+        }
+    }
+
 }
