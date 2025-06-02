@@ -36,7 +36,6 @@ public abstract class BaseController : ControllerBase
 
         if (!Request.Headers.ContainsKey(HEADER_KEY)) return null;
         
-        // TODO: Try to grab the session id from the headers.
         var sessionId = Request.Headers[HEADER_KEY].ToString();
         
         if(sessionId is null) return null;
