@@ -69,11 +69,8 @@ const AdminJobsHome: React.FC = () => {
 
   // Table columns
   const jobColumns: ColumnsType<JobData> = [
-    { title: "Job ID", dataIndex: "jobId", key: "jobId" },
     { title: "Purchase Order #", dataIndex: "purchaseOrder", key: "purchaseOrder" },
     { title: "Job Name", dataIndex: "jobName", key: "jobName" },
-    { title: "Requestor", dataIndex: "requestor", key: "requestor" },
-    { title: "Contact", dataIndex: "contact", key: "contact" },
     { title: "Location", dataIndex: "location", key: "location" },
     { title: "Date", dataIndex: "date", key: "date" },
   ];

@@ -4,6 +4,7 @@ using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Datastore.Interfaces;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Responses;
+using Oxigin.Attendance.Shared.Enums;
 
 namespace Oxigin.Attendance.API.Controllers;
 
@@ -57,10 +58,30 @@ public class JobController : BaseController
     public async Task<IActionResult> CreateJobRequestAsync([FromBody] Job request, CancellationToken token)
     {
         var signedInUser = await GetRequestingUserAsync(token);
+        if (signedInUser == null) 
+            return Unauthorized("You must be logged in to create a job request.");
+
+        // For non-admin users, they must be associated with a client
+        if (signedInUser.UserType != UserType.Admin)
+        {
+            if (signedInUser.Client == null)
+                return BadRequest(new StandardizedError 
+                { 
+                    Origin = nameof(JobController),
+                    Message = "You must be associated with a client to create job requests.",
+                    Data = new Dictionary<string, object>
+                    {
+                        { "UserId", signedInUser.Id },
+                        { "UserType", signedInUser.UserType }
+                    }
+                });
+            
+            // Non-admin users can only create jobs for their associated client
+            request.ClientID = signedInUser.Client.Id;
+        }
+        // For admin users, use whatever client ID is provided in the request
 
         request.RequestorID = signedInUser.Id;
-        request.ClientID = signedInUser.Client.Id;
-
         var result = await _jobRequestManager.CreateJobRequestAsync(request, token);
 
         return Ok(result);

@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import type { Dayjs } from "dayjs";
 import { getClientsAsync } from "../services/data/clients";
+import { createJobAsync } from "../services/data/job";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
 import type { ClientData } from "../types";
+import type { Job } from "../models/jobModels";
 
 interface Worker {
   key: string;
@@ -13,23 +16,13 @@ interface Worker {
   role: string;
 }
 
-interface JobRequestForm {
-  jobName: string;
-  requestorName: string;
-  purchaseOrderNumber: string;
-  date: Dayjs;
-  time: Dayjs;
-  location: string;
-  numberOfWorkers: number;
-  numberOfHours: number;
-  clientId: string;
-}
 
 const AdminJobRequest: React.FC = () => {
   const navigate = useNavigate();
-  const [form] = Form.useForm<JobRequestForm>();
+  const [form] = Form.useForm<Job>();
   const [clients, setClients] = useState<ClientData[]>([]);
   const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   // Fetch clients when component mounts
   useEffect(() => {
@@ -37,6 +30,7 @@ const AdminJobRequest: React.FC = () => {
       try {
         setLoading(true);
         const fetchedClients = await getClientsAsync();
+        console.log('Fetched clients:', fetchedClients); // Debug clients data
         setClients(fetchedClients);
       } catch (error) {
         console.error("Error fetching clients:", error);
@@ -68,9 +62,54 @@ const AdminJobRequest: React.FC = () => {
     { key: "2", name: "Jane Smith", role: "Plumber" },
   ];
 
-  const handleSubmit = (values: JobRequestForm) => {
-    console.log("Form values:", values);
-    navigate("/adminjobshome");
+  const handleSubmit = async (values: any) => {
+    try {
+      setProcessing(true);
+
+      // Check if user is logged in
+      const userContext = await GetLoggedInUserContextAsync();
+      if (!userContext) {
+        message.error('You must be logged in to submit a job request');
+        navigate('/');
+        return;
+      }
+
+      console.log('User context:', userContext); // Debug user context
+
+      const dateTime = new Date(
+        values.date.year(),
+        values.date.month(),
+        values.date.date(),
+        values.time.hour(),
+        values.time.minute()
+      );
+      
+      // Convert form values to JobRequest format
+      const jobRequest: Job = {
+        jobName: values.jobName,
+        purchaseOrderNumber: values.purchaseOrderNumber,
+        time: dateTime,
+        location: values.location,
+        numWorkers: values.numWorkers,
+        numHours: values.numHours,
+        approved: false,
+        clientID: values.clientId  // Use the selected client ID from the form
+      };
+
+      console.log('Submitting job request:', jobRequest); // Debug logging
+      await createJobAsync(jobRequest);
+      message.success('Job request submitted successfully');
+      navigate("/adminjobshome");
+    } catch (error) {
+      console.error('Failed to submit job request:', error);
+      if (error instanceof Error) {
+        message.error(error.message);
+      } else {
+        message.error('Failed to submit job request. Please try again.');
+      }
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -97,6 +136,9 @@ const AdminJobRequest: React.FC = () => {
             placeholder="Select client" 
             loading={loading}
             disabled={loading}
+            onChange={(value) => {
+              console.log('Selected client ID:', value); // Debug selected client
+            }}
           >
             {clients.map(client => (
               <Select.Option key={client.id} value={client.id}>
@@ -152,7 +194,7 @@ const AdminJobRequest: React.FC = () => {
         </Form.Item>
 
         <Form.Item 
-          name="numberOfWorkers" 
+          name="numWorkers" 
           label="Number of Workers Needed" 
           rules={[{ required: true, message: "Please enter number of workers" }]}
           style={{ marginBottom: 20 }}
@@ -161,7 +203,7 @@ const AdminJobRequest: React.FC = () => {
         </Form.Item>
 
         <Form.Item 
-          name="numberOfHours" 
+          name="numHours" 
           label="Number of Hours Needed" 
           rules={[{ required: true, message: "Please enter number of hours" }]}
           style={{ marginBottom: 20 }}
@@ -183,8 +225,8 @@ const AdminJobRequest: React.FC = () => {
         <Table columns={columns} dataSource={dataSource} size="small" pagination={false} />
 
         {/* Submit Request Button */}
-        <Button type="primary" htmlType="submit" style={{ marginTop: 20, width: "100%" }}>
-          Submit Request
+        <Button type="primary" htmlType="submit" style={{ marginTop: 20, width: "100%" }} loading={processing}>
+          {processing ? "Submitting Request..." : "Submit Request"}
         </Button>
       </Form>
     </div>
