@@ -27,5 +27,11 @@ public interface IUserManager
     /// <returns>The created user's new session.</returns>
     Task<UserSigninResponse> SignUpAsync(User user, CancellationToken token);
     Task<UserSigninResponse> ChangePasswordAsync(Credentials request, CancellationToken token);
-    
+    /// <summary>
+    /// Refreshes the session for a signed-in user, creating a new session and returning updated context.
+    /// </summary>
+    /// <param name="user">The signed-in user entity.</param>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>The user's new session context.</returns>
+    Task<UserSigninResponse> RefreshSessionAsync(User user, CancellationToken token);
 }

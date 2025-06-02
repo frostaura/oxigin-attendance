@@ -94,7 +94,7 @@ public class UserManager : IUserManager
                     Data = new Dictionary<string, object>
                     {
                         { nameof(e.Message), e.Message },
-                        { nameof(e.StackTrace), e.StackTrace }
+                        { nameof(e.StackTrace), e.StackTrace ?? string.Empty }
                     }
                 }
             };
@@ -141,7 +141,7 @@ public class UserManager : IUserManager
                     Data = new Dictionary<string, object>
                     {
                         { nameof(e.Message), e.Message },
-                        { nameof(e.StackTrace), e.StackTrace }
+                        { nameof(e.StackTrace), e.StackTrace ?? string.Empty }
                     }
                 }
             };
@@ -182,7 +182,47 @@ public class UserManager : IUserManager
                     Data = new Dictionary<string, object>
                     {
                         { nameof(e.Message), e.Message },
-                        { nameof(e.StackTrace), e.StackTrace }
+                        { nameof(e.StackTrace), e.StackTrace ?? string.Empty }
+                    }
+                }
+            };
+        }
+    }
+
+    /// <summary>
+    /// Refreshes the session for a signed-in user by creating a new session and returning the updated session context.
+    /// </summary>
+    /// <param name="user">The signed-in user entity for whom the session should be refreshed.</param>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>A <see cref="UserSigninResponse"/> containing the user and the new session ID.</returns>
+    public async Task<UserSigninResponse> RefreshSessionAsync(User user, CancellationToken token)
+    {
+        try
+        {
+            user.ThrowIfNull(nameof(user));
+            // Create a new session for the user
+            var session = new UserSession { UserId = user.Id };
+
+            _db.UserSessions.Add(session);
+            await _db.SaveChangesAsync(token);
+            return new UserSigninResponse
+            {
+                User = user,
+                SessionId = session.Id
+            };
+        }
+        catch (Exception e)
+        {
+            throw new StandardizedErrorException
+            {
+                Error = new StandardizedError
+                {
+                    Origin = nameof(UserManager),
+                    Message = "Unable to refresh session, please try again later.",
+                    Data = new Dictionary<string, object>
+                    {
+                        { nameof(e.Message), e.Message },
+                        { nameof(e.StackTrace), e.StackTrace ?? string.Empty }
                     }
                 }
             };

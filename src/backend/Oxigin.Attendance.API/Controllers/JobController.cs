@@ -57,7 +57,10 @@ public class JobController : BaseController
     public async Task<IActionResult> CreateJobRequestAsync([FromBody] Job request, CancellationToken token)
     {
         // TODO: Grab the context of the requesting user.
-        var requestUser = await GetRequestingUserAsync(token);
+        var signedInUser = await GetRequestingUserAsync(token);
+        
+        request.RequestorID = signedInUser.Id;
+        //request.ClientID = signedInUser.Id;
         
         // TODO: Assign the request id to that of the above user.
         

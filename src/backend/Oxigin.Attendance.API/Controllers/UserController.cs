@@ -99,4 +99,29 @@ public class UserController : BaseController
             return BadRequest(e.Error);
         }
     }
+
+    /// <summary>
+    /// Creates a new session given an existing one.
+    /// </summary>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>User sign-in response or error.</returns>
+    [HttpPost("RefreshSession")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserSigninResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
+    public async Task<IActionResult?> RefreshSession(CancellationToken token)
+    {
+        try
+        {
+            var signedInUser = await GetRequestingUserAsync(token);
+            
+            if (signedInUser == null) return Unauthorized("You are not signed in.");
+            
+            var response = await _userManager.RefreshSessionAsync(signedInUser, token);
+            return Ok(response);
+        }
+        catch (StandardizedErrorException e)
+        {
+            return BadRequest(e.Error);
+        }
+    }
 }
