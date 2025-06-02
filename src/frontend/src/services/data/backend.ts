@@ -28,7 +28,7 @@ export async function PostAsync<T>(url: string, body: object): Promise<T>{
         body: JSON.stringify(body)
     });
 
-    if(request.status !== 403) {
+    if(request.status === 403) {
         NavigateToSignInPage();
     }
     if(!request.ok) throw new Error(await request.text());

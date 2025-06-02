@@ -24,15 +24,16 @@ export interface Employee extends BaseUser {
 // Job Types
 export interface JobRequest {
   id: string;
-  clientId: string;
-  eventDate: Date;
-  startTime: string;
-  endTime: string;
+  jobName: string;
+  requestorName: string;
+  purchaseOrderNumber: string;
+  date: Date;
+  time: string;
   location: string;
-  numberOfStaff: number;
-  staffRole: string;
-  status: 'pending' | 'approved' | 'rejected' | 'completed';
-  notes?: string;
+  numberOfWorkers: number;
+  numberOfHours: number;
+  approved: boolean;
+  clientId: string;
   createdAt: Date;
   updatedAt: Date;
 }

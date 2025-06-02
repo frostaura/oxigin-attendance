@@ -1,9 +1,10 @@
-import React from "react";
-import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table } from "antd";
+import React, { useState } from "react";
+import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import type { Dayjs } from "dayjs";
+import { createJobRequestAsync } from "../services/data/jobRequests";
 
 interface Worker {
   key: string;
@@ -25,6 +26,7 @@ interface JobRequestForm {
 const ClientJobRequest: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm<JobRequestForm>();
+  const [processing, setProcessing] = useState(false);
 
   // Sample table data
   const columns: ColumnsType<Worker> = [
@@ -37,9 +39,32 @@ const ClientJobRequest: React.FC = () => {
     { key: "2", name: "Jane Smith", role: "Plumber" },
   ];
 
-  const handleSubmit = (values: JobRequestForm) => {
-    console.log("Form values:", values);
-    navigate("/adminjobshome");
+  const handleSubmit = async (values: JobRequestForm) => {
+    try {
+      setProcessing(true);
+      
+      // Convert form values to JobRequest format
+      const jobRequest = {
+        jobName: values.jobName,
+        requestorName: values.requestorName,
+        purchaseOrderNumber: values.purchaseOrderNumber,
+        date: values.date.toDate(),
+        time: values.time.format('HH:mm:ss'),
+        location: values.location,
+        numberOfWorkers: values.numberOfWorkers,
+        numberOfHours: values.numberOfHours,
+        approved: false
+      };
+
+      await createJobRequestAsync(jobRequest);
+      message.success('Job request submitted successfully');
+      navigate("/clienthome");
+    } catch (error) {
+      console.error('Failed to submit job request:', error);
+      message.error('Failed to submit job request. Please try again.');
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -123,7 +148,7 @@ const ClientJobRequest: React.FC = () => {
         <Button
           type="dashed"
           icon={<PlusOutlined />}
-          onClick={() => navigate("/adminadditionalworkertype")}
+          onClick={() => navigate("/clientadditionalworkertype")}
           style={{ width: "100%", marginBottom: 20 }}
         >
           Additional Workers Needed
@@ -133,8 +158,8 @@ const ClientJobRequest: React.FC = () => {
         <Table columns={columns} dataSource={dataSource} size="small" pagination={false} />
 
         {/* Submit Request Button */}
-        <Button type="primary" htmlType="submit" style={{ marginTop: 20, width: "100%" }}>
-          Submit Request
+        <Button type="primary" htmlType="submit" style={{ marginTop: 20, width: "100%" }} loading={processing}>
+          {processing ? "Submitting Request..." : "Submit Request"}
         </Button>
       </Form>
     </div>

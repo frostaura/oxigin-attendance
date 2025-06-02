@@ -3,7 +3,6 @@ using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Datastore.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Oxigin.Attendance.Shared.Enums;
 
 namespace Oxigin.Attendance.Core.Services.Managers;
 
@@ -60,7 +59,7 @@ public class JobRequestManager : IJobRequestManager
     {
         try
         {
-            request.Status = JobRequestStatus.Pending;
+            request.Approved = false; // Set default value
             _db.JobRequests.Add(request);
             await _db.SaveChangesAsync(token);
             return request;
@@ -73,18 +72,18 @@ public class JobRequestManager : IJobRequestManager
     }
 
     /// <summary>
-    /// Approve a pending job request, typically by a client or site manager.
+    /// Approve a job request.
     /// </summary>
-    /// <param name="request">The job request entity to approve (should include the id and any relevant context).</param>
+    /// <param name="request">The job request entity to approve.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
-    /// <returns>The updated job request entity with approved status.</returns>
+    /// <returns>The updated job request entity.</returns>
     public async Task<JobRequest> ApproveJobRequestAsync(JobRequest request, CancellationToken token)
     {
         try
         {
             var entity = await _db.JobRequests.FirstOrDefaultAsync(j => j.Id == request.Id, token);
             if (entity == null) throw new InvalidOperationException("Job request not found");
-            entity.Status = JobRequestStatus.Approved;
+            entity.Approved = true;
             await _db.SaveChangesAsync(token);
             return entity;
         }
@@ -96,18 +95,18 @@ public class JobRequestManager : IJobRequestManager
     }
 
     /// <summary>
-    /// Reject a pending job request, typically by a client or site manager.
+    /// Reject a job request by setting approved to false.
     /// </summary>
-    /// <param name="request">The job request entity to reject (should include the id and any relevant context).</param>
+    /// <param name="request">The job request entity to reject.</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
-    /// <returns>The updated job request entity with rejected status.</returns>
+    /// <returns>The updated job request entity.</returns>
     public async Task<JobRequest> RejectJobRequestAsync(JobRequest request, CancellationToken token)
     {
         try
         {
             var entity = await _db.JobRequests.FirstOrDefaultAsync(j => j.Id == request.Id, token);
             if (entity == null) throw new InvalidOperationException("Job request not found");
-            entity.Status = JobRequestStatus.Rejected;
+            entity.Approved = false;
             await _db.SaveChangesAsync(token);
             return entity;
         }
