@@ -45,6 +45,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Oxigin.Attendance.Shared\Oxigin.Attendance.Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20250602155501_InitialDbMigration.Designer.cs" />
+  </ItemGroup>
   <PropertyGroup>
     <NoWarn>$(NoWarn);CS8618</NoWarn>
   </PropertyGroup>

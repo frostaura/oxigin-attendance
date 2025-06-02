@@ -388,7 +388,7 @@ namespace Oxigin.Attendance.Datastore.Migrations
 
             modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.Job", b =>
                 {
-                    b.HasOne("Oxigin.Attendance.Shared.Models.Entities.User", "Client")
+                    b.HasOne("Oxigin.Attendance.Shared.Models.Entities.Client", "Client")
                         .WithMany()
                         .HasForeignKey("ClientID")
                         .OnDelete(DeleteBehavior.Cascade)

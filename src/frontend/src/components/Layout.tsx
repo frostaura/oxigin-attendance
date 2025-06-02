@@ -9,6 +9,7 @@ const { Header, Content } = Layout;
 interface AppLayoutProps {
   children: React.ReactNode;
 }
+// TODO: Take out banner from registration page
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
