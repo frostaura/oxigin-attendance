@@ -3,7 +3,7 @@ import { Layout, Card, Button, Table, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { getJobRequestsAsync as getJobsAsync } from "../services/data/jobRequests";
-import type { Job } from "../types";
+import type { Job } from "../models/jobModels";
 
 const { Header, Content } = Layout;
 
@@ -68,7 +68,7 @@ const ClientHome: React.FC = () => {
   ];
 
   // Fetch all data we need, and ensure the effect only runs once on mount ([]).
-  const [jobs, setJobs] = useState<Array<JobData>>([]);
+  //const [jobs, setJobs] = useState<Array<JobData>>([]);
   useEffect(() => {
     setTimeout(async () => {
       const allJobs: Array<Job> = await getJobsAsync();

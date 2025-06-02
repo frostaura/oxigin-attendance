@@ -1,5 +1,5 @@
+import type { Job } from "../../models/jobModels";
 import { PostAsync, GetAsync } from "./backend";
-import type { Job } from "../../types";
 
 /**
  * Creates a new job request.

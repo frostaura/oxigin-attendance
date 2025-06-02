@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import type { Dayjs } from "dayjs";
 import { createJobsAsync } from "../services/data/jobRequests";
-import type { Job } from "../types";
+import type { Job } from "../models/jobModels";
 
 interface Worker {
   key: string;
@@ -54,12 +54,11 @@ const ClientJobRequest: React.FC = () => {
       // Convert form values to JobRequest format
       const jobRequest: Job = {
         jobName: values.jobName,
-        requestorName: values.requestorName,
         purchaseOrderNumber: values.purchaseOrderNumber,
         time: dateTime,
         location: values.location,
-        numberOfWorkers: values.numberOfWorkers,
-        numberOfHours: values.numberOfHours,
+        numWorkers: values.numberOfWorkers,
+        numHours: values.numberOfHours,
         approved: false
       };
 

@@ -21,19 +21,6 @@ export interface Employee extends BaseUser {
   type: 'employee'; 
 }
 
-// Job Types
-export interface Job {
-  id?: string;
-  jobName: string;
-  requestorName: string;
-  purchaseOrderNumber: string;
-  time: Date;
-  location: string;
-  numberOfWorkers: number;
-  numberOfHours: number;
-  approved: boolean;
-  clientI?: string;
-}
 
 export interface JobAllocation {
   id: string;
