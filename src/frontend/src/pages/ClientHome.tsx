@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Layout, Card, Button, Table, Checkbox } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { getJobRequestsAsync as getJobsAsync } from "../services/data/jobRequests";
+import { getJobRequestsAsync as getJobsAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
 
 const { Header, Content } = Layout;

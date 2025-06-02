@@ -4,7 +4,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import type { Dayjs } from "dayjs";
-import { createJobsAsync } from "../services/data/jobRequests";
+import { createJobsAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
 
 interface Worker {
