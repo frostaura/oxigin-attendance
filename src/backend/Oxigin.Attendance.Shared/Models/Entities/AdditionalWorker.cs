@@ -1,8 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore;
-using Oxigin.Attendance.Shared.Enums;
 using Oxigin.Attendance.Shared.Models.Abstractions;
 
 namespace Oxigin.Attendance.Shared.Models.Entities;
