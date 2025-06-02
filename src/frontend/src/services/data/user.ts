@@ -4,7 +4,6 @@
 
 import type { UserSignUpResponse, UserSigninResponse } from "../../models/userModels";
 import { PostAsync } from "./backend";
-//import { UserSigninResponse, UserSession } from "../models/userModels";
 
 /**
  * Sign in a user with the provided email and password.
@@ -22,8 +21,27 @@ export async function SignInAsync(email: string, password: string): Promise<User
     return response;
 }
 
+/**
+ * Registers a new user and stores the session in localStorage.
+ * @param {string} name - The user's name.
+ * @param {string} contactNr - The user's contact number.
+ * @param {string} email - The user's email address.
+ * @param {string} password - The user's password.
+ * @returns {Promise<UserSignUpResponse>} The user and session ID from the backend.
+ */
 export async function SignUpAsync(name: string, contactNr: string, email: string, password: string): Promise<UserSignUpResponse> {
     const response = await PostAsync<UserSignUpResponse>('User/SignUp', { name, contactNr, email, password });
+    localStorage.setItem("session", JSON.stringify(response));
+
+    return response;
+}
+
+/**
+ * Refreshes the current user's session by calling the backend and updating localStorage.
+ * @returns {Promise<UserSigninResponse>} The refreshed user and session ID from the backend.
+ */
+export async function RefreshSessionAsync(): Promise<UserSigninResponse> {
+    const response = await PostAsync<UserSigninResponse>('User/RefreshSession', {});
     localStorage.setItem("session", JSON.stringify(response));
 
     return response;

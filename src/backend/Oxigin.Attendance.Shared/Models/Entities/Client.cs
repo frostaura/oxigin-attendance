@@ -13,12 +13,10 @@ public class Client : BaseEntity
     /// <summary>
     /// Company name
     /// </summary>
-
     public string CompanyName{ get; set; }
     /// <summary>
     /// Company Registration Number
     /// </summary>
-
     public string RegNo { get; set; }
     /// <summary>
     /// Company address

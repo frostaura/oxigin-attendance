@@ -16,8 +16,14 @@ public class DatastoreContext : DbContext, IDatastoreContext
     public DatastoreContext(DbContextOptions<DatastoreContext> options)
         : base(options)
     { }
-
+    
+    public virtual DbSet<AdditionalWorker> AdditionalWorkers { get; set; }
+    public virtual DbSet<Allocation> Allocations { get; set; }
+    public virtual DbSet<Client> Clients { get; set; }
+    public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<Job> Jobs { get; set; }
+    public virtual DbSet<Oxigin.Attendance.Shared.Models.Entities.Oxigin> Oxigins { get; set; }
+    public virtual DbSet<Timesheet> Timesheets { get; set; }
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<UserSession> UserSessions { get; set; }
-    public virtual DbSet<Job> Jobs { get; set; }
 }

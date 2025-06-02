@@ -39,5 +39,4 @@ public class Employee : BaseEntity
     /// Bank account details to pay employee
     /// </summary>
     public string AccountNumber { get; set; }
-    
 }
