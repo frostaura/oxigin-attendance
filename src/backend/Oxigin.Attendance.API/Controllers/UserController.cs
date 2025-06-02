@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Oxigin.Attendance.API.Abstractions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
+using Oxigin.Attendance.Datastore.Interfaces;
 using Oxigin.Attendance.Shared.Exceptions;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Requests;
@@ -25,8 +26,8 @@ public class UserController : BaseController
     /// </summary>
     /// <param name="userManager">The user manager service.</param>
     /// <param name="logger">The logger instance.</param>
-    public UserController(IUserManager userManager, ILogger<UserController> logger)
-        : base(logger)
+    public UserController(IUserManager userManager, ILogger<UserController> logger, IDatastoreContext db)
+        : base(logger, db)
     {
         _userManager = userManager;
     }

@@ -1,5 +1,8 @@
 ﻿using FrostAura.Libraries.Core.Extensions.Validation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Oxigin.Attendance.Datastore.Interfaces;
+using Oxigin.Attendance.Shared.Models.Entities;
 
 namespace Oxigin.Attendance.API.Abstractions;
 
@@ -14,13 +17,35 @@ public abstract class BaseController : ControllerBase
     /// Controller logger instance.
     /// </summary>
     protected readonly ILogger logger;
+    
+    protected readonly IDatastoreContext datastoreContext;
 
     /// <summary>
     /// Overloaded constructor to allow for injecting dependencies.
     /// </summary>
     /// <param name="logger">The controller logger instance.</param>
-    protected BaseController(ILogger logger)
+    protected BaseController(ILogger logger, IDatastoreContext dbContext)
     {
         this.logger = logger.ThrowIfNull(nameof(logger));
+        this.datastoreContext = datastoreContext.ThrowIfInvalid(nameof(datastoreContext));
+    }
+    
+    protected async Task<User?> GetRequestingUserAsync(CancellationToken token)
+    {
+        var HEADER_KEY = Request.Headers["SessionId"];
+
+        if (!Request.Headers.ContainsKey(HEADER_KEY)) return null;
+        
+        // TODO: Try to grab the session id from the headers.
+        var sessionId = Request.Headers[HEADER_KEY].ToString();
+        
+        if(sessionId is null) return null;
+        
+        var userContext = await datastoreContext
+            .UserSessions
+            .Include(s => s.User)
+            .SingleAsync(s => s.Id == Guid.Parse(sessionId), token);
+        
+        return userContext.User;
     }
 }

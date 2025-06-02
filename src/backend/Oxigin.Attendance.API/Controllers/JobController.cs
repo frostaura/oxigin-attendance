@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Oxigin.Attendance.API.Abstractions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
+using Oxigin.Attendance.Datastore.Interfaces;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Responses;
 
@@ -23,8 +24,8 @@ public class JobController : BaseController
     /// </summary>
     /// <param name="jobRequestManager">Manager for job use cases.</param>
     /// <param name="logger">Logger instance.</param>
-    public JobController(IJobRequestManager jobRequestManager, ILogger<JobController> logger)
-        : base(logger)
+    public JobController(IJobRequestManager jobRequestManager, ILogger<JobController> logger, IDatastoreContext db)
+        : base(logger, db)
     {
         _jobRequestManager = jobRequestManager;
     }
@@ -55,6 +56,10 @@ public class JobController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> CreateJobRequestAsync([FromBody] Job request, CancellationToken token)
     {
+        // TODO: Grab the context of the requesting user.
+        
+        // TODO: Assign the request id to that of the above user.
+        
         var result = await _jobRequestManager.CreateJobRequestAsync(request, token);
 
         return Ok(result);
