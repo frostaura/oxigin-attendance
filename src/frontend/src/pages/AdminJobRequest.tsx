@@ -1,9 +1,11 @@
-import React from "react";
-import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table } from "antd";
+import React, { useState, useEffect } from "react";
+import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table, Select, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import type { Dayjs } from "dayjs";
+import { getClientsAsync } from "../services/data/clients";
+import type { ClientData } from "../types";
 
 interface Worker {
   key: string;
@@ -20,11 +22,32 @@ interface JobRequestForm {
   location: string;
   numberOfWorkers: number;
   numberOfHours: number;
+  clientId: string;
 }
 
 const AdminJobRequest: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm<JobRequestForm>();
+  const [clients, setClients] = useState<ClientData[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch clients when component mounts
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        setLoading(true);
+        const fetchedClients = await getClientsAsync();
+        setClients(fetchedClients);
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+        message.error('Failed to fetch clients. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClients();
+  }, []);
 
   // Sample table data
   const columns: ColumnsType<Worker> = [
@@ -54,6 +77,25 @@ const AdminJobRequest: React.FC = () => {
           style={{ marginBottom: 20 }}
         >
           <Input placeholder="Enter job name" />
+        </Form.Item>
+
+        <Form.Item 
+          name="clientId" 
+          label="Client" 
+          rules={[{ required: true, message: "Please select a client" }]}
+          style={{ marginBottom: 20 }}
+        >
+          <Select 
+            placeholder="Select client" 
+            loading={loading}
+            disabled={loading}
+          >
+            {clients.map(client => (
+              <Select.Option key={client.id} value={client.id}>
+                {client.company}
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item 
