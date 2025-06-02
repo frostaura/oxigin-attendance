@@ -3,7 +3,6 @@ import { Layout, Card, Button, Table, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { getJobsAsync as getJobsAsync, getJobsRequiringApprovalAsync } from "../services/data/job";
-import { getJobRequestsAsync as getJobsAsync, getJobsRequiringApprovalAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
 
 const { Header, Content } = Layout;

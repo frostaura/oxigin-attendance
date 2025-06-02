@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Layout, Card, Button, Table, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { getJobRequestsAsync as getJobsAsync, getJobsRequiringApprovalAsync, approveJobRequestAsync, rejectJobRequestAsync } from "../services/data/job";
+import { getJobsAsync, getJobsRequiringApprovalAsync, approveJobAsync, rejectJobAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
 
 const { Header, Content } = Layout;
@@ -48,12 +48,12 @@ const AdminJobsHome: React.FC = () => {
 
       // Process approved jobs
       for (const job of approvedJobs) {
-        await approveJobRequestAsync({ id: job.jobId } as Job);
+        await approveJobAsync({ id: job.jobId } as Job);
       }
 
       // Process declined jobs
       for (const job of declinedJobs) {
-        await rejectJobRequestAsync({ id: job.jobId } as Job);
+        await rejectJobAsync({ id: job.jobId } as Job);
       }
 
       // Remove processed jobs from the list
