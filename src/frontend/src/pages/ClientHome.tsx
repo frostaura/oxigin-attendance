@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Card, Button, Table, Checkbox } from "antd";
+import { Layout, Card, Button, Table, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { getJobRequestsAsync as getJobsAsync } from "../services/data/jobRequests";
+import { getJobRequestsAsync as getJobsAsync, getJobsRequiringApprovalAsync } from "../services/data/jobRequests";
 import type { Job } from "../models/jobModels";
 
 const { Header, Content } = Layout;
@@ -16,45 +16,62 @@ interface JobData {
   contact?: string;
   location?: string;
   date?: string;
-  checked?: boolean;
+  approved?: boolean;
+  declined?: boolean;
 }
 
 const ClientHome: React.FC = () => {
   const navigate = useNavigate();
-  const [jobsPendingApproval, setJobsPendingApproval] = useState<JobData[]>([
-    { key: "1", jobId: "1234", purchaseOrder: "PO4567", jobName: "Fix Plumbing", requestor: "John Doe", contact: "555-1234", checked: false },
-    { key: "2", jobId: "5678", purchaseOrder: "PO7890", jobName: "Install Wiring", requestor: "Jane Smith", contact: "555-5678", checked: false },
-  ]);
+  const [jobsPendingApproval, setJobsPendingApproval] = useState<JobData[]>([]);
 
   const [upcomingJobData] = useState<JobData[]>([
     { key: "1", jobId: "91011", purchaseOrder: "PO1112", jobName: "Roof Repair", location: "NYC", date: "2025-04-01" },
     { key: "2", jobId: "13141", purchaseOrder: "PO1314", jobName: "Flooring", location: "LA", date: "2025-04-05" },
   ]);
 
-  const handleCheckboxChange = (record: JobData) => {
+  // Add state for jobs awaiting confirmation
+  const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState<Job[]>([]);
+
+  const handleApproveChange = (record: JobData) => {
     const updatedJobs = jobsPendingApproval.map((job) =>
-      job.key === record.key ? { ...job, checked: !job.checked } : job
+      job.key === record.key ? { ...job, approved: !job.approved, declined: false } : job
     );
     setJobsPendingApproval(updatedJobs);
   };
 
-  const approveJobs = () => {
-    const approvedJobs = jobsPendingApproval.filter((job) => job.checked);
+  const handleDeclineChange = (record: JobData) => {
+    const updatedJobs = jobsPendingApproval.map((job) =>
+      job.key === record.key ? { ...job, declined: !job.declined, approved: false } : job
+    );
+    setJobsPendingApproval(updatedJobs);
+  };
+
+  const processJobs = () => {
+    const approvedJobs = jobsPendingApproval.filter((job) => job.approved);
+    const declinedJobs = jobsPendingApproval.filter((job) => job.declined);
     console.log("Approved Jobs:", approvedJobs);
-    setJobsPendingApproval(jobsPendingApproval.filter((job) => !job.checked));
+    console.log("Declined Jobs:", declinedJobs);
+    setJobsPendingApproval(jobsPendingApproval.filter((job) => !job.approved && !job.declined));
   };
 
   const jobColumns: ColumnsType<JobData> = [
     { title: "Job ID", dataIndex: "jobId", key: "jobId" },
     { title: "Purchase Order #", dataIndex: "purchaseOrder", key: "purchaseOrder" },
     { title: "Job Name", dataIndex: "jobName", key: "jobName" },
-    { title: "Requestor", dataIndex: "requestor", key: "requestor" },
-    { title: "Contact", dataIndex: "contact", key: "contact" },
+    { title: "Location", dataIndex: "location", key: "location" },
+    { title: "Date", dataIndex: "date", key: "date" },
     {
       title: "Approve",
-      key: "select",
+      key: "approve",
       render: (_, record) => (
-        <Checkbox checked={record.checked} onChange={() => handleCheckboxChange(record)} />
+        <Checkbox checked={record.approved} onChange={() => handleApproveChange(record)} />
+      ),
+    },
+    {
+      title: "Decline",
+      key: "decline",
+      render: (_, record) => (
+        <Checkbox checked={record.declined} onChange={() => handleDeclineChange(record)} />
       ),
     },
   ];
@@ -68,19 +85,35 @@ const ClientHome: React.FC = () => {
   ];
 
   // Fetch all data we need, and ensure the effect only runs once on mount ([]).
-  //const [jobs, setJobs] = useState<Array<JobData>>([]);
   useEffect(() => {
-    setTimeout(async () => {
-      const allJobs: Array<Job> = await getJobsAsync();
-      
-      // TODO: Map to JobData.
+    const fetchJobs = async () => {
+      try {
+        // Fetch jobs awaiting confirmation
+        const allJobs: Array<Job> = await getJobsAsync();
+        const awaitingConfirmation = allJobs.filter(job => !job.approved);
+        setJobsAwaitingConfirmation(awaitingConfirmation);
 
-      // Set the job data (setJobs) and ensure you bind the table to (jobs)
+        // Fetch jobs requiring approval
+        const jobsRequiringApproval = await getJobsRequiringApprovalAsync();
+        const formattedJobs: JobData[] = jobsRequiringApproval.map(job => ({
+          key: job.id || '',
+          jobId: job.id || '',
+          purchaseOrder: job.purchaseOrderNumber,
+          jobName: job.jobName,
+          location: job.location,
+          date: new Date(job.time).toLocaleDateString(),
+          approved: false,
+          declined: false
+        }));
+        setJobsPendingApproval(formattedJobs);
 
-      console.log("Fetched Jobs:", allJobs);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+        message.error('Failed to fetch jobs. Please try again later.');
+      }
+    };
 
-      debugger;
-    });
+    fetchJobs();
   }, []);
 
   return (
@@ -92,7 +125,21 @@ const ClientHome: React.FC = () => {
 
         <Content style={{ flex: 1, padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
           <Card title="Jobs Pending Confirmation">
-            <Table columns={jobColumns.filter((col) => col.key !== "select")} dataSource={jobsPendingApproval} pagination={false} />
+            <Table 
+              columns={[
+                { title: "Purchase Order #", dataIndex: "purchaseOrderNumber", key: "purchaseOrderNumber" },
+                { title: "Job Name", dataIndex: "jobName", key: "jobName" },
+                { title: "Location", dataIndex: "location", key: "location" },
+                { title: "Date", dataIndex: "time", key: "time", 
+                  render: (time: Date) => new Date(time).toLocaleDateString() 
+                },
+                { title: "Workers Needed", dataIndex: "numWorkers", key: "numWorkers" },
+                { title: "Hours Required", dataIndex: "numHours", key: "numHours" }
+              ]} 
+              dataSource={jobsAwaitingConfirmation} 
+              rowKey="id"
+              pagination={false} 
+            />
           </Card>
 
           <Card title="Jobs Pending My Approval">
@@ -100,10 +147,10 @@ const ClientHome: React.FC = () => {
             <div style={{ textAlign: "right", marginTop: 20 }}>
               <Button
                 type="primary"
-                onClick={approveJobs}
-                disabled={!jobsPendingApproval.some((job) => job.checked)}
+                onClick={processJobs}
+                disabled={!jobsPendingApproval.some((job) => job.approved || job.declined)}
               >
-                Approve Selected Jobs
+                Process Selected Jobs
               </Button>
             </div>
           </Card>
