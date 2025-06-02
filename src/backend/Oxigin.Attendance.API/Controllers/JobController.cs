@@ -56,7 +56,6 @@ public class JobController : BaseController
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> CreateJobRequestAsync([FromBody] Job request, CancellationToken token)
     {
-        // TODO: Grab the context of the requesting user.
         var signedInUser = await GetRequestingUserAsync(token);
 
         request.RequestorID = signedInUser.Id;
