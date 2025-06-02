@@ -27,12 +27,12 @@ public abstract class BaseController : ControllerBase
     protected BaseController(ILogger logger, IDatastoreContext dbContext)
     {
         this.logger = logger.ThrowIfNull(nameof(logger));
-        this.datastoreContext = datastoreContext.ThrowIfInvalid(nameof(datastoreContext));
+        this.datastoreContext = dbContext.ThrowIfInvalid(nameof(dbContext));
     }
     
     protected async Task<User?> GetRequestingUserAsync(CancellationToken token)
     {
-        var HEADER_KEY = Request.Headers["SessionId"];
+        var HEADER_KEY = "SessionId";
 
         if (!Request.Headers.ContainsKey(HEADER_KEY)) return null;
         

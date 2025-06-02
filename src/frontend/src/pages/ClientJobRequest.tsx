@@ -42,14 +42,20 @@ const ClientJobRequest: React.FC = () => {
   const handleSubmit = async (values: JobRequestForm) => {
     try {
       setProcessing(true);
+
+      const dateTime = new Date(
+        values.date.year(),
+        values.date.month(),
+        values.date.date(),
+        values.time.hour(),
+        values.time.minute());
       
       // Convert form values to JobRequest format
       const jobRequest = {
         jobName: values.jobName,
         requestorName: values.requestorName,
         purchaseOrderNumber: values.purchaseOrderNumber,
-        date: values.date.toDate(),
-        time: values.time.format('HH:mm:ss'),
+        time: dateTime,
         location: values.location,
         numberOfWorkers: values.numberOfWorkers,
         numberOfHours: values.numberOfHours,
@@ -79,15 +85,6 @@ const ClientJobRequest: React.FC = () => {
           style={{ marginBottom: 20 }}
         >
           <Input placeholder="Enter job name" />
-        </Form.Item>
-
-        <Form.Item 
-          name="requestorName" 
-          label="Requestor Name" 
-          rules={[{ required: true, message: "Please enter requestor name" }]}
-          style={{ marginBottom: 20 }}
-        >
-          <Input placeholder="Enter requestor name" />
         </Form.Item>
 
         <Form.Item 

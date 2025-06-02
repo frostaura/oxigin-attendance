@@ -27,8 +27,7 @@ export interface JobRequest {
   jobName: string;
   requestorName: string;
   purchaseOrderNumber: string;
-  date: Date;
-  time: string;
+  time: Date;
   location: string;
   numberOfWorkers: number;
   numberOfHours: number;

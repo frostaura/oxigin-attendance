@@ -29,12 +29,15 @@ import "./App.css";
 import { Routes as AppRoutes } from "./enums/routes";
 
 // TODO: Refactor routes to be enums for reusability instea 
+// TODO: Change clientsignin to just signin
+// TODO: Sort out registration form to be one and allow settings after
 
 const App: React.FC = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<ClientSignIn />} />
+        <Route path="/clntsignin" element={<ClientSignIn />} />
         <Route path="/clientregister" element={<ClientRegister />} />
         
         <Route

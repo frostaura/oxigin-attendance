@@ -7,7 +7,7 @@ import type { JobRequest } from "../../types";
  * @returns The created job request from the server
  */
 export async function createJobRequestAsync(request: Omit<JobRequest, 'id' | 'clientId' | 'status' | 'createdAt' | 'updatedAt'>): Promise<JobRequest> {
-    const response = await PostAsync<JobRequest>('JobRequest', request);
+    const response = await PostAsync<JobRequest>('Job', request);
     return response;
 }
 
