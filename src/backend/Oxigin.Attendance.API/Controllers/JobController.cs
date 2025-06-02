@@ -58,12 +58,12 @@ public class JobController : BaseController
     {
         // TODO: Grab the context of the requesting user.
         var signedInUser = await GetRequestingUserAsync(token);
-        
+
         request.RequestorID = signedInUser.Id;
         //request.ClientID = signedInUser.Id;
-        
+
         // TODO: Assign the request id to that of the above user.
-        
+
         var result = await _jobRequestManager.CreateJobRequestAsync(request, token);
 
         return Ok(result);
@@ -98,6 +98,38 @@ public class JobController : BaseController
     {
         var result = await _jobRequestManager.RejectJobRequestAsync(request, token);
 
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get all jobs that require approval by the current user (e.g., site manager or client).
+    /// </summary>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>A collection of jobs requiring approval.</returns>
+    [HttpGet("requiring-approval")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Job>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
+    public async Task<IActionResult> GetJobsRequiringApprovalAsync(CancellationToken token)
+    {
+        var signedInUser = await GetRequestingUserAsync(token);
+        if (signedInUser == null) return Unauthorized("You are not signed in.");
+        var result = await _jobRequestManager.GetJobsRequiringApprovalAsync(signedInUser, token);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Get all jobs that are awaiting confirmation by the current user (e.g., worker or client).
+    /// </summary>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>A collection of jobs awaiting confirmation.</returns>
+    [HttpGet("awaiting-confirmation")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Job>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
+    public async Task<IActionResult> GetJobsAwaitingConfirmationAsync(CancellationToken token)
+    {
+        var signedInUser = await GetRequestingUserAsync(token);
+        if (signedInUser == null) return Unauthorized("You are not signed in.");
+        var result = await _jobRequestManager.GetJobsAwaitingConfirmationAsync(signedInUser, token);
         return Ok(result);
     }
 }
