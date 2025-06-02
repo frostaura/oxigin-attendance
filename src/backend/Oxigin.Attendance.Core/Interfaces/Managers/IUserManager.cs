@@ -34,4 +34,12 @@ public interface IUserManager
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The user's new session context.</returns>
     Task<UserSigninResponse> RefreshSessionAsync(User user, CancellationToken token);
+
+    /// <summary>
+    /// Updates an existing user's details.
+    /// </summary>
+    /// <param name="user">The user entity with updated details.</param>
+    /// <param name="token">A token for cancelling downstream operations.</param>
+    /// <returns>The updated user entity.</returns>
+    Task<User> UpdateUserAsync(User user, CancellationToken token);
 }
