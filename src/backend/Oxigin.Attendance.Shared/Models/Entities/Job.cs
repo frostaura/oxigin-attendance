@@ -63,5 +63,5 @@ public class Job : BaseEntity
     /// The context for the user that is mapped to this session (client).
     /// </summary>
     [ForeignKey(nameof(ClientID))]
-    public virtual User? Client { get; set; }
+    public virtual Client? Client { get; set; }
 }

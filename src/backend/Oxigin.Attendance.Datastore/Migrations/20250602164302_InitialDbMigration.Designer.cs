@@ -12,8 +12,8 @@ using Oxigin.Attendance.Datastore;
 namespace Oxigin.Attendance.Datastore.Migrations
 {
     [DbContext(typeof(DatastoreContext))]
-    [Migration("20250602140449_Initial")]
-    partial class Initial
+    [Migration("20250602164302_InitialDbMigration")]
+    partial class InitialDbMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -391,7 +391,7 @@ namespace Oxigin.Attendance.Datastore.Migrations
 
             modelBuilder.Entity("Oxigin.Attendance.Shared.Models.Entities.Job", b =>
                 {
-                    b.HasOne("Oxigin.Attendance.Shared.Models.Entities.User", "Client")
+                    b.HasOne("Oxigin.Attendance.Shared.Models.Entities.Client", "Client")
                         .WithMany()
                         .HasForeignKey("ClientID")
                         .OnDelete(DeleteBehavior.Cascade)

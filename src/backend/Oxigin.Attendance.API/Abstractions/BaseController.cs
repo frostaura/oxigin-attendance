@@ -43,6 +43,7 @@ public abstract class BaseController : ControllerBase
         var userContext = await datastoreContext
             .UserSessions
             .Include(s => s.User)
+            .ThenInclude(u => u.Client)
             .SingleAsync(s => s.Id == Guid.Parse(sessionId), token);
         
         return userContext.User;
