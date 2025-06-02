@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Layout, Avatar, Menu, Dropdown } from "antd";
 import { LeftOutlined, RobotOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
-import { GetLoggedInUserContext } from '../services/data/backend';
+import { GetLoggedInUserContextAsync } from '../services/data/backend';
 
 const { Header, Content } = Layout;
 
@@ -16,15 +16,17 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   const hideBackButtonOn = ["/", "/register"];
   const showBackButton = !hideBackButtonOn.includes(location.pathname) && !location.pathname.includes("home");
+  const [userInitials, setUserInitials] = useState<string>("");
 
-  // TODO: Fill in with user initials
-  var userContext = GetLoggedInUserContext();
-  let userInitials = "";
-  if (!!userContext) {
-    userInitials = userContext.user.name.split(" ").map((n: string) => n[0].toUpperCase()).join("");
+  useEffect(() => {
+    setTimeout(async () => {
+      var userContext = await GetLoggedInUserContextAsync();
 
-  }
- 
+      if (!!userContext) {
+        setUserInitials(userContext.user.name.split(" ").map((n: string) => n[0].toUpperCase()).join(""));
+      }
+    });
+  }, []);
 
   const menu = (
     <Menu>

@@ -15,9 +15,13 @@ const BASE_BACKEND_URL: string = "http://localhost:5275";
  * @param {object} body - The request payload to send as JSON.
  * @returns {Promise<T>} The parsed JSON response from the backend.
  */
-export async function PostAsync<T>(url: string, body: object): Promise<T>{
-    const userContext = GetLoggedInUserContext();
-    const sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
+export async function PostAsync<T>(url: string, body: object, sessionId?: string | null): Promise<T>{
+    if(!sessionId){
+        const userContext = await GetLoggedInUserContextAsync();
+        // If no sessionId is provided, use the one from userContext or localStorage.
+        sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
+    }
+
     const finalUrl = `${BASE_BACKEND_URL}/${url}`;
     const request = await fetch(finalUrl, {
         method: "POST",
@@ -40,15 +44,21 @@ export async function PostAsync<T>(url: string, body: object): Promise<T>{
  * Check if the user is currently logged in by verifying the presence of a session ID in localStorage.
  * @returns {boolean} True if a session ID exists, otherwise false.
  */
-export function GetLoggedInUserContext(): UserSigninResponse | null {
+export async function GetLoggedInUserContextAsync(): Promise<UserSigninResponse | null> {
     const session = localStorage.getItem("session");
-    const parsedSession = session ? JSON.parse(session) : null;
+    const parsedSession: UserSigninResponse = session ? JSON.parse(session) : null;
 
-    return parsedSession as UserSigninResponse;
+    if(!parsedSession) return null;
+
+    // Refresh the session if it exists.
+    const newSession = await PostAsync<UserSigninResponse>('User/RefreshSession', {}, parsedSession.sessionId);
+
+    localStorage.setItem("session", JSON.stringify(newSession));
+    return newSession;
 }
 
 /**
- * 
+ * Sign a user out and navigate to the sign in page.
  */
 export function NavigateToSignInPage(): void{
     localStorage.removeItem("session");

@@ -2,10 +2,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
 import { SignInAsync } from "../services/data/user";
 import { useEffect, useState } from "react";
-import { GetLoggedInUserContext } from "../services/data/backend";
 import type { UserSigninResponse } from "../models/userModels";
 import { UserType } from "../enums/userTypes";
 import { Routes } from "../enums/routes";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
 
 const { Title, Text } = Typography;
 
@@ -16,10 +16,16 @@ interface LoginFormValues {
 
 const ClientSignIn: React.FC = () => {
   // Attempt to get the signed in user from localsotrage.
-  const [userContext, setUserContext] = useState<UserSigninResponse | null>(GetLoggedInUserContext());
+  const [userContext, setUserContext] = useState<UserSigninResponse | null>();
   const navigate = useNavigate();
   const [processing, setProcessing] = useState(false);
-  
+
+  useEffect(() => {
+    setTimeout(async () => {
+      setUserContext(await GetLoggedInUserContextAsync());
+    });
+  }, []);
+
   useEffect(() => {
     if(!userContext) return;
 
