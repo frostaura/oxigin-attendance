@@ -6,7 +6,7 @@ import type { ColumnsType } from "antd/es/table";
 import { getClientsAsync } from "../services/data/clients";
 import { createJobAsync } from "../services/data/job";
 import { GetLoggedInUserContextAsync } from "../services/data/backend";
-import type { Client } from "../models/clientModels";
+import type { ClientData } from "../models/clientModels";
 import type { Job } from "../models/jobModels";
 
 interface Worker {
@@ -19,7 +19,7 @@ interface Worker {
 const AdminJobRequest: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm<Job>();
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientData[]>([]);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
 

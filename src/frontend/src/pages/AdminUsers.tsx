@@ -266,7 +266,7 @@ const AdminUsers: React.FC = () => {
       contactNr: "",
       password: "",
       userType: UserType.BaseUser, // Default to BaseUser
-      clientID: ""
+      clientID: null
     };
     setNewUser(newUserData);
     
@@ -277,7 +277,7 @@ const AdminUsers: React.FC = () => {
       contactNr: "",
       password: "",
       userType: UserType.BaseUser,
-      clientID: ""
+      clientID: null
     });
     
     setEditingKey(newKey);
@@ -353,7 +353,7 @@ const AdminUsers: React.FC = () => {
       title: "Client",
       dataIndex: "clientID",
       key: "clientID",
-      render: (text, record) => {
+      render: (_text, record) => {
         const client = clients.find(c => c.id === record.clientID);
         return editingKey === record.key ? (
           <Form.Item

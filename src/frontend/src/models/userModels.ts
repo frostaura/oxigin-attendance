@@ -14,7 +14,7 @@ export interface User {
     email: string;
     userType: UserType;
     password: string;
-    clientID?: string; // Optional client ID for users associated with a client
+    clientID?: string | null; // Optional client ID for users associated with a client
     //sessions?: UserSession[];
 }
 

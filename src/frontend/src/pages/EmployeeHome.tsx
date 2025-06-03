@@ -97,33 +97,6 @@ const EmployeeHome: React.FC = () => {
     },
   ];
 
-  const upcomingJobColumns: ColumnsType<JobData> = [
-    {
-      title: "Job Name",
-      dataIndex: "jobName",
-      key: "jobName",
-    },
-    {
-      title: "Job Location",
-      dataIndex: "location",
-      key: "location",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-    {
-      title: "Time",
-      dataIndex: "time",
-      key: "time",
-    },
-    {
-      title: "Worker Type",
-      dataIndex: "workerType",
-      key: "workerType",
-    },
-  ];
 
   return (
     <Layout style={{ minHeight: "100vh", padding: "20px" }}>
@@ -168,15 +141,6 @@ const EmployeeHome: React.FC = () => {
           </div>
 
           <div style={{ width: "100%", marginBottom: "20px" }}>
-            <Card title="Upcoming Jobs" style={{ height: "100%" }}>
-              <Table
-                columns={upcomingJobColumns}
-                dataSource={upcomingJobs}
-                rowKey="key"
-                pagination={false}
-                style={{ height: "100%" }}
-              />
-            </Card>
           </div>
         </Content>
       </Card>

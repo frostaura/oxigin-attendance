@@ -3,7 +3,8 @@
 // Handles user sign-in and session management for the Oxigin Attendance frontend.
 
 import type { User, UserSignUpResponse, UserSigninResponse } from "../../models/userModels";
-import { GetAsync, PostAsync, DeleteAsync, PutAsync, PatchAsync } from "./backend";
+import { GetAsync, PostAsync, DeleteAsync, PatchAsync } from "./backend";
+import { hashString } from "../../utils/crypto";
 
 /**
  * Sign in a user with the provided email and password.
@@ -13,7 +14,9 @@ import { GetAsync, PostAsync, DeleteAsync, PutAsync, PatchAsync } from "./backen
  * @returns {Promise<UserSigninResponse>} The user and session ID from the backend.
  */
 export async function SignInAsync(email: string, password: string): Promise<UserSigninResponse>{
-    const response = await PostAsync<UserSigninResponse>('User/SignIn', { email, password });
+    // Hash the password before sending it to match the backend's stored hash
+    const hashedPassword = await hashString(password);
+    const response = await PostAsync<UserSigninResponse>('User/SignIn', { email, password: hashedPassword });
 
     // Add the session id to localstorage.
     localStorage.setItem("session", JSON.stringify(response));
@@ -27,7 +30,6 @@ export async function SignInAsync(email: string, password: string): Promise<User
  * @param {string} contactNr - The user's contact number.
  * @param {string} email - The user's email address.
  * @param {string} password - The user's password.
- * @param {number} userType - The user's type (from UserType enum).
  * @returns {Promise<UserSignUpResponse>} The user and session ID from the backend.
  */
 export async function SignUpAsync(
@@ -36,11 +38,13 @@ export async function SignUpAsync(
     email: string, 
     password: string,
 ): Promise<UserSignUpResponse> {
+    // Hash the password before sending it to match the backend's stored hash
+    const hashedPassword = await hashString(password);
     const response = await PostAsync<UserSignUpResponse>('User/SignUp', { 
         name, 
         contactNr, 
         email, 
-        password,
+        password: hashedPassword,
         userType: 0 
     });
     localStorage.setItem("session", JSON.stringify(response));
@@ -56,7 +60,7 @@ export async function SignUpAsync(
  * @param {string} email - The user's email address.
  * @param {string} password - The user's password.
  * @param {number} userType - The user's type (from UserType enum).
- * @param {string} [clientID] - Optional client ID to associate with the user.
+ * @param {string | null} [clientID] - Optional client ID to associate with the user.
  * @returns {Promise<UserSignUpResponse>} The created user and session ID from the backend.
  */
 export async function CreateUserAsAdmin(
@@ -65,16 +69,18 @@ export async function CreateUserAsAdmin(
     email: string, 
     password: string,
     userType: number,
-    clientID?: string
+    clientID?: string | null
 ): Promise<UserSignUpResponse> {
-    return await PostAsync<UserSignUpResponse>('User/SignUp', { 
+    // Only include clientID in the request if it has a value
+    const requestData = {
         name, 
         contactNr, 
         email, 
         password,
         userType,
-        clientID 
-    });
+        ...(clientID ? { clientID } : {})
+    };
+    return await PostAsync<UserSignUpResponse>('User/SignUp', requestData);
 }
 
 /**
