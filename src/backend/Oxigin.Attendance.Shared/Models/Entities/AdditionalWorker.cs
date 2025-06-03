@@ -39,6 +39,6 @@ public class AdditionalWorker : BaseEntity
     /// Navigation property for the related Job.
     /// </summary>
     [ForeignKey(nameof(JobID))]
-    public virtual Job Job { get; set; }
+    public virtual Job? Job { get; set; }
 
 }

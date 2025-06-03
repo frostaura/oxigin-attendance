@@ -17,7 +17,7 @@ export async function getAdditionalWorkersByJob(jobId: string, sessionId?: strin
 
 /**
  * Add an additional worker to a job.
- * @param {Partial<AdditionalWorker>} worker - The AdditionalWorker entity (must include JobID).
+ * @param {AdditionalWorker} worker - The worker details to add
  * @param {string | null} sessionId - Optional session ID for authentication.
  * @returns {Promise<AdditionalWorker>} The created AdditionalWorker entity.
  */

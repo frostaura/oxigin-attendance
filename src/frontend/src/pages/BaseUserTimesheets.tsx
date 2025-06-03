@@ -4,7 +4,6 @@ import type { ColumnsType } from "antd/es/table";
 import { getJobsAsync } from "../services/data/job";
 import { getTimesheetsForJobAsync } from "../services/data/timesheet";
 import type { Job } from "../models/jobModels";
-import type { Timesheet } from "../models/timesheetModels";
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -23,11 +22,6 @@ interface JobOnDate {
   purchaseOrderNo: string;
   jobName: string;
   companyName: string;
-  job?: {
-    client?: {
-      companyName: string;
-    };
-  };
 }
 
 interface TimesheetEntry {
@@ -75,7 +69,6 @@ const BaseUserTimesheets: React.FC = () => {
           purchaseOrderNo: selectedJobData.purchaseOrderNumber || '',
           jobName: selectedJobData.jobName || '',
           companyName: selectedJobData.clientID || '',
-          job: selectedJobData.job
         }]);
 
         // Set job date
@@ -150,6 +143,7 @@ const BaseUserTimesheets: React.FC = () => {
       // Add job details
       doc.setFontSize(12);
       const jobDetails = jobsOnDate[0];
+      const selectedJobData = jobs.find(job => job.id === selectedJob);
       
       // Job Details Section
       doc.setFontSize(14);
@@ -159,7 +153,7 @@ const BaseUserTimesheets: React.FC = () => {
       const jobDetailsData = [
         ["Purchase Order Number:", jobDetails.purchaseOrderNo],
         ["Job Name:", jobDetails.jobName],
-        ["Client Name:", jobDetails.job?.client?.companyName || "N/A"],
+        ["Client Name:", selectedJobData?.client?.companyName || "N/A"],
         ["Date:", selectedJobDate]
       ];
 
