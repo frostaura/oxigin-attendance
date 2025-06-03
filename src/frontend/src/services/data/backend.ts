@@ -36,9 +36,22 @@ export async function PostAsync<T>(url: string, body: object, sessionId?: string
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
 
-    return await request.json() as T;
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**
@@ -66,9 +79,22 @@ export async function GetAsync<T>(url: string, sessionId?: string | null): Promi
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
 
-    return await request.json() as T;
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**
@@ -94,10 +120,25 @@ export async function DeleteAsync<T>(url: string, sessionId?: string | null): Pr
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
+
     // If the backend returns no content, just return undefined as T
     if(request.status === 204) return undefined as T;
-    return await request.json() as T;
+
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**
@@ -125,8 +166,22 @@ export async function PutAsync<T>(url: string, body: object | string, sessionId?
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
-    return await request.json() as T;
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
+
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**
@@ -154,8 +209,22 @@ export async function PatchAsync<T>(url: string, body: object, sessionId?: strin
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
-    return await request.json() as T;
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
+
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**

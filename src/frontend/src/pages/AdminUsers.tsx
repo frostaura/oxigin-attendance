@@ -10,7 +10,6 @@ import type { Client } from "../models/clientModels";
 import type { Employee } from "../models/employeeModels";
 import type { ColumnType } from "antd/es/table";
 import { UserType } from "../enums/userTypes";
-import { hashString } from "../utils/crypto";
 
 const { Header, Content } = Layout;
 const { Search } = Input;
@@ -131,15 +130,11 @@ const AdminUsers: React.FC = () => {
 
   const handleSave = async (key: string) => {
     try {
-      console.log('Validating form fields...');
       const values = await form.validateFields();
-      console.log('Form values:', values);
       
       const userType = Number(values.userType);
-      console.log('UserType converted to:', userType);
-
+      
       if (newUser && key === newUser.key) {
-        console.log('Creating new user...');
         if (!values.password || !values.email || !values.name || !values.contactNr) {
           message.error("All fields are required for new users");
           return;
@@ -158,7 +153,6 @@ const AdminUsers: React.FC = () => {
         }
       } else {
         // Handle existing user update
-        console.log('Updating existing user...');
         const existingUser = users.find(u => u.key === key);
         if (!existingUser) {
           message.error("User not found");
@@ -199,7 +193,8 @@ const AdminUsers: React.FC = () => {
   };
 
   const createUser = async (values: any, userType: UserType) => {
-    const hashedPassword = await hashString(values.password || 'defaultPassword123'); // Default password if not provided
+    // Send plain password to backend - it will handle hashing
+    const password = values.password || 'defaultPassword123'; // Default password if not provided
     
     // Generate a random string for unique email
     const randomString = Math.random().toString(36).substring(2, 8);
@@ -225,7 +220,7 @@ const AdminUsers: React.FC = () => {
           defaultValues.name,
           defaultValues.contactNr,
           defaultValues.email,
-          hashedPassword,
+          password,
           userType,
           null, // No client ID for employee
           newEmployee.id // Link to the newly created employee
@@ -242,7 +237,7 @@ const AdminUsers: React.FC = () => {
         defaultValues.name,
         defaultValues.contactNr,
         defaultValues.email,
-        hashedPassword,
+        password,
         userType,
         values.clientID
       );

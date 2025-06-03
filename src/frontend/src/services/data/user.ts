@@ -4,7 +4,6 @@
 
 import type { User, UserSignUpResponse, UserSigninResponse } from "../../models/userModels";
 import { GetAsync, PostAsync, DeleteAsync, PatchAsync } from "./backend";
-import { hashString } from "../../utils/crypto";
 
 /**
  * Sign in a user with the provided email and password.
@@ -14,9 +13,11 @@ import { hashString } from "../../utils/crypto";
  * @returns {Promise<UserSigninResponse>} The user and session ID from the backend.
  */
 export async function SignInAsync(email: string, password: string): Promise<UserSigninResponse>{
-    // Hash the password before sending it to match the backend's stored hash
-    const hashedPassword = await hashString(password);
-    const response = await PostAsync<UserSigninResponse>('User/SignIn', { email, password: hashedPassword });
+    // Send plain password to backend - it will handle hashing
+    const response = await PostAsync<UserSigninResponse>('User/SignIn', { 
+        email: email.toLowerCase(), // Ensure email is lowercase
+        password 
+    });
 
     // Add the session id to localstorage.
     localStorage.setItem("session", JSON.stringify(response));
@@ -38,13 +39,12 @@ export async function SignUpAsync(
     email: string, 
     password: string,
 ): Promise<UserSignUpResponse> {
-    // Hash the password before sending it to match the backend's stored hash
-    const hashedPassword = await hashString(password);
+    // Send plain password to backend - it will handle hashing
     const response = await PostAsync<UserSignUpResponse>('User/SignUp', { 
         name, 
         contactNr, 
         email, 
-        password: hashedPassword,
+        password,
         userType: 0 
     });
     localStorage.setItem("session", JSON.stringify(response));
@@ -58,7 +58,7 @@ export async function SignUpAsync(
  * @param {string} name - The user's name.
  * @param {string} contactNr - The user's contact number.
  * @param {string} email - The user's email address.
- * @param {string} password - The user's password (already hashed).
+ * @param {string} password - The user's plain text password.
  * @param {number} userType - The user's type (from UserType enum).
  * @param {string | null} [clientID] - Optional client ID to associate with the user.
  * @param {string | null} [employeeID] - Optional employee ID to associate with the user.
@@ -78,7 +78,7 @@ export async function CreateUserAsAdmin(
         name, 
         contactNr, 
         email: email.toLowerCase(), // Ensure email is lowercase
-        password, // Password should already be hashed by the caller
+        password, // Send plain password to backend - it will handle hashing
         userType,
         ...(clientID ? { clientID } : {}),
         ...(employeeID ? { employeeID } : {})

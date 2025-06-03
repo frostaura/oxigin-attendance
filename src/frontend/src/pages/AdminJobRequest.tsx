@@ -22,6 +22,7 @@ const AdminJobRequest: React.FC = () => {
   const [clients, setClients] = useState<ClientData[]>([]);
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
 
   // Fetch clients when component mounts
   useEffect(() => {
@@ -92,7 +93,8 @@ const AdminJobRequest: React.FC = () => {
         numWorkers: values.numWorkers,
         numHours: values.numHours,
         approved: false,
-        clientID: values.clientId  // Use the selected client ID from the form
+        clientID: selectedClient?.id || '',
+        status: 'PENDING'
       };
 
       console.log('Submitting job request:', jobRequest); // Debug logging
@@ -109,6 +111,11 @@ const AdminJobRequest: React.FC = () => {
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handleClientChange = (value: string) => {
+    const client = clients.find(c => c.id === value);
+    setSelectedClient(client);
   };
 
   return (
@@ -135,9 +142,7 @@ const AdminJobRequest: React.FC = () => {
             placeholder="Select client" 
             loading={loading}
             disabled={loading}
-            onChange={(value) => {
-              console.log('Selected client ID:', value); // Debug selected client
-            }}
+            onChange={handleClientChange}
           >
             {clients.map(client => (
               <Select.Option key={client.id} value={client.id}>

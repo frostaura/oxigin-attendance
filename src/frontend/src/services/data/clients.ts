@@ -14,7 +14,6 @@ export async function getClientsAsync(): Promise<Array<ClientData>> {
         }
 
         const response = await GetAsync<Array<any>>('Client');
-        console.log('Raw client response:', response); // This will help us see the exact field names
         return response.map(client => ({
             key: client.id,
             id: client.id,
@@ -81,11 +80,7 @@ export async function updateClientAsync(client: ClientData): Promise<ClientData>
             RegNo: client.registrationNo
         };
         
-        console.log('Updating client with data:', backendClient);
-        
         const response = await PutAsync<any>('Client', backendClient);
-        
-        console.log('Update response:', response);
         return response;
     } catch (error) {
         console.error('Error details:', error);

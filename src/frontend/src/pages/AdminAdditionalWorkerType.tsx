@@ -1,10 +1,7 @@
-
 import React, { useState } from "react";
-import { Table, Form, Select, InputNumber, Button } from "antd";
+import { Table, Form, Input, InputNumber, Button } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-
-const { Option } = Select;
 
 interface Worker {
   key: number;
@@ -15,7 +12,6 @@ interface Worker {
 
 const AdminAdditionalWorkerType: React.FC = () => {
   const [workers, setWorkers] = useState<Worker[]>([{ key: 0 }]);
-  const [workerOptions, setWorkerOptions] = useState<string[]>(["Electrician", "Plumber", "Carpenter", "Painter"]); // Default options
   const navigate = useNavigate();
 
   // Function to add a new worker type row
@@ -28,13 +24,6 @@ const AdminAdditionalWorkerType: React.FC = () => {
     setWorkers(workers.filter((worker) => worker.key !== key));
   };
 
-  // Function to handle adding new options when typing in the dropdown
-  const handleWorkerTypeChange = (value: string | string[]): void => {
-    if (typeof value === "string" && !workerOptions.includes(value)) {
-      setWorkerOptions([...workerOptions, value]); // Add new worker type
-    }
-  };
-
   const columns = [
     {
       title: "Worker Type",
@@ -42,19 +31,8 @@ const AdminAdditionalWorkerType: React.FC = () => {
       key: "workerType",
       width: "50%",
       render: (_: unknown, record: Worker) => (
-        <Form.Item name={`workerType_${record.key}`} rules={[{ required: true, message: "Select worker type" }]}>
-          <Select
-            mode="tags"
-            placeholder="Select or type a worker type"
-            style={{ width: "100%" }}
-            onChange={handleWorkerTypeChange}
-          >
-            {workerOptions.map((option) => (
-              <Option key={option} value={option}>
-                {option}
-              </Option>
-            ))}
-          </Select>
+        <Form.Item name={`workerType_${record.key}`} rules={[{ required: true, message: "Enter worker type" }]}>
+          <Input placeholder="Enter worker type" />
         </Form.Item>
       ),
     },
