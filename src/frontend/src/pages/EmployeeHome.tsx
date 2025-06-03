@@ -3,6 +3,7 @@ import { Layout, Card, Table, Select, Button, message, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { getAllocationsForEmployeeAsync } from "../services/data/jobAllocation";
+import { getTimesheetsForJobAsync } from "../services/data/timesheet";
 import type { Allocation } from "../models/jobAllocationModels";
 import { GetLoggedInUserContextAsync } from "../services/data/backend";
 import { signInAsync } from "../services/data/timesheet";
@@ -11,13 +12,17 @@ import type { Timesheet } from "../models/timesheetModels";
 const { Header, Content } = Layout;
 const { Option } = Select;
 
+interface AllocationWithCheckIn extends Allocation {
+  isCheckedIn?: boolean;
+}
+
 const EmployeeHome: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState<string>("Check in");
+  const [selectedJob, setSelectedJob] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [allocations, setAllocations] = useState<Allocation[]>([]);
+  const [allocations, setAllocations] = useState<AllocationWithCheckIn[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedAllocation, setSelectedAllocation] = useState<Allocation | null>(null);
+  const [selectedAllocation, setSelectedAllocation] = useState<AllocationWithCheckIn | null>(null);
 
   useEffect(() => {
     const fetchAllocations = async () => {
@@ -28,8 +33,36 @@ const EmployeeHome: React.FC = () => {
           message.error("No employee ID found. Please contact support.");
           return;
         }
+
+        // Get all allocations for the employee
         const allocationData = await getAllocationsForEmployeeAsync(userContext.user.employeeID);
-        setAllocations(allocationData);
+        
+        // For each job in the allocations, check if the employee is already checked in
+        const checkedJobs = await Promise.all(
+          allocationData.map(async (allocation) => {
+            if (!allocation.job?.id) return allocation;
+
+            const timesheets = await getTimesheetsForJobAsync(allocation.job.id);
+            const isCheckedIn = timesheets.some(timesheet => 
+              timesheet.employeeID === userContext.user.employeeID && 
+              !timesheet.deleted &&
+              timesheet.timeIn &&
+              timesheet.timeOut === "0001-01-01T00:00:00" // Not checked out
+            );
+
+            return {
+              ...allocation,
+              isCheckedIn
+            } as AllocationWithCheckIn;
+          })
+        );
+
+        // Filter out jobs where the employee is already checked in
+        const availableAllocations = checkedJobs.filter(
+          (allocation: AllocationWithCheckIn) => !allocation.isCheckedIn && !allocation.deleted
+        );
+
+        setAllocations(availableAllocations);
       } catch (error) {
         console.error("Failed to fetch allocations:", error);
         message.error("Failed to fetch job allocations");
@@ -42,13 +75,11 @@ const EmployeeHome: React.FC = () => {
   }, []);
 
   const handleJobChange = (value: string) => {
-    console.log("Job selected:", value);
-    if (value === "Check in") {
+    if (!value) {
       return;
     }
     
     const allocation = allocations.find(a => a.job?.jobName === value);
-    console.log("Found allocation:", allocation);
     
     setSelectedJob(value);
     setSelectedAllocation(allocation || null);
@@ -61,6 +92,7 @@ const EmployeeHome: React.FC = () => {
   const handleModalCancel = () => {
     setIsModalVisible(false);
     setSelectedAllocation(null);
+    setSelectedJob("");
   };
 
   const handleCheckIn = async () => {
@@ -89,14 +121,19 @@ const EmployeeHome: React.FC = () => {
         siteManagerID: selectedAllocation.job.requestorID
       };
 
-      console.log("Sending timesheet data:", timesheet); // Debug log
-      const response = await signInAsync(timesheet);
-      console.log("Server response:", response); // Debug log
+      await signInAsync(timesheet);
       
       message.success("Successfully checked in!");
       setIsModalVisible(false);
       setSelectedAllocation(null);
-      setSelectedJob("Check in"); // Reset the dropdown to "Check in"
+      setSelectedJob("");
+
+      // Refresh allocations to update the list
+      const userContextRefresh = await GetLoggedInUserContextAsync();
+      if (userContextRefresh?.user?.employeeID) {
+        const allocationData = await getAllocationsForEmployeeAsync(userContextRefresh.user.employeeID);
+        setAllocations(allocationData.filter(a => !a.deleted));
+      }
     } catch (error) {
       console.error("Failed to check in:", error);
       message.error("Failed to check in. Please try again.");
@@ -144,9 +181,13 @@ const EmployeeHome: React.FC = () => {
         <Content>
           <div style={{ width: "100%", marginBottom: "20px" }}>
             <Select
-              value={selectedJob}
+              placeholder="Job"
+              allowClear
+              showSearch={false}
+              value={selectedJob || undefined}
               onChange={handleJobChange}
               style={{ width: "100%", marginBottom: "20px" }}
+              loading={loading}
             >
               {allocations.map((allocation) => (
                 <Option 
