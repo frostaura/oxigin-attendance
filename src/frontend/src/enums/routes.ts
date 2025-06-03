@@ -17,6 +17,7 @@ export enum Routes {
     AdminJobAllocations = "/adminjoballocations",
     AdminClientHome = "/adminclienthome",
     AdminManageClients = "/adminmanageclients",
+    AdminUsers = "/adminusers",
 
     EmployeeHome = "/employeehome",
     SiteManagerHome = "/sitemanagerhome",

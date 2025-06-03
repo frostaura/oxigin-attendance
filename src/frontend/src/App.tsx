@@ -17,6 +17,7 @@ import EmployeeRegister from "./pages/EmployeeRegister";
 import AdminJobAllocations from "./pages/AdminJobAllocations";
 import AdminClientHome from "./pages/AdminClientHome";
 import AdminManageClients from "./pages/AdminManageClients";
+import AdminUsers from "./pages/AdminUsers";
 import EmployeeHome from "./pages/EmployeeHome";
 import SiteManagerHome from "./pages/SiteManagerHome";
 import SiteManagerCheckIn from "./pages/SiteManagerCheckIn";
@@ -60,6 +61,7 @@ const App: React.FC = () => {
                 <Route path="/adminjoballocations" element={<AdminJobAllocations/>}/>
                 <Route path="/adminclienthome" element={<AdminClientHome/>}/>
                 <Route path="/adminmanageclients" element={<AdminManageClients/>}/>
+                <Route path="/adminusers" element={<AdminUsers/>}/>
                 <Route path="/employeehome" element={<EmployeeHome/>}/>
                 <Route path="/sitemanagerhome" element={<SiteManagerHome/>}/>
                 <Route path="/sitemanagercheckin" element={<SiteManagerCheckIn/>}/>

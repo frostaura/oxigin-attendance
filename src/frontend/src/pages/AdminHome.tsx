@@ -1,7 +1,7 @@
 import React from "react";
 import { Layout, Card, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { AppstoreAddOutlined, TeamOutlined, CustomerServiceOutlined } from "@ant-design/icons";
+import { AppstoreAddOutlined, TeamOutlined, CustomerServiceOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Header, Content } = Layout;
 
@@ -21,6 +21,7 @@ const AdminHome: React.FC = () => {
           <Button type="primary" block icon={<AppstoreAddOutlined/>} onClick={() => navigate("/adminjobshome")} style={{ width: "300px", height: "100px", fontSize: "18px"}} >Jobs</Button>
           <Button type="primary" block icon={<TeamOutlined/>} onClick={() => navigate("/adminemployeeshome" )} style={{ width: "300px", height: "100px", fontSize: "18px" }} >Employees</Button>
           <Button type="primary" block icon={<CustomerServiceOutlined/>} onClick={() => navigate("/adminmanageclients")} style={{ width: "300px", height: "100px", fontSize: "18px" }} >Clients</Button>
+          <Button type="primary" block icon={<UserOutlined/>} onClick={() => navigate("/adminusers")} style={{ width: "300px", height: "100px", fontSize: "18px" }} >Users</Button>
         </Content>
       </Card>
     </Layout>

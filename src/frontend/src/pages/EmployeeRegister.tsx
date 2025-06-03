@@ -2,24 +2,19 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
 import { SignUpAsync } from "../services/data/user";
+import type { UserSignUpValues } from "../models/userModels";
 
 const { Title } = Typography;
 
-interface EmployeeRegistrationFormValues {
-  name: string;
-  contactNr: string;
-  email: string;
-  password: string;
-}
 
 const EmployeeRegister: React.FC = () => {
   // TODO: We should have only one register and name it something like Register.
   const navigate = useNavigate();
-  const [form] = Form.useForm<EmployeeRegistrationFormValues>();
+  const [form] = Form.useForm<UserSignUpValues>();
   const [processing, setProcessing] = useState(false);
 
 
-  const handleSignUp = async (values: EmployeeRegistrationFormValues) => {
+  const handleSignUp = async (values: UserSignUpValues) => {
     try {
       setProcessing(true); 
       // Call the SignUpAsync function with the form values

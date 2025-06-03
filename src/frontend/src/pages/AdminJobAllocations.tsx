@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Table, Select, Button, Checkbox, Card, message } from "antd";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import type { Job } from "../models/jobModels";
 import type { Employee } from "../models/employeeModels";
@@ -16,7 +16,7 @@ interface EmployeeWithCheck extends Employee {
 }
 
 const AdminJobAllocations: React.FC = () => {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [availableEmployees, setAvailableEmployees] = useState<EmployeeWithCheck[]>([]);
