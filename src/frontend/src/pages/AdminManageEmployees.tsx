@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
-import { Layout, Card, Table, Input, Button, message } from "antd";
-import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { Layout, Card, Table, Input, Button, message, Modal } from "antd";
+import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { addEmployeeAsync, getEmployeesAsync, removeEmployeeAsync, updateEmployeeAsync } from "../services/data/employee";
 import type { Employee } from "../models/employeeModels";
 
 const { Header, Content } = Layout;
+const { Search } = Input;
 
 interface EditableEmployee extends Employee {
   key: string;
@@ -100,17 +101,26 @@ const ManageEmployees: React.FC = () => {
 
   // Delete an employee row
   const handleDelete = async (key: string) => {
-    try {
-      setLoading(true);
-      await removeEmployeeAsync(key);
-      message.success("Employee removed successfully");
-      await fetchEmployees(); // Refresh the list
-    } catch (error) {
-      message.error("Failed to delete employee");
-      console.error("Error deleting employee:", error);
-    } finally {
-      setLoading(false);
-    }
+    Modal.confirm({
+      title: 'Are you sure you want to delete this employee?',
+      content: 'This action cannot be undone.',
+      okText: 'Yes',
+      okType: 'danger',
+      cancelText: 'No',
+      onOk: async () => {
+        try {
+          setLoading(true);
+          await removeEmployeeAsync(key);
+          message.success("Employee removed successfully");
+          await fetchEmployees();
+        } catch (error) {
+          message.error("Failed to delete employee");
+          console.error("Error deleting employee:", error);
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   // Add a new employee row
@@ -144,13 +154,14 @@ const ManageEmployees: React.FC = () => {
     }
   };
 
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
+  const handleSearch = (value: string) => {
+    setSearchValue(value.toLowerCase());
   };
 
   const filteredEmployees = employees.filter(employee =>
-    employee.id.toLowerCase().includes(searchValue.toLowerCase()) ||
-    employee.idNumber?.toLowerCase().includes(searchValue.toLowerCase())
+    (employee.idNumber?.toLowerCase() || '').includes(searchValue) ||
+    (employee.address?.toLowerCase() || '').includes(searchValue) ||
+    (employee.contactNo?.toLowerCase() || '').includes(searchValue)
   );
 
   const columns: ColumnsType<EditableEmployee> = [
@@ -251,40 +262,35 @@ const ManageEmployees: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "80%", padding: 20 }}>
-        {/* Page Header */}
-        <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px" }}>
-          <h2 style={{ margin: 0, textAlign: "center" }}>Manage Employees</h2>
+      <Card style={{ width: "80%", padding: 20, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px", width: "100%" }}>
+          <h2 style={{ margin: 0, textAlign: "center", width: "100%" }}>Manage Employees</h2>
         </Header>
 
-        {/* Main Content */}
-        <Content style={{ flex: 1, padding: 20 }}>
-          <Card title="All Employees">
+        <Content style={{ flex: 1, padding: 20, width: "100%" }}>
+          <Card title="All Employees" style={{ width: "100%" }}>
+            <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddEmployee} disabled={!!newEmployee}>
+                Add Employee
+              </Button>
+              <Search
+                placeholder="Search by ID Number, Address, or Contact"
+                allowClear
+                enterButton={<SearchOutlined />}
+                style={{ width: 300 }}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
+
             <Table 
               columns={columns} 
               dataSource={newEmployee ? [...filteredEmployees, newEmployee] : filteredEmployees} 
-              pagination={false}
+              pagination={{ pageSize: 10 }}
               loading={loading}
             />
-            
-            {/* Bottom section */}
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
-              <div style={{ display: "flex", gap: 10 }}>
-                {/* Back Button */}
-                <Button onClick={() => navigate(-1)}>Back</Button>
-                {/* Add Employee Button */}
-                <Button type="dashed" icon={<PlusOutlined />} onClick={handleAddEmployee} disabled={!!newEmployee}>
-                  Add Employee
-                </Button>
-              </div>
 
-              {/* Search Box (Bottom Right) */}
-              <Input 
-                placeholder="Search Employee ID or Name" 
-                style={{ borderColor: "#1890ff", borderWidth: 2, width: 200, padding: "8px" }}
-                value={searchValue}
-                onChange={handleSearchChange}
-              />
+            <div style={{ marginTop: 16 }}>
+              <Button onClick={() => navigate(-1)}>Back</Button>
             </div>
           </Card>
         </Content>

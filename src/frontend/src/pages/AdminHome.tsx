@@ -20,7 +20,7 @@ const AdminHome: React.FC = () => {
           {/* Vertical Buttons */}
           <Button type="primary" block icon={<AppstoreAddOutlined/>} onClick={() => navigate("/adminjobshome")} style={{ width: "300px", height: "100px", fontSize: "18px"}} >Jobs</Button>
           <Button type="primary" block icon={<TeamOutlined/>} onClick={() => navigate("/adminemployeeshome" )} style={{ width: "300px", height: "100px", fontSize: "18px" }} >Employees</Button>
-          <Button type="primary" block icon={<CustomerServiceOutlined/>} onClick={() => navigate("/adminclienthome")} style={{ width: "300px", height: "100px", fontSize: "18px" }} >Clients</Button>
+          <Button type="primary" block icon={<CustomerServiceOutlined/>} onClick={() => navigate("/adminmanageclients")} style={{ width: "300px", height: "100px", fontSize: "18px" }} >Clients</Button>
         </Content>
       </Card>
     </Layout>
