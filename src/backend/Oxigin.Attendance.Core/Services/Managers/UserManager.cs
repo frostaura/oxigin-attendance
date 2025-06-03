@@ -116,6 +116,27 @@ public class UserManager : IUserManager
             // Hash the password before saving
             user.Password = user.Password.HashString();
             user.Email = user.Email.ToLower();
+
+            // If clientID is provided, verify it exists
+            if (user.ClientID.HasValue)
+            {
+                var client = await _db.Clients.FirstOrDefaultAsync(c => c.Id == user.ClientID && !c.Deleted, token);
+                if (client == null)
+                {
+                    throw new StandardizedErrorException
+                    {
+                        Error = new StandardizedError
+                        {
+                            Origin = nameof(UserManager),
+                            Message = "The specified client does not exist.",
+                            Data = new Dictionary<string, object>
+                            {
+                                { "ClientID", user.ClientID.Value }
+                            }
+                        }
+                    };
+                }
+            }
         
             _db.Users.Add(user);
             await _db.SaveChangesAsync(token);
@@ -242,10 +263,33 @@ public class UserManager : IUserManager
             user.ThrowIfNull(nameof(user));
             var dbUser = await _db.Users.SingleOrDefaultAsync(u => u.Id == user.Id, token);
             if (dbUser == null) throw new StandardizedErrorException { Error = new StandardizedError { Origin = nameof(UserManager), Message = "User not found." } };
+
+            // If clientID is provided and changed, verify it exists
+            if (user.ClientID != dbUser.ClientID && user.ClientID.HasValue)
+            {
+                var client = await _db.Clients.FirstOrDefaultAsync(c => c.Id == user.ClientID && !c.Deleted, token);
+                if (client == null)
+                {
+                    throw new StandardizedErrorException
+                    {
+                        Error = new StandardizedError
+                        {
+                            Origin = nameof(UserManager),
+                            Message = "The specified client does not exist.",
+                            Data = new Dictionary<string, object>
+                            {
+                                { "ClientID", user.ClientID.Value }
+                            }
+                        }
+                    };
+                }
+            }
+
             dbUser.Name = user.Name;
             dbUser.ContactNr = user.ContactNr;
             dbUser.Email = user.Email;
             dbUser.UserType = user.UserType;
+            dbUser.ClientID = user.ClientID; // Update clientID
             // Do not update password here for security reasons
             await _db.SaveChangesAsync(token);
             return dbUser;

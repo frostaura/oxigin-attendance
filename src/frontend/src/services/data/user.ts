@@ -56,6 +56,7 @@ export async function SignUpAsync(
  * @param {string} email - The user's email address.
  * @param {string} password - The user's password.
  * @param {number} userType - The user's type (from UserType enum).
+ * @param {string} [clientID] - Optional client ID to associate with the user.
  * @returns {Promise<UserSignUpResponse>} The created user and session ID from the backend.
  */
 export async function CreateUserAsAdmin(
@@ -63,14 +64,16 @@ export async function CreateUserAsAdmin(
     contactNr: string, 
     email: string, 
     password: string,
-    userType: number
+    userType: number,
+    clientID?: string
 ): Promise<UserSignUpResponse> {
     return await PostAsync<UserSignUpResponse>('User/SignUp', { 
         name, 
         contactNr, 
         email, 
         password,
-        userType 
+        userType,
+        clientID 
     });
 }
 

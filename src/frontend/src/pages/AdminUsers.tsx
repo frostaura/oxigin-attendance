@@ -3,7 +3,9 @@ import { Layout, Card, Table, Button, Input, message, Form, Select, Modal } from
 import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getUsersAsync, updateUserAsync, deleteUserAsync, CreateUserAsAdmin } from "../services/data/user";
+import { getClientsAsync } from "../services/data/client";
 import type { User } from "../models/userModels";
+import type { Client } from "../models/clientModels";
 import type { ColumnType } from "antd/es/table";
 import { UserType } from "../enums/userTypes";
 import { hashString } from "../utils/crypto";
@@ -13,12 +15,15 @@ const { Search } = Input;
 
 interface EditableUser extends User {
   key: string;
+  client?: Client | null;
+  employee?: any | null; // We don't have the Employee type imported, using any for now
 }
 
 const AdminUsers: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [users, setUsers] = useState<EditableUser[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [editingKey, setEditingKey] = useState('');
@@ -26,7 +31,18 @@ const AdminUsers: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
+    fetchClients();
   }, []);
+
+  const fetchClients = async () => {
+    try {
+      const fetchedClients = await getClientsAsync();
+      setClients(fetchedClients);
+    } catch (error) {
+      message.error("Failed to fetch clients");
+      console.error("Error fetching clients:", error);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -68,6 +84,7 @@ const AdminUsers: React.FC = () => {
       email: record.email,
       contactNr: record.contactNr,
       userType: userTypeValue,
+      clientID: record.clientID,
       password: '' // Empty password field when editing
     });
     setEditingKey(record.key);
@@ -97,7 +114,6 @@ const AdminUsers: React.FC = () => {
   };
 
   const handleSave = async (key: string) => {
-    console.log('handleSave called with key:', key);
     try {
       console.log('Validating form fields...');
       const values = await form.validateFields();
@@ -135,7 +151,8 @@ const AdminUsers: React.FC = () => {
             values.contactNr, 
             values.email, 
             hashedPassword,
-            userType
+            userType,
+            values.clientID
           );
           console.log('User created successfully:', response);
           message.success("User created successfully");
@@ -161,12 +178,14 @@ const AdminUsers: React.FC = () => {
         }
 
         try {
+          const { client, employee, ...cleanUser } = existingUser; // Remove navigation properties
           const updateData = {
-            ...existingUser,
+            ...cleanUser,
             name: values.name,
             email: values.email,
             contactNr: values.contactNr,
             userType: userType,
+            clientID: values.clientID,
             // Only include password if it was changed
             ...(values.password ? { password: values.password } : {})
           };
@@ -246,7 +265,8 @@ const AdminUsers: React.FC = () => {
       email: "",
       contactNr: "",
       password: "",
-      userType: UserType.BaseUser // Default to BaseUser
+      userType: UserType.BaseUser, // Default to BaseUser
+      clientID: ""
     };
     setNewUser(newUserData);
     
@@ -256,7 +276,8 @@ const AdminUsers: React.FC = () => {
       email: "",
       contactNr: "",
       password: "",
-      userType: UserType.BaseUser
+      userType: UserType.BaseUser,
+      clientID: ""
     });
     
     setEditingKey(newKey);
@@ -327,6 +348,35 @@ const AdminUsers: React.FC = () => {
         ) : (
           text
         ),
+    },
+    {
+      title: "Client",
+      dataIndex: "clientID",
+      key: "clientID",
+      render: (text, record) => {
+        const client = clients.find(c => c.id === record.clientID);
+        return editingKey === record.key ? (
+          <Form.Item
+            name="clientID"
+            style={{ margin: 0 }}
+          >
+            <Select
+              allowClear
+              placeholder="Select client"
+              onChange={(value) => handleInputChange(record.key, "clientID", value)}
+              style={{ width: '100%' }}
+            >
+              {clients.map(client => (
+                <Select.Option key={client.id} value={client.id}>
+                  {client.companyName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        ) : (
+          client?.companyName || '-'
+        );
+      },
     },
     {
       title: "Password",

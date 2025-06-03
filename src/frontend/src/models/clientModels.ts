@@ -7,30 +7,21 @@ export interface Client {
      */
     id: string;
     /**
-     * The name of the client.
+     * The company name.
      */
-    name: string;
+    companyName: string;
     /**
-     * The registration number of the client (if applicable).
+     * The registration number of the client.
      */
-    registrationNo?: string;
+    regNo: string;
     /**
      * The address of the client.
      */
-    address?: string;
+    address: string;
     /**
      * The contact number for the client.
      */
-    contact?: string;
-    /**
-     * The email address for the client.
-     */
-    email?: string;
-    /**
-     * The company name (if applicable).
-     */
-    company?: string;
-    // Add any other fields present in your backend Client model.
+    contactNo: string;
 }
 
 export interface ClientData {

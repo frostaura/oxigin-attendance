@@ -45,6 +45,7 @@ public class UserController : BaseController
         if (signedInUser == null) return Forbid();
         
         var users = await datastoreContext.Users
+            .Include(u => u.Client)
             .Where(u => !u.Deleted)
             .ToListAsync(token);
             
