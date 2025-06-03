@@ -22,6 +22,16 @@ export async function getAllocationsForJobAsync(jobId: string): Promise<Array<Al
 }
 
 /**
+ * Gets all allocations for a given employee.
+ * @param employeeId The employee ID
+ * @returns A list of allocations for the employee
+ */
+export async function getAllocationsForEmployeeAsync(employeeId: string): Promise<Array<Allocation>> {
+    const response = await GetAsync<Array<Allocation>>(`JobAllocation/employee/${employeeId}`);
+    return response;
+}
+
+/**
  * Gets a single allocation by its ID.
  * @param id The allocation ID
  * @returns The allocation, or null if not found

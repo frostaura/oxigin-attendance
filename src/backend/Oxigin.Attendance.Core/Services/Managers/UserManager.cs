@@ -5,6 +5,7 @@ using Oxigin.Attendance.Core.Extensions;
 using Oxigin.Attendance.Core.Interfaces.Data;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Datastore.Interfaces;
+using Oxigin.Attendance.Shared.Enums;
 using Oxigin.Attendance.Shared.Exceptions;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Requests;
@@ -285,11 +286,57 @@ public class UserManager : IUserManager
                 }
             }
 
+            // If employeeID is provided and changed, verify it exists
+            if (user.EmployeeID != dbUser.EmployeeID && user.EmployeeID.HasValue)
+            {
+                var employee = await _db.Employees.FirstOrDefaultAsync(e => e.Id == user.EmployeeID && !e.Deleted, token);
+                if (employee == null)
+                {
+                    throw new StandardizedErrorException
+                    {
+                        Error = new StandardizedError
+                        {
+                            Origin = nameof(UserManager),
+                            Message = "The specified employee does not exist.",
+                            Data = new Dictionary<string, object>
+                            {
+                                { "EmployeeID", user.EmployeeID.Value }
+                            }
+                        }
+                    };
+                }
+            }
+
+            // Handle user type changes and related foreign keys
+            if (user.UserType != dbUser.UserType)
+            {
+                // Clear both foreign keys when changing user type
+                dbUser.ClientID = null;
+                dbUser.EmployeeID = null;
+
+                // Set the appropriate foreign key based on new user type
+                switch (user.UserType)
+                {
+                    case UserType.Client:
+                        dbUser.ClientID = user.ClientID;
+                        break;
+                    case UserType.Employee:
+                    case UserType.SiteManager:
+                        dbUser.EmployeeID = user.EmployeeID;
+                        break;
+                }
+            }
+            else
+            {
+                // If user type hasn't changed, just update the foreign keys
+                dbUser.ClientID = user.ClientID;
+                dbUser.EmployeeID = user.EmployeeID;
+            }
+
             dbUser.Name = user.Name;
             dbUser.ContactNr = user.ContactNr;
             dbUser.Email = user.Email;
             dbUser.UserType = user.UserType;
-            dbUser.ClientID = user.ClientID; // Update clientID
             // Do not update password here for security reasons
             await _db.SaveChangesAsync(token);
             return dbUser;
@@ -301,11 +348,11 @@ public class UserManager : IUserManager
                 Error = new StandardizedError
                 {
                     Origin = nameof(UserManager),
-                    Message = "Unable to update user, please try again later.",
+                    Message = "Failed to update user.",
                     Data = new Dictionary<string, object>
                     {
-                        { nameof(e.Message), e.Message },
-                        { nameof(e.StackTrace), e.StackTrace ?? string.Empty }
+                        { "UserId", user.Id },
+                        { "Error", e.Message }
                     }
                 }
             };

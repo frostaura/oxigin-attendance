@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Oxigin.Attendance.Shared.Models.DTOs;
 using Oxigin.Attendance.Shared.Models.Entities;
 
 namespace Oxigin.Attendance.Core.Interfaces.Managers;
@@ -23,10 +28,10 @@ public interface ITimesheetManager
     /// <summary>
     /// Sign in (create a new timesheet entry).
     /// </summary>
-    /// <param name="timesheet">The Timesheet entity to add.</param>
+    /// <param name="dto">The Timesheet DTO to add.</param>
     /// <param name="token">Cancellation token.</param>
     /// <returns>The created Timesheet entity.</returns>
-    Task<Timesheet> SignInAsync(Timesheet timesheet, CancellationToken token);
+    Task<Timesheet> SignInAsync(CreateTimesheetDTO dto, CancellationToken token);
     /// <summary>
     /// Sign out (update the out time of a timesheet entry).
     /// </summary>

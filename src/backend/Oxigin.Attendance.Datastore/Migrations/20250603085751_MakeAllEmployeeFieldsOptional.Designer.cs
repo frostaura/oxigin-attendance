@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oxigin.Attendance.Datastore;
@@ -11,9 +12,11 @@ using Oxigin.Attendance.Datastore;
 namespace Oxigin.Attendance.Datastore.Migrations
 {
     [DbContext(typeof(DatastoreContext))]
-    partial class DatastoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250603085751_MakeAllEmployeeFieldsOptional")]
+    partial class MakeAllEmployeeFieldsOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

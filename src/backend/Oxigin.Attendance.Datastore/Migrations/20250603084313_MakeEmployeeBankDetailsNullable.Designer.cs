@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Oxigin.Attendance.Datastore;
@@ -11,9 +12,11 @@ using Oxigin.Attendance.Datastore;
 namespace Oxigin.Attendance.Datastore.Migrations
 {
     [DbContext(typeof(DatastoreContext))]
-    partial class DatastoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250603084313_MakeEmployeeBankDetailsNullable")]
+    partial class MakeEmployeeBankDetailsNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,6 +143,7 @@ namespace Oxigin.Attendance.Datastore.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BankName")
@@ -156,6 +160,7 @@ namespace Oxigin.Attendance.Datastore.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("IDNumber")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("TimeStamp")

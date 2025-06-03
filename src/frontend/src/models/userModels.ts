@@ -15,6 +15,7 @@ export interface User {
     userType: UserType;
     password: string;
     clientID?: string | null; // Optional client ID for users associated with a client
+    employeeID?: string | null; // Optional employee ID for users who are employees
     //sessions?: UserSession[];
 }
 

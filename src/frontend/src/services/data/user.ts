@@ -58,9 +58,10 @@ export async function SignUpAsync(
  * @param {string} name - The user's name.
  * @param {string} contactNr - The user's contact number.
  * @param {string} email - The user's email address.
- * @param {string} password - The user's password.
+ * @param {string} password - The user's password (already hashed).
  * @param {number} userType - The user's type (from UserType enum).
  * @param {string | null} [clientID] - Optional client ID to associate with the user.
+ * @param {string | null} [employeeID] - Optional employee ID to associate with the user.
  * @returns {Promise<UserSignUpResponse>} The created user and session ID from the backend.
  */
 export async function CreateUserAsAdmin(
@@ -69,16 +70,18 @@ export async function CreateUserAsAdmin(
     email: string, 
     password: string,
     userType: number,
-    clientID?: string | null
+    clientID?: string | null,
+    employeeID?: string | null
 ): Promise<UserSignUpResponse> {
-    // Only include clientID in the request if it has a value
+    // Only include clientID and employeeID in the request if they have values
     const requestData = {
         name, 
         contactNr, 
-        email, 
-        password,
+        email: email.toLowerCase(), // Ensure email is lowercase
+        password, // Password should already be hashed by the caller
         userType,
-        ...(clientID ? { clientID } : {})
+        ...(clientID ? { clientID } : {}),
+        ...(employeeID ? { employeeID } : {})
     };
     return await PostAsync<UserSignUpResponse>('User/SignUp', requestData);
 }

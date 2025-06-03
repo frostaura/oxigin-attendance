@@ -68,7 +68,8 @@ const ManageEmployees: React.FC = () => {
           bankName: employeeToSave.bankName || '',
           accountHolderName: employeeToSave.accountHolderName || '',
           branchCode: employeeToSave.branchCode || '',
-          accountNumber: employeeToSave.accountNumber || ''
+          accountNumber: employeeToSave.accountNumber || '',
+          name: employeeToSave.name || ''
         };
         await addEmployeeAsync(employeeData);
         message.success("Employee added successfully");
@@ -77,6 +78,7 @@ const ManageEmployees: React.FC = () => {
         // For updates, make sure to include the existing ID
         const employeeData: Employee = {
           id: employeeToSave.id, // Include the existing ID
+          name: employeeToSave.name || '',  // Add the required name field
           idNumber: employeeToSave.idNumber,
           address: employeeToSave.address,
           contactNo: employeeToSave.contactNo || '',
@@ -130,6 +132,7 @@ const ManageEmployees: React.FC = () => {
       setNewEmployee({
         key: newKey,
         id: newKey,
+        name: "",  // Add the required name field
         idNumber: "",
         address: "",
         contactNo: "",

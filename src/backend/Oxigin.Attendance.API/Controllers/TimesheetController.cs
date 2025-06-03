@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Oxigin.Attendance.API.Abstractions;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Datastore.Interfaces;
+using Oxigin.Attendance.Shared.Models.DTOs;
 using Oxigin.Attendance.Shared.Models.Entities;
 
 namespace Oxigin.Attendance.API.Controllers;
@@ -59,15 +60,15 @@ public class TimesheetController : BaseController
     /// <summary>
     /// Sign in (create a new timesheet entry).
     /// </summary>
-    /// <param name="timesheet">The Timesheet entity to add.</param>
+    /// <param name="dto">The timesheet creation data.</param>
     /// <param name="token">Cancellation token.</param>
     /// <returns>The created Timesheet entity.</returns>
     [HttpPost("signin")]
-    public async Task<IActionResult> SignIn([FromBody] Timesheet timesheet, CancellationToken token)
+    public async Task<IActionResult> SignIn([FromBody] CreateTimesheetDTO dto, CancellationToken token)
     {
         var signedInUser = await GetRequestingUserAsync(token);
         if (signedInUser == null) return Forbid();
-        var created = await _timesheetManager.SignInAsync(timesheet, token);
+        var created = await _timesheetManager.SignInAsync(dto, token);
         return Ok(created);
     }
 

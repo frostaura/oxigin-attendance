@@ -10,6 +10,10 @@ export interface Employee {
      */
     id: string;
     /**
+     * The name of the employee.
+     */
+    name?: string;
+    /**
      * The ID number of the employee.
      */
     idNumber?: string;
@@ -20,21 +24,21 @@ export interface Employee {
     /**
      * The contact number for the employee.
      */
-    contactNo: string;
+    contactNo?: string;
     /**
      * Bank name for payment details
      */
-    bankName: string;
+    bankName?: string;
     /**
      * Account holder name for payment details
      */
-    accountHolderName: string;
+    accountHolderName?: string;
     /**
      * Branch code for payment details
      */
-    branchCode: string;
+    branchCode?: string;
     /**
      * Account number for payment details
      */
-    accountNumber: string;
+    accountNumber?: string;
 }

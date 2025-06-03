@@ -39,7 +39,26 @@ public class JobAllocationManager : IJobAllocationManager
     /// <returns>List of Allocation entities.</returns>
     public async Task<IEnumerable<Allocation>> GetAllocationsForJobAsync(Guid jobId, CancellationToken token)
     {
-        return await _db.Allocations.Where(a => a.JobID == jobId && !a.Deleted).ToListAsync(token);
+        return await _db.Allocations
+            .Include(a => a.Job)
+            .Include(a => a.Employee)
+            .Where(a => a.JobID == jobId && !a.Deleted)
+            .ToListAsync(token);
+    }
+
+    /// <summary>
+    /// Get all allocations for a given employee.
+    /// </summary>
+    /// <param name="employeeId">The employee ID.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>List of Allocation entities.</returns>
+    public async Task<IEnumerable<Allocation>> GetAllocationsForEmployeeAsync(Guid employeeId, CancellationToken token)
+    {
+        return await _db.Allocations
+            .Include(a => a.Job)
+            .Include(a => a.Employee)
+            .Where(a => a.EmployeeID == employeeId && !a.Deleted)
+            .ToListAsync(token);
     }
 
     /// <summary>
@@ -100,6 +119,9 @@ public class JobAllocationManager : IJobAllocationManager
     /// <returns>The Allocation entity, or null if not found.</returns>
     public async Task<Allocation?> GetByIdAsync(Guid id, CancellationToken token)
     {
-        return await _db.Allocations.FirstOrDefaultAsync(a => a.Id == id && !a.Deleted, token);
+        return await _db.Allocations
+            .Include(a => a.Job)
+            .Include(a => a.Employee)
+            .FirstOrDefaultAsync(a => a.Id == id && !a.Deleted, token);
     }
 }

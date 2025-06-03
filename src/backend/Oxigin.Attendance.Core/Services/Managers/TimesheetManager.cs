@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Datastore.Interfaces;
+using Oxigin.Attendance.Shared.Models.DTOs;
 using Oxigin.Attendance.Shared.Models.Entities;
 
 namespace Oxigin.Attendance.Core.Services.Managers;
@@ -63,16 +64,40 @@ public class TimesheetManager : ITimesheetManager
     /// <summary>
     /// Sign in (create a new timesheet entry).
     /// </summary>
-    /// <param name="timesheet">The Timesheet entity to add.</param>
+    /// <param name="dto">The Timesheet DTO to add.</param>
     /// <param name="token">Cancellation token.</param>
     /// <returns>The created Timesheet entity.</returns>
-    public async Task<Timesheet> SignInAsync(Timesheet timesheet, CancellationToken token)
+    public async Task<Timesheet> SignInAsync(CreateTimesheetDTO dto, CancellationToken token)
     {
-        timesheet.Id = Guid.NewGuid();
-        timesheet.TimeIn = timesheet.TimeIn == default ? DateTime.UtcNow : timesheet.TimeIn;
+        // Verify that all referenced entities exist
+        var job = await _db.Jobs.FindAsync(new object[] { dto.JobID }, token);
+        if (job == null) throw new Exception("Job not found");
+
+        var employee = await _db.Employees.FindAsync(new object[] { dto.EmployeeID }, token);
+        if (employee == null) throw new Exception("Employee not found");
+
+        var siteManager = await _db.Users.FindAsync(new object[] { dto.SiteManagerID }, token);
+        if (siteManager == null) throw new Exception("Site manager not found");
+
+        // Create new timesheet with only the necessary fields
+        var timesheet = new Timesheet
+        {
+            Id = Guid.NewGuid(),
+            TimeIn = dto.TimeIn == default ? DateTime.UtcNow : dto.TimeIn,
+            JobID = dto.JobID,
+            EmployeeID = dto.EmployeeID,
+            SiteManagerID = dto.SiteManagerID
+        };
+
         _db.Timesheets.Add(timesheet);
         await _db.SaveChangesAsync(token);
-        return timesheet;
+
+        // Return the created timesheet with its relationships loaded
+        return await _db.Timesheets
+            .Include(t => t.Job)
+            .Include(t => t.Employee)
+            .Include(t => t.User)
+            .FirstAsync(t => t.Id == timesheet.Id, token);
     }
 
     /// <summary>

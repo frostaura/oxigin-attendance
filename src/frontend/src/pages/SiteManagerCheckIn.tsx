@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { Layout, Card, Button, Table, Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { Layout, Card, Button, Table, Select, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
+import { getJobsAsync } from "../services/data/job";
+import type { Job } from "../models/jobModels";
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -18,10 +20,28 @@ const SiteManagerCheckIn: React.FC = () => {
   const navigate = useNavigate();
   const [selectedJob, setSelectedJob] = useState<string>("Job ID");
   const [selectedEmployee, setSelectedEmployee] = useState<string>("Employee ID");
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(false);
   const [checkInHistory, setCheckInHistory] = useState<CheckInRecord[]>([
     { key: "1", jobId: "J001", employeeId: "E001", employeeName: "John Doe", timeIn: "2025-03-20 08:00" },
     { key: "2", jobId: "J002", employeeId: "E002", employeeName: "Jane Smith", timeIn: "2025-03-20 08:30" },
   ]);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const jobsData = await getJobsAsync();
+        setJobs(jobsData);
+      } catch (error) {
+        console.error("Failed to fetch jobs:", error);
+        message.error("Failed to fetch jobs");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJobs();
+  }, []);
 
   const handleCheckIn = () => {
     const newCheckIn: CheckInRecord = {
@@ -69,9 +89,14 @@ const SiteManagerCheckIn: React.FC = () => {
                   value={selectedJob}
                   onChange={handleJobChange}
                   style={{ width: "100%", marginBottom: "20px" }}
+                  loading={loading}
                 >
-                  <Option value="Job 1">Job 1</Option>
-                  <Option value="Job 2">Job 2</Option>
+                  <Option value="Job ID" disabled>Select Job</Option>
+                  {jobs.map(job => (
+                    <Option key={job.id} value={job.id || ''}>
+                      {job.jobName} ({job.purchaseOrderNumber})
+                    </Option>
+                  ))}
                 </Select>
               </div>
               <div style={{ flex: 1, minWidth: "70px" }}>
@@ -80,6 +105,7 @@ const SiteManagerCheckIn: React.FC = () => {
                   onChange={handleEmployeeChange}
                   style={{ width: "100%", marginBottom: "20px" }}
                 >
+                  <Option value="Employee ID">Select Employee</Option>
                   <Option value="E001">Employee 1</Option>
                   <Option value="E002">Employee 2</Option>
                 </Select>
