@@ -6,6 +6,7 @@ import { getAllocationsForEmployeeAsync } from "../services/data/jobAllocation";
 import type { Allocation } from "../models/jobAllocationModels";
 import { GetLoggedInUserContextAsync } from "../services/data/backend";
 import { signInAsync } from "../services/data/timesheet";
+import type { Timesheet } from "../models/timesheetModels";
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -81,11 +82,11 @@ const EmployeeHome: React.FC = () => {
       }
 
       // Create the timesheet with only the required fields
-      const timesheet = {
-        TimeIn: new Date().toISOString(),
-        JobID: selectedAllocation.job.id,
-        EmployeeID: userContext.user.employeeID,
-        SiteManagerID: selectedAllocation.job.requestorID
+      const timesheet: Timesheet = {
+        timeIn: new Date().toISOString(),
+        jobID: selectedAllocation.job.id,
+        employeeID: userContext.user.employeeID,
+        siteManagerID: selectedAllocation.job.requestorID
       };
 
       console.log("Sending timesheet data:", timesheet); // Debug log

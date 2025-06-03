@@ -3,7 +3,13 @@ import { Layout, Card, Button, Table, Select, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { getJobsAsync } from "../services/data/job";
+import { getAllocationsForJobAsync } from "../services/data/jobAllocation";
+import { signInAsync } from "../services/data/timesheet";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
 import type { Job } from "../models/jobModels";
+import type { Employee } from "../models/employeeModels";
+import type { Timesheet } from "../models/timesheetModels";
+import { getTimesheetsForJobAsync } from "../services/data/timesheet";
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -18,14 +24,14 @@ interface CheckInRecord {
 
 const SiteManagerCheckIn: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState<string>("Job ID");
-  const [selectedEmployee, setSelectedEmployee] = useState<string>("Employee ID");
+  const [selectedJob, setSelectedJob] = useState<string>("");
+  const [selectedEmployee, setSelectedEmployee] = useState<string>("");
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [allocatedEmployees, setAllocatedEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
-  const [checkInHistory, setCheckInHistory] = useState<CheckInRecord[]>([
-    { key: "1", jobId: "J001", employeeId: "E001", employeeName: "John Doe", timeIn: "2025-03-20 08:00" },
-    { key: "2", jobId: "J002", employeeId: "E002", employeeName: "Jane Smith", timeIn: "2025-03-20 08:30" },
-  ]);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [checkInHistory, setCheckInHistory] = useState<CheckInRecord[]>([]);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -43,17 +49,107 @@ const SiteManagerCheckIn: React.FC = () => {
     fetchJobs();
   }, []);
 
-  const handleCheckIn = () => {
-    const newCheckIn: CheckInRecord = {
-      key: `${checkInHistory.length + 1}`,
-      jobId: selectedJob,
-      employeeId: selectedEmployee,
-      employeeName: "John Doe", // This can be dynamic if needed
-      timeIn: new Date().toLocaleString(),
-    };
-    setCheckInHistory([...checkInHistory, newCheckIn]);
-    setSelectedJob("Job ID");
-    setSelectedEmployee("Employee ID");
+  const fetchAllocatedEmployees = async (jobId: string) => {
+    try {
+      setLoadingEmployees(true);
+      const [allocations, timesheets] = await Promise.all([
+        getAllocationsForJobAsync(jobId),
+        getTimesheetsForJobAsync(jobId)
+      ]);
+      
+      // Get list of employees who are already checked in
+      const checkedInEmployeeIds = new Set(
+        timesheets
+          .filter(timesheet => 
+            !timesheet.deleted && 
+            timesheet.timeIn && 
+            timesheet.timeOut === "0001-01-01T00:00:00" // Not checked out
+          )
+          .map(timesheet => timesheet.employeeID)
+      );
+      
+      // Filter for valid allocations and exclude already checked-in employees
+      const validAllocations = allocations
+        .filter(allocation => 
+          !allocation.deleted && 
+          allocation.employee &&
+          !checkedInEmployeeIds.has(allocation.employee.id)
+        );
+      
+      // Remove duplicate employees by keeping the most recent allocation for each employee
+      const uniqueEmployees = validAllocations.reduce((acc, current) => {
+        const existing = acc.find(a => a.employee?.id === current.employee?.id);
+        if (!existing || new Date(current.time) > new Date(existing.time)) {
+          const filtered = acc.filter(a => a.employee?.id !== current.employee?.id);
+          return [...filtered, current];
+        }
+        return acc;
+      }, [] as typeof validAllocations);
+
+      // Map to employee objects
+      const employees = uniqueEmployees
+        .map(allocation => allocation.employee as Employee);
+      
+      setAllocatedEmployees(employees);
+    } catch (error) {
+      console.error("Failed to fetch allocated employees:", error);
+      message.error("Failed to fetch allocated employees");
+    } finally {
+      setLoadingEmployees(false);
+    }
+  };
+
+  const handleCheckIn = async () => {
+    if (!selectedJob || !selectedEmployee) {
+      message.error("Please select both a job and an employee");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const userContext = await GetLoggedInUserContextAsync();
+      if (!userContext?.user?.id) {
+        message.error("No site manager ID found. Please sign in again.");
+        return;
+      }
+
+      const selectedEmployeeData = allocatedEmployees.find(emp => emp.id === selectedEmployee);
+      if (!selectedEmployeeData) {
+        message.error("Selected employee not found");
+        return;
+      }
+
+      // Create the timesheet with required fields
+      const timesheet: Timesheet = {
+        timeIn: new Date().toISOString(),
+        jobID: selectedJob,
+        employeeID: selectedEmployee,
+        siteManagerID: userContext.user.id
+      };
+
+      // Submit the timesheet
+      await signInAsync(timesheet);
+      
+      // Add to check-in history
+      const newCheckIn: CheckInRecord = {
+        key: `${checkInHistory.length + 1}`,
+        jobId: selectedJob,
+        employeeId: selectedEmployee,
+        employeeName: selectedEmployeeData.accountHolderName || "Unknown",
+        timeIn: new Date().toLocaleString(),
+      };
+      setCheckInHistory(prev => [...prev, newCheckIn]);
+
+      // Reset selections
+      setSelectedJob("");
+      setSelectedEmployee("");
+      message.success("Successfully checked in employee!");
+    } catch (error) {
+      console.error("Failed to check in:", error);
+      message.error("Failed to check in employee. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const columns: ColumnsType<CheckInRecord> = [
@@ -65,6 +161,12 @@ const SiteManagerCheckIn: React.FC = () => {
 
   const handleJobChange = (value: string) => {
     setSelectedJob(value);
+    setSelectedEmployee("");
+    if (value) {
+      fetchAllocatedEmployees(value);
+    } else {
+      setAllocatedEmployees([]);
+    }
   };
 
   const handleEmployeeChange = (value: string) => {
@@ -86,12 +188,14 @@ const SiteManagerCheckIn: React.FC = () => {
             <div style={{ display: "flex", gap: 10, flex: 1 }}>
               <div style={{ flex: 1, minWidth: "70px" }}>
                 <Select
-                  value={selectedJob}
+                  placeholder="Job"
+                  allowClear
+                  showSearch={false}
+                  value={selectedJob || undefined}
                   onChange={handleJobChange}
                   style={{ width: "100%", marginBottom: "20px" }}
                   loading={loading}
                 >
-                  <Option value="Job ID" disabled>Select Job</Option>
                   {jobs.map(job => (
                     <Option key={job.id} value={job.id || ''}>
                       {job.jobName} ({job.purchaseOrderNumber})
@@ -101,17 +205,32 @@ const SiteManagerCheckIn: React.FC = () => {
               </div>
               <div style={{ flex: 1, minWidth: "70px" }}>
                 <Select
-                  value={selectedEmployee}
+                  placeholder="Employee"
+                  allowClear
+                  showSearch={false}
+                  value={selectedEmployee || undefined}
                   onChange={handleEmployeeChange}
                   style={{ width: "100%", marginBottom: "20px" }}
+                  loading={loadingEmployees}
+                  disabled={!selectedJob}
                 >
-                  <Option value="Employee ID">Select Employee</Option>
-                  <Option value="E001">Employee 1</Option>
-                  <Option value="E002">Employee 2</Option>
+                  {allocatedEmployees.map(employee => (
+                    <Option key={employee.id} value={employee.id || ''}>
+                      {employee.accountHolderName} ({employee.idNumber || 'No ID'})
+                    </Option>
+                  ))}
                 </Select>
               </div>
             </div>
-            <Button type="primary" onClick={handleCheckIn} style={{ marginLeft: "20px" }}>Check In</Button>
+            <Button 
+              type="primary" 
+              onClick={handleCheckIn} 
+              style={{ marginLeft: "20px" }}
+              loading={submitting}
+              disabled={!selectedJob || !selectedEmployee}
+            >
+              Check In
+            </Button>
           </div>
 
           {/* Check-in History Table */}

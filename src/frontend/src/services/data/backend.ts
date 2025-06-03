@@ -105,10 +105,10 @@ export async function DeleteAsync<T>(url: string, sessionId?: string | null): Pr
  * Automatically includes the session ID from localStorage in the headers.
  * @template T The expected response type.
  * @param {string} url - The endpoint to send the request to (relative to the backend base URL).
- * @param {object} body - The request payload to send as JSON.
+ * @param {object | string} body - The request payload to send as JSON. Can be a string for raw body.
  * @returns {Promise<T>} The parsed JSON response from the backend.
  */
-export async function PutAsync<T>(url: string, body: object, sessionId?: string | null): Promise<T> {
+export async function PutAsync<T>(url: string, body: object | string, sessionId?: string | null): Promise<T> {
     if(!sessionId){
         const userContext = await GetLoggedInUserContextAsync();
         sessionId = userContext?.sessionId || "";
@@ -120,7 +120,7 @@ export async function PutAsync<T>(url: string, body: object, sessionId?: string 
             "Content-Type": "application/json",
             "SessionId": sessionId,
         },
-        body: JSON.stringify(body)
+        body: typeof body === "string" ? body : JSON.stringify(body)
     });
     if(request.status === 403) {
         NavigateToSignInPage();

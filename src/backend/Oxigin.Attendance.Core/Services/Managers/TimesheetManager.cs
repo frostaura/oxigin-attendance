@@ -84,6 +84,7 @@ public class TimesheetManager : ITimesheetManager
         {
             Id = Guid.NewGuid(),
             TimeIn = dto.TimeIn == default ? DateTime.UtcNow : dto.TimeIn,
+            TimeOut = DateTime.MinValue,
             JobID = dto.JobID,
             EmployeeID = dto.EmployeeID,
             SiteManagerID = dto.SiteManagerID
