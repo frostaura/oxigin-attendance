@@ -32,3 +32,27 @@ export interface Client {
     company?: string;
     // Add any other fields present in your backend Client model.
 }
+
+export interface ClientData {
+    key: string;
+    id: string;
+    name: string;
+    email: string;
+    company: string;
+    phone: string;
+    status?: string;
+    registrationNo?: string;
+    address?: string;
+    contactNo?: string;
+}
+
+export interface ClientRegistrationFormValues {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    companyName: string;
+    address: string;
+}

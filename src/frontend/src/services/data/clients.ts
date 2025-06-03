@@ -1,5 +1,5 @@
 import { GetAsync } from './backend';
-import type { ClientData } from '../../types';
+import type { ClientData } from '../../models/clientModels';
 
 /**
  * Gets all clients from the database.

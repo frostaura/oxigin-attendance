@@ -50,9 +50,30 @@ public class JobAllocationManager : IJobAllocationManager
     /// <returns>The created Allocation entity.</returns>
     public async Task<Allocation> CreateAllocationAsync(Allocation allocation, CancellationToken token)
     {
-        _db.Allocations.Add(allocation);
+        // Attach existing Job and Employee instead of trying to create new ones
+        var job = await _db.Jobs.FindAsync(new object[] { allocation.JobID }, token);
+        var employee = await _db.Employees.FindAsync(new object[] { allocation.EmployeeID }, token);
+
+        if (job == null || employee == null)
+        {
+            throw new InvalidOperationException("Job or Employee not found");
+        }
+
+        // Create new allocation with references to existing entities
+        var newAllocation = new Allocation
+        {
+            Name = allocation.Name,
+            Description = allocation.Description,
+            Time = allocation.Time,
+            HoursNeeded = allocation.HoursNeeded,
+            JobID = allocation.JobID,
+            EmployeeID = allocation.EmployeeID,
+            Deleted = false
+        };
+
+        _db.Allocations.Add(newAllocation);
         await _db.SaveChangesAsync(token);
-        return allocation;
+        return newAllocation;
     }
 
     /// <summary>

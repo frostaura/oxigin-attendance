@@ -4,7 +4,7 @@ import { Layout, Card, Table, Input, Button } from "antd";
 import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import type { ClientData } from "../types";
+import type { ClientData } from "../models/clientModels";
 
 const { Header, Content } = Layout;
 
