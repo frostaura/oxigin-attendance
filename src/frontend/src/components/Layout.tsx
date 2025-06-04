@@ -35,7 +35,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => navigate("/clientupdate")}>
         Update Details
       </Menu.Item>
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => navigate("/")}>
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => {
+        localStorage.removeItem("session");
+        navigate("/");
+      }}>
         Log Out
       </Menu.Item>
     </Menu>

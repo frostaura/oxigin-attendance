@@ -59,7 +59,7 @@ const ClientJobRequest: React.FC = () => {
         location: values.location,
         numWorkers: values.numberOfWorkers,
         numHours: values.numberOfHours,
-        approved: false
+        approved: false,
       };
 
       await createJobAsync(jobRequest);
