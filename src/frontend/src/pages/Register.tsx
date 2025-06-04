@@ -7,7 +7,7 @@ import type { UserSignUpValues } from "../models/userModels";
 const { Title } = Typography;
 
 
-const EmployeeRegister: React.FC = () => {
+const Register: React.FC = () => {
   // TODO: We should have only one register and name it something like Register.
   const navigate = useNavigate();
   const [form] = Form.useForm<UserSignUpValues>();
@@ -36,7 +36,7 @@ const EmployeeRegister: React.FC = () => {
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px" }}>
       <Card style={{ width: 450, textAlign: "center", padding: "20px 24px" }}>
-        <Title level={2} style={{ marginBottom: 20 }}>Employee Register</Title>
+        <Title level={2} style={{ marginBottom: 20 }}>Register</Title>
 
         <Form form={form} layout="vertical" onFinish={handleSignUp}>
           {/* Employee Information */}
@@ -85,4 +85,4 @@ const EmployeeRegister: React.FC = () => {
   );
 };
 
-export default EmployeeRegister; 
+export default Register; 

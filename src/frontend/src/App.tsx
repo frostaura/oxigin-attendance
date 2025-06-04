@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/Layout";
-import ClientSignIn from "./pages/ClientSignIn";
-import ClientRegister from "./pages/ClientRegister";
+import SignIn from "./pages/SignIn";
+import Register from "./pages/Register";
 import ClientHome from "./pages/ClientHome";
 import ClientUpdate from "./pages/ClientUpdate";
 import ClientJobRequest from "./pages/ClientJobRequest"; 
@@ -13,7 +13,7 @@ import AdminHome from "./pages/AdminHome";
 import AdminJobsHome from "./pages/AdminJobsHome";
 import AdminEmployeesHome from "./pages/AdminEmployeesHome";
 import AdminManageEmployees from "./pages/AdminManageEmployees";
-import EmployeeRegister from "./pages/EmployeeRegister";
+import EmployeeRegister from "./pages/Register";
 import AdminJobAllocations from "./pages/AdminJobAllocations";
 import AdminClientHome from "./pages/AdminClientHome";
 import AdminManageClients from "./pages/AdminManageClients";
@@ -37,9 +37,8 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<ClientSignIn />} />
-        <Route path="/clntsignin" element={<ClientSignIn />} />
-        <Route path="/clientregister" element={<ClientRegister />} />
+        <Route path="/" element={<SignIn />} />
+        <Route path= {AppRoutes.Register} element={<Register />} />
         
         <Route
           path="/*"

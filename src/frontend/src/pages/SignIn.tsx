@@ -4,7 +4,7 @@ import { SignInAsync } from "../services/data/user";
 import { useEffect, useState } from "react";
 import type { UserSigninResponse } from "../models/userModels";
 import { UserType } from "../enums/userTypes";
-import { Routes } from "../enums/routes";
+import { Routes as AppRoutes } from "../enums/routes";
 import { GetLoggedInUserContextAsync } from "../services/data/backend";
 
 const { Title, Text } = Typography;
@@ -14,7 +14,7 @@ interface LoginFormValues {
   password: string;
 }
 
-const ClientSignIn: React.FC = () => {
+const SignIn: React.FC = () => {
   // TODO: We should only have one sign in so renaming this to SignIn would be better.
   // Attempt to get the signed in user from localsotrage.
   const [userContext, setUserContext] = useState<UserSigninResponse | null>();
@@ -34,23 +34,23 @@ const ClientSignIn: React.FC = () => {
 
     switch(userContext.user.userType){
       case UserType.Admin:
-        navigate(Routes.AdminHome);
+        navigate(AppRoutes.AdminHome);
         break;
       case UserType.Employee:
-        navigate(Routes.EmployeeHome);
+        navigate(AppRoutes.EmployeeHome);
         break;
       case UserType.Client:
-        navigate(Routes.ClientHome);
+        navigate(AppRoutes.ClientHome);
         break;
       case UserType.SiteManager:
-        navigate(Routes.SiteManagerHome);
+        navigate(AppRoutes.SiteManagerHome);
         break;
       case UserType.BaseUser:
-        navigate(Routes.BaseUserHome);
+        navigate(AppRoutes.BaseUserHome);
         break;
       case UserType.Unassigned:
       default:
-        navigate(Routes.UnassignedUser);
+        navigate(AppRoutes.UnassignedUser);
         break;
     }
 
@@ -100,10 +100,10 @@ const ClientSignIn: React.FC = () => {
         </Form>
 
         <Text style={{ marginTop: 10, display: "block" }}>Don't have an account?</Text>
-        <Link to="/clientregister">Register</Link>
+        <Link to={AppRoutes.Register}>Register</Link>
       </Card>
     </div>
   );
 };
 
-export default ClientSignIn;
+export default SignIn;

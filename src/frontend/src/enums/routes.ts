@@ -13,7 +13,7 @@ export enum Routes {
     AdminJobsHome = "/adminjobshome",
     AdminEmployeesHome = "/adminemployeeshome",
     AdminManageEmployees = "/adminmanageemployees",
-    EmployeeRegister = "/employeeregister",
+    Register = "/register",
     AdminJobAllocations = "/adminjoballocations",
     AdminClientHome = "/adminclienthome",
     AdminManageClients = "/adminmanageclients",
