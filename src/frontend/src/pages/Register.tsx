@@ -34,13 +34,11 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px" }}>
-      <Card style={{ width: 450, textAlign: "center", padding: "20px 24px" }}>
-        <Title level={2} style={{ marginBottom: 20 }}>Register</Title>
+    <div className="form-container">
+      <Card className="form-card">
+        <Title level={3} style={{ marginBottom: 16 }}>Register</Title>
 
         <Form form={form} layout="vertical" onFinish={handleSignUp}>
-          {/* Employee Information */}
-
           <Form.Item label="Full Name" name="name" rules={[{ required: true, message: "First name is required." }]}>
             <Input placeholder="Enter Full Name" />
           </Form.Item>
@@ -75,9 +73,9 @@ const Register: React.FC = () => {
           >
             <Input.Password placeholder="Confirm your password" />
           </Form.Item>
-          {/* Done Button */}
+
           <Button type="primary" htmlType="submit" block>
-          {processing ? "Registering you..." : "Done"}
+            {processing ? "Registering..." : "Register"}
           </Button>
         </Form>
       </Card>

@@ -7,7 +7,7 @@ import type { ColumnsType } from "antd/es/table";
 import { addEmployeeAsync, getEmployeesAsync, removeEmployeeAsync, updateEmployeeAsync } from "../services/data/employee";
 import type { Employee } from "../models/employeeModels";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Search } = Input;
 
 interface EditableEmployee extends Employee {
@@ -264,38 +264,42 @@ const ManageEmployees: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "80%", padding: 20, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px", width: "100%" }}>
-          <h2 style={{ margin: 0, textAlign: "center", width: "100%" }}>Manage Employees</h2>
-        </Header>
+    <Layout className="min-h-screen flex justify-center items-center p-4">
+      <Card className="responsive-card w-full max-w-[1200px]">
+        <h2 className="page-title mb-4">Manage Employees</h2>
 
-        <Content style={{ flex: 1, padding: 20, width: "100%" }}>
-          <Card title="All Employees" style={{ width: "100%" }}>
-            <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
-              <Button type="primary" icon={<PlusOutlined />} onClick={handleAddEmployee} disabled={!!newEmployee}>
-                Add Employee
-              </Button>
-              <Search
-                placeholder="Search by ID Number, Address, or Contact"
-                allowClear
-                enterButton={<SearchOutlined />}
-                style={{ width: 300 }}
-                onChange={(e) => handleSearch(e.target.value)}
-              />
-            </div>
+        <Content className="flex flex-col gap-4">
+          <div className="flex justify-between items-center gap-4 mb-4">
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddEmployee} disabled={!!newEmployee}>
+              Add Employee
+            </Button>
+            <Search
+              placeholder="Search by ID Number, Address, or Contact"
+              allowClear
+              enterButton={<SearchOutlined />}
+              style={{ width: '100%', maxWidth: 300 }}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
 
+          <div className="responsive-table">
             <Table 
               columns={columns} 
               dataSource={newEmployee ? [...filteredEmployees, newEmployee] : filteredEmployees} 
-              pagination={{ pageSize: 10 }}
+              pagination={{ 
+                pageSize: 8,
+                position: ['bottomCenter']
+              }}
               loading={loading}
+              scroll={{ x: 'max-content' }}
+              size="middle"
+              bordered
             />
+          </div>
 
-            <div style={{ marginTop: 16 }}>
-              <Button onClick={() => navigate(-1)}>Back</Button>
-            </div>
-          </Card>
+          <div className="mt-4">
+            <Button onClick={() => navigate(-1)}>Back</Button>
+          </div>
         </Content>
       </Card>
     </Layout>

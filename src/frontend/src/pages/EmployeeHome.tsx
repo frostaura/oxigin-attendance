@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Card, Table, Select, Button, message, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Layout, Card, Table, Select, message, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { getAllocationsForEmployeeAsync } from "../services/data/jobAllocation";
 import { getTimesheetsForJobAsync } from "../services/data/timesheet";
@@ -9,7 +8,7 @@ import { GetLoggedInUserContextAsync } from "../services/data/backend";
 import { signInAsync } from "../services/data/timesheet";
 import type { Timesheet } from "../models/timesheetModels";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Option } = Select;
 
 interface AllocationWithCheckIn extends Allocation {
@@ -17,7 +16,6 @@ interface AllocationWithCheckIn extends Allocation {
 }
 
 const EmployeeHome: React.FC = () => {
-  const navigate = useNavigate();
   const [selectedJob, setSelectedJob] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [allocations, setAllocations] = useState<AllocationWithCheckIn[]>([]);
@@ -169,15 +167,11 @@ const EmployeeHome: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh", padding: "20px" }}>
-      <Card style={{ width: "100%", padding: "20px" }}>
-        <Header style={{ textAlign: "center", marginBottom: "20px", background: "transparent" }}>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
-            <h2 style={{ margin: 0, textAlign: "center" }}>Home Page</h2>
-          </div>
-        </Header>
+    <Layout className="min-h-screen p-4">
+      <Card className="responsive-card w-full">
+        <h2 className="page-title">Home Page</h2>
 
-        <Content>
+        <Content className="flex flex-col gap-4">
           <div style={{ width: "100%", marginBottom: "20px" }}>
             <Select
               placeholder="Job"

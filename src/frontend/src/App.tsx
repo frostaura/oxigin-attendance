@@ -37,7 +37,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<SignIn />} />
+        <Route path={AppRoutes.SignIn} element={<SignIn />} />
         <Route path= {AppRoutes.Register} element={<Register />} />
         
         <Route

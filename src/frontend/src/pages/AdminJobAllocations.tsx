@@ -183,12 +183,12 @@ const AdminJobAllocations: React.FC = () => {
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", padding: "20px" }}>
-      <Card style={{ width: "80%", padding: 20 }}>
-        <h2 style={{ textAlign: "center" }}>Job Allocations</h2>
+      <Card className="responsive-card w-full max-w-[1200px]">
+        <h2 className="page-title mb-4">Job Allocations</h2>
         
         <Select 
           placeholder="Select a job" 
-          style={{ width: 200, marginBottom: 20 }} 
+          style={{ width: '100%', maxWidth: 300, marginBottom: 20 }} 
           onChange={handleJobChange}
           value={selectedJob}
           loading={loading}
@@ -200,25 +200,41 @@ const AdminJobAllocations: React.FC = () => {
           ))}
         </Select>
         
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <Card title="Available Employees" style={{ width: "100%" }}>
-            <Table
-              dataSource={availableEmployees}
-              columns={availableColumns}
-              rowKey="id"
-              pagination={false}
-              loading={loading}
-            />
+        <div className="flex flex-col gap-4">
+          <Card title="Available Employees">
+            <div className="responsive-table">
+              <Table
+                dataSource={availableEmployees}
+                columns={availableColumns}
+                rowKey="id"
+                pagination={{ 
+                  pageSize: 8,
+                  position: ['bottomCenter']
+                }}
+                loading={loading}
+                scroll={{ x: 'max-content' }}
+                size="middle"
+                bordered
+              />
+            </div>
           </Card>
 
-          <Card title="Allocated Employees" style={{ width: "100%" }}>
-            <Table 
-              dataSource={allocatedEmployees} 
-              columns={columns} 
-              rowKey="id" 
-              pagination={false}
-              loading={loading}
-            />
+          <Card title="Allocated Employees">
+            <div className="responsive-table">
+              <Table 
+                dataSource={allocatedEmployees} 
+                columns={columns} 
+                rowKey="id" 
+                pagination={{ 
+                  pageSize: 8,
+                  position: ['bottomCenter']
+                }}
+                loading={loading}
+                scroll={{ x: 'max-content' }}
+                size="middle"
+                bordered
+              />
+            </div>
           </Card>
         </div>
 

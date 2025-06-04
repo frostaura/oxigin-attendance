@@ -13,9 +13,10 @@ export interface User {
     contactNr: string;
     email: string;
     userType: UserType;
-    password: string;
+    password?: string;
     clientID?: string | null; // Optional client ID for users associated with a client
     employeeID?: string | null; // Optional employee ID for users who are employees
+    department?: string | null; // Optional department field
     //sessions?: UserSession[];
 }
 

@@ -46,7 +46,7 @@ const SignIn: React.FC = () => {
         navigate(AppRoutes.SiteManagerHome);
         break;
       case UserType.BaseUser:
-        navigate(AppRoutes.BaseUserHome);
+        navigate(AppRoutes.BaseUserTimesheets);
         break;
       case UserType.Unassigned:
       default:
@@ -63,7 +63,9 @@ const SignIn: React.FC = () => {
   const onFinish = async (values: any) => {
     try {
       await SignInAsync(values.email, values.password);
-      navigate('/client/home');
+      // Get the user context after successful sign in
+      const context = await GetLoggedInUserContextAsync();
+      setUserContext(context);
     } catch (error) {
       let errorMessage = 'Failed to sign in';
       if (error instanceof Error) {
@@ -79,13 +81,27 @@ const SignIn: React.FC = () => {
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-      <Card style={{ width: 400, textAlign: "center", padding: 20 }}>
-        <Title level={2}>Sign In</Title>
+    <div className="form-container">
+      <Card className="form-card">
+        <Title level={3} className="text-center" style={{ marginBottom: 16 }}>Sign In</Title>
 
-        <div style={{ width: 100, height: 100, borderRadius: "50%", backgroundImage: "url(icon.JPG)", margin: "10px auto", backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain" }}></div>
+        <div className="img-fluid" style={{ 
+          width: '80px', 
+          height: '80px', 
+          borderRadius: '50%', 
+          backgroundImage: 'url(icon.JPG)', 
+          margin: '8px auto', 
+          backgroundRepeat: 'no-repeat', 
+          backgroundPosition: 'center', 
+          backgroundSize: 'contain' 
+        }}></div>
 
-        <Form<LoginFormValues> form={form} layout="vertical" onFinish={onFinish}>
+        <Form<LoginFormValues> 
+          form={form} 
+          layout="vertical" 
+          onFinish={onFinish}
+          className="w-full"
+        >
           <Form.Item label="Email" name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
             <Input type="email" placeholder="Enter your email" />
           </Form.Item>
@@ -99,8 +115,10 @@ const SignIn: React.FC = () => {
           </Button>
         </Form>
 
-        <Text style={{ marginTop: 10, display: "block" }}>Don't have an account?</Text>
-        <Link to={AppRoutes.Register}>Register</Link>
+        <div className="flex flex-col items-center mt-4">
+          <Text>Don't have an account?</Text>
+          <Link to={AppRoutes.Register}>Register</Link>
+        </div>
       </Card>
     </div>
   );

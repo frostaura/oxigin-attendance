@@ -226,7 +226,7 @@ const BaseUserTimesheets: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "80%", padding: 20 }}>
+      <Card className="responsive-card">
         {/* Page Header */}
         <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", padding: "0 20px" }}>
           <h2 style={{ margin: 0, textAlign: "center" }}>Base User Timesheets</h2>
@@ -255,40 +255,40 @@ const BaseUserTimesheets: React.FC = () => {
           </div>
 
           {/* Tables Container */}
-          <Card style={{ display: "flex", justifyContent: "space-between", gap: "20px", marginTop: 20 }}>
-            {/* Left Side Table - Jobs on Date */}
-            <div style={{ flex: 1 }}>
-              <Card title="Selected Job Details">
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            {/* Jobs on Date Table */}
+            <Card title="Selected Job Details">
+              <div className="responsive-table">
                 <Table
                   columns={columnsJobsOnDate}
                   dataSource={jobsOnDate}
                   pagination={false}
                   rowKey="key"
-                  scroll={{ y: 300 }}
+                  scroll={{ x: 'max-content' }}
                 />
-              </Card>
-            </div>
+              </div>
+            </Card>
 
-            {/* Right Side Table - Timesheet */}
-            <div style={{ flex: 1 }}>
-              <Card 
-                title={
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Timesheet</span>
-                    {selectedJobDate && <span>Date: {selectedJobDate}</span>}
-                  </div>
-                }
-              >
+            {/* Timesheet Table */}
+            <Card 
+              title={
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>Timesheet</span>
+                  {selectedJobDate && <span>Date: {selectedJobDate}</span>}
+                </div>
+              }
+            >
+              <div className="responsive-table">
                 <Table
                   columns={columnsTimesheet}
                   dataSource={timesheetData}
                   pagination={false}
                   rowKey="key"
-                  scroll={{ y: 300 }}
+                  scroll={{ x: 'max-content' }}
                 />
-              </Card>
-            </div>
-          </Card>
+              </div>
+            </Card>
+          </div>
 
           {/* Print Button */}
           <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>

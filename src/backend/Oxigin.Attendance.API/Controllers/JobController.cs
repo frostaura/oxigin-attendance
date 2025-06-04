@@ -93,7 +93,7 @@ public class JobController : BaseController
     /// <param name="request">The job request entity to approve (should include the id and any relevant context).</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with approved status.</returns>
-    [HttpPost("approve")]
+    [HttpPatch("approve")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Job))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> ApproveJobRequestAsync([FromBody] Job request, CancellationToken token)
@@ -109,7 +109,7 @@ public class JobController : BaseController
     /// <param name="request">The job request entity to reject (should include the id and any relevant context).</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with rejected status.</returns>
-    [HttpPost("reject")]
+    [HttpPatch("reject")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Job))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
     public async Task<IActionResult> RejectJobRequestAsync([FromBody] Job request, CancellationToken token)

@@ -11,7 +11,7 @@ import type { Employee } from "../models/employeeModels";
 import type { Timesheet } from "../models/timesheetModels";
 import { getTimesheetsForJobAsync } from "../services/data/timesheet";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Option } = Select;
 
 interface CheckInRecord {
@@ -174,26 +174,21 @@ const SiteManagerCheckIn: React.FC = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "80%", padding: 20 }}>
-        {/* Page Header */}
-        <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", padding: "0 20px" }}>
-          <h2 style={{ margin: 0, textAlign: "center" }}>Check In Page</h2>
-        </Header>
+    <Layout className="min-h-screen flex justify-center items-center p-4">
+      <Card className="responsive-card w-full max-w-[1200px]">
+        <h2 className="page-title mb-4">Check In</h2>
 
-        {/* Main Content */}
-        <Content style={{ flex: 1, padding: 20 }}>
-          {/* Job ID and Employee ID inputs with Check In button */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <div style={{ display: "flex", gap: 10, flex: 1 }}>
-              <div style={{ flex: 1, minWidth: "70px" }}>
+        <Content className="flex flex-col gap-4">
+          <div className="flex justify-between items-center gap-4 mb-4">
+            <div className="flex gap-4 flex-1">
+              <div className="flex-1 min-w-[70px]">
                 <Select
                   placeholder="Job"
                   allowClear
                   showSearch={false}
                   value={selectedJob || undefined}
                   onChange={handleJobChange}
-                  style={{ width: "100%", marginBottom: "20px" }}
+                  style={{ width: "100%" }}
                   loading={loading}
                 >
                   {jobs.map(job => (
@@ -203,14 +198,14 @@ const SiteManagerCheckIn: React.FC = () => {
                   ))}
                 </Select>
               </div>
-              <div style={{ flex: 1, minWidth: "70px" }}>
+              <div className="flex-1 min-w-[70px]">
                 <Select
                   placeholder="Employee"
                   allowClear
                   showSearch={false}
                   value={selectedEmployee || undefined}
                   onChange={handleEmployeeChange}
-                  style={{ width: "100%", marginBottom: "20px" }}
+                  style={{ width: "100%" }}
                   loading={loadingEmployees}
                   disabled={!selectedJob}
                 >
@@ -225,7 +220,6 @@ const SiteManagerCheckIn: React.FC = () => {
             <Button 
               type="primary" 
               onClick={handleCheckIn} 
-              style={{ marginLeft: "20px" }}
               loading={submitting}
               disabled={!selectedJob || !selectedEmployee}
             >
@@ -233,10 +227,21 @@ const SiteManagerCheckIn: React.FC = () => {
             </Button>
           </div>
 
-          {/* Check-in History Table */}
           <Card title="Check-in History">
-            <Table columns={columns} dataSource={checkInHistory} pagination={false} />
-            <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end" }}>
+            <div className="responsive-table">
+              <Table 
+                columns={columns} 
+                dataSource={checkInHistory} 
+                pagination={{ 
+                  pageSize: 8,
+                  position: ['bottomCenter']
+                }}
+                scroll={{ x: 'max-content' }}
+                size="middle"
+                bordered
+              />
+            </div>
+            <div className="mt-4 text-right">
               <Button onClick={() => navigate(-1)}>Back</Button>
             </div>
           </Card>

@@ -14,7 +14,7 @@ interface LoginFormValues {
   password: string;
 }
 
-const ClientSignIn: React.FC = () => {
+const SignIn: React.FC = () => {
   // TODO: We should only have one sign in so renaming this to SignIn would be better.
   // Attempt to get the signed in user from localsotrage.
   const [userContext, setUserContext] = useState<UserSigninResponse | null>();
@@ -106,4 +106,4 @@ const ClientSignIn: React.FC = () => {
   );
 };
 
-export default ClientSignIn;
+export default SignIn;

@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Card, Table, Button, Input, message, Form, Select, Modal } from "antd";
-import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined, SearchOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
+
 import { getUsersAsync, updateUserAsync, deleteUserAsync, CreateUserAsAdmin } from "../services/data/user";
 import { getClientsAsync } from "../services/data/client";
-import { getEmployeesAsync, addEmployeeAsync } from "../services/data/employee";
 import type { User } from "../models/userModels";
 import type { Client } from "../models/clientModels";
 import type { Employee } from "../models/employeeModels";
 import type { ColumnType } from "antd/es/table";
 import { UserType } from "../enums/userTypes";
-import { hashString } from "../utils/crypto";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Search } = Input;
 
 interface EditableUser extends User {
@@ -22,14 +20,12 @@ interface EditableUser extends User {
 }
 
 const AdminUsers: React.FC = () => {
-  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [employeeForm] = Form.useForm();
   const [users, setUsers] = useState<EditableUser[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const [searchValue, setSearchValue] = useState<string>("");
   const [editingKey, setEditingKey] = useState('');
   const [newUser, setNewUser] = useState<EditableUser | null>(null);
   const [isEmployeeModalVisible, setIsEmployeeModalVisible] = useState(false);
@@ -37,7 +33,6 @@ const AdminUsers: React.FC = () => {
   useEffect(() => {
     fetchUsers();
     fetchClients();
-    fetchEmployees();
   }, []);
 
   const fetchClients = async () => {
@@ -50,16 +45,6 @@ const AdminUsers: React.FC = () => {
     }
   };
 
-  const fetchEmployees = async () => {
-    try {
-      const fetchedEmployees = await getEmployeesAsync();
-      setEmployees(fetchedEmployees);
-    } catch (error) {
-      message.error("Failed to fetch employees");
-      console.error("Error fetching employees:", error);
-    }
-  };
-
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -67,7 +52,7 @@ const AdminUsers: React.FC = () => {
       const formattedUsers = fetchedUsers.map((user) => ({
         ...user,
         key: user.id,
-        userType: typeof user.userType === 'string' ? parseInt(user.userType) : user.userType // Ensure userType is number
+        userType: typeof user.userType === 'string' ? parseInt(user.userType) : user.userType
       }));
       setUsers(formattedUsers);
     } catch (error) {
@@ -79,54 +64,30 @@ const AdminUsers: React.FC = () => {
   };
 
   const handleSearch = (value: string) => {
-    setSearchText(value.toLowerCase());
+    setSearchValue(value.toLowerCase());
   };
 
   const filteredUsers = users.filter(user => 
-    user.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-    user.contactNr?.toLowerCase().includes(searchText.toLowerCase())
+    user.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchValue.toLowerCase()) ||
+    user.contactNr?.toLowerCase().includes(searchValue.toLowerCase())
   );
 
   const handleEdit = (record: EditableUser) => {
-    // Ensure userType is properly set in form
     const userTypeValue = typeof record.userType === 'string' ? 
       parseInt(record.userType) : 
       record.userType;
     
-    // Initialize form with current values
     form.setFieldsValue({ 
-      name: record.name,
-      email: record.email,
-      contactNr: record.contactNr,
+      id: record.id,
+      name: record.name?.trim(),
+      email: record.email?.trim(),
+      contactNr: record.contactNr?.trim(),
       userType: userTypeValue,
       clientID: record.clientID,
-      password: '' // Empty password field when editing
+      password: record.password// Explicitly set password as undefined when editing
     });
     setEditingKey(record.key);
-  };
-
-  const handleInputChange = (key: string, field: keyof EditableUser, value: string | number) => {
-    if (editingKey === key) {
-      // Convert userType to number if it's the userType field
-      const processedValue = field === 'userType' ? Number(value) : value;
-      
-      // Update form value
-      form.setFieldValue(field, processedValue);
-
-      // Update local state
-      if (newUser?.key === key) {
-        setNewUser(prev => prev ? { ...prev, [field]: processedValue } : null);
-      } else {
-        setUsers(prev =>
-          prev.map(user => 
-            user.key === key 
-              ? { ...user, [field]: processedValue }
-              : user
-          )
-        );
-      }
-    }
   };
 
   const handleSave = async (key: string) => {
@@ -135,8 +96,34 @@ const AdminUsers: React.FC = () => {
       const values = await form.validateFields();
       console.log('Form values:', values);
       
-      const userType = Number(values.userType);
+      // Find the existing user to get current values
+      const existingUser = users.find(u => u.key === key);
+      if (!existingUser && !newUser) {
+        message.error("User not found");
+        return;
+      }
+
+      // Use existing userType if not changed
+      const userType = values.userType !== undefined ? Number(values.userType) : existingUser?.userType ?? UserType.BaseUser;
       console.log('UserType converted to:', userType);
+
+      if (isNaN(userType)) {
+        message.error("Invalid user type selected");
+        return;
+      }
+
+      // Validate required fields
+      if (!values.name?.trim() || !values.email?.trim() || !values.contactNr?.trim()) {
+        message.error("Name, email and contact number are required");
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(values.email.trim())) {
+        message.error("Please enter a valid email address");
+        return;
+      }
 
       if (newUser && key === newUser.key) {
         console.log('Creating new user...');
@@ -145,122 +132,81 @@ const AdminUsers: React.FC = () => {
           return;
         }
 
-        try {
-          // If the user type is Employee or SiteManager, show the employee form modal
-          //if (userType === UserType.Employee || userType === UserType.SiteManager) {
-          //  setIsEmployeeModalVisible(true);
-          //  return;
-         // }
-
-          // For other user types, proceed with user creation
-          await createUser(values, userType);
-        } catch (error) {
-          console.error('Error creating user:', error);
-          if (error instanceof Error) {
-            message.error(error.message);
-          } else {
-            message.error("Failed to create user");
-          }
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(values.email)) {
+          message.error("Please enter a valid email address");
+          return;
         }
-      } else {
-        // Handle existing user update
-        console.log('Updating existing user...');
-        const existingUser = users.find(u => u.key === key);
-        if (!existingUser) {
-          message.error("User not found");
+
+        // Validate password strength
+        if (values.password.length < 8) {
+          message.error("Password must be at least 8 characters long");
           return;
         }
 
         try {
-          const { client, employee, ...cleanUser } = existingUser;
-          const updateData = {
-            ...cleanUser,
-            name: values.name,
-            email: values.email,
-            contactNr: values.contactNr,
+          await CreateUserAsAdmin(
+            values.name.trim(),
+            values.contactNr.trim(),
+            values.email.toLowerCase().trim(),
+            values.password,
+            userType,
+            userType === UserType.Client ? values.clientID : null,
+            userType === UserType.Employee || userType === UserType.SiteManager ? values.employeeID : null
+          );
+
+          message.success('User created successfully');
+          setNewUser(null);
+        } catch (error) {
+          console.error('Error creating user:', error);
+          message.error('Failed to create user. Please check if the email is already in use.');
+          return;
+        }
+      } else if (existingUser) {
+        console.log('Updating existing user...');
+        try {
+          const updatedUser = await updateUserAsync({
+            id: existingUser.id,
+            name: values.name.trim(),
+            email: values.email.toLowerCase().trim(),
+            contactNr: values.contactNr.trim(),
             userType: userType,
             clientID: userType === UserType.Client ? values.clientID : null,
-            employeeID: (userType === UserType.Employee || userType === UserType.SiteManager) ? values.employeeID : null,
-            ...(values.password ? { password: values.password } : {})
-          };
-
-          await updateUserAsync(updateData);
-          message.success("User updated successfully");
-          setEditingKey('');
-          form.resetFields();
-          await fetchUsers();
+            employeeID: userType === UserType.Employee || userType === UserType.SiteManager ? values.employeeID : null,
+            password: values.password || undefined
+          });
+          
+          console.log('User updated successfully:', updatedUser);
+          message.success('User updated successfully');
+          
+          // Update the local users state with the updated user
+          setUsers(prevUsers => 
+            prevUsers.map(u => 
+              u.id === updatedUser.id ? { ...updatedUser, key: updatedUser.id } : u
+            )
+          );
         } catch (error) {
           console.error('Error updating user:', error);
           if (error instanceof Error) {
-            message.error(error.message);
+            message.error(`Failed to update user: ${error.message}`);
           } else {
-            message.error("Failed to update user");
+            message.error('Failed to update user');
           }
+          return;
         }
       }
+
+      setEditingKey('');
+      form.resetFields();
     } catch (error) {
-      console.error('Form validation or general error:', error);
-      message.error("Failed to save user");
-    }
-  };
-
-  const createUser = async (values: any, userType: UserType) => {
-    const hashedPassword = await hashString(values.password);
-    
-    // If creating an employee user, first create the employee record
-    if (userType === UserType.Employee || userType === UserType.SiteManager) {
-      try {
-        // Only validate required fields
-        const employeeValues = await employeeForm.validateFields(['idNumber', 'address', 'contactNo']);
-        
-        // Create employee record with optional bank details
-        const newEmployee = await addEmployeeAsync({
-          name: values.name,
-          idNumber: employeeValues.idNumber,
-          address: employeeValues.address,
-          contactNo: employeeValues.contactNo,
-          // Make bank details optional by using null if not provided
-          bankName: employeeForm.getFieldValue('bankName') || null,
-          accountHolderName: employeeForm.getFieldValue('accountHolderName') || null,
-          branchCode: employeeForm.getFieldValue('branchCode') || null,
-          accountNumber: employeeForm.getFieldValue('accountNumber') || null
-        });
-
-        // Create user with employee ID
-        await CreateUserAsAdmin(
-          values.name,
-          values.contactNr,
-          values.email,
-          hashedPassword,
-          userType,
-          null, // No client ID for employee
-          newEmployee.id // Link to the newly created employee
-        );
-
-        message.success("Employee user created successfully");
-        setIsEmployeeModalVisible(false);
-        employeeForm.resetFields();
-      } catch (error) {
-        console.error('Error creating employee user:', error);
-        throw error;
+      console.error('Error saving user:', error);
+      if (error instanceof Error) {
+        message.error(`Failed to save user: ${error.message}`);
+      } else {
+        message.error('Failed to save user');
       }
-    } else {
-      // Create regular user
-      await CreateUserAsAdmin(
-        values.name,
-        values.contactNr,
-        values.email,
-        hashedPassword,
-        userType,
-        values.clientID
-      );
-      message.success("User created successfully");
     }
-
-    setNewUser(null);
-    setEditingKey('');
-    form.resetFields();
-    await fetchUsers();
   };
 
   const handleEmployeeModalCancel = () => {
@@ -311,17 +257,22 @@ const AdminUsers: React.FC = () => {
 
   const handleAddUser = () => {
     const newKey = crypto.randomUUID();
-    const newUserData = {
+    const newUserData: EditableUser = {
       key: newKey,
       id: newKey,
       name: "",
       email: "",
       contactNr: "",
       password: "",
-      userType: UserType.BaseUser, // Default to BaseUser
-      clientID: null
+      userType: UserType.BaseUser,
+      clientID: null,
+      employeeID: null,
+      client: null,
+      employee: null
     };
+    
     setNewUser(newUserData);
+    setUsers(prev => [newUserData, ...prev]); // Add the new user to the beginning of the array
     
     // Initialize form with empty values and default user type
     form.setFieldsValue({
@@ -330,7 +281,8 @@ const AdminUsers: React.FC = () => {
       contactNr: "",
       password: "",
       userType: UserType.BaseUser,
-      clientID: null
+      clientID: null,
+      employeeID: null
     });
     
     setEditingKey(newKey);
@@ -341,29 +293,29 @@ const AdminUsers: React.FC = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      width: '20%',
       sorter: (a, b) => (a.name || '').localeCompare(b.name || ''),
-      render: (text, record) =>
+      render: (_, record) =>
         editingKey === record.key ? (
           <Form.Item
             name="name"
             style={{ margin: 0 }}
             rules={[{ required: true, message: 'Name is required' }]}
+            initialValue={record.name}
           >
-            <Input 
-              onChange={(e) => handleInputChange(record.key, "name", e.target.value)}
-              placeholder="Enter name"
-            />
+            <Input />
           </Form.Item>
         ) : (
-          text
+          record.name
         ),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      width: '20%',
       sorter: (a, b) => (a.email || '').localeCompare(b.email || ''),
-      render: (text, record) =>
+      render: (_, record) =>
         editingKey === record.key ? (
           <Form.Item
             name="email"
@@ -372,43 +324,41 @@ const AdminUsers: React.FC = () => {
               { required: true, message: 'Email is required' },
               { type: 'email', message: 'Please enter a valid email' }
             ]}
+            initialValue={record.email}
           >
-            <Input 
-              onChange={(e) => handleInputChange(record.key, "email", e.target.value)}
-              placeholder="Enter email"
-            />
+            <Input />
           </Form.Item>
         ) : (
-          text
+          record.email
         ),
     },
     {
-      title: "Contact Number",
+      title: "Contact",
       dataIndex: "contactNr",
       key: "contactNr",
-      render: (text, record) =>
+      width: '15%',
+      render: (_, record) =>
         editingKey === record.key ? (
           <Form.Item
             name="contactNr"
             style={{ margin: 0 }}
             rules={[{ required: true, message: 'Contact number is required' }]}
+            initialValue={record.contactNr}
           >
-            <Input 
-              onChange={(e) => handleInputChange(record.key, "contactNr", e.target.value)}
-              placeholder="Enter contact number"
-            />
+            <Input />
           </Form.Item>
         ) : (
-          text
+          record.contactNr
         ),
     },
     {
       title: "Client",
       dataIndex: "clientID",
       key: "clientID",
+      width: '15%',
       render: (_text, record) => {
         // Don't show this column for employee users
-        if (record.userType === UserType.Employee || record.userType === UserType.SiteManager) {
+        if (record.userType === UserType.Employee) {
           return null;
         }
 
@@ -418,11 +368,11 @@ const AdminUsers: React.FC = () => {
             name="clientID"
             style={{ margin: 0 }}
             rules={[{ required: record.userType === UserType.Client, message: 'Client is required for client users' }]}
+            initialValue={record.clientID}
           >
             <Select
               allowClear
               placeholder="Select client"
-              onChange={(value) => handleInputChange(record.key, "clientID", value)}
               style={{ width: '100%' }}
             >
               {clients.map(client => (
@@ -438,65 +388,37 @@ const AdminUsers: React.FC = () => {
       },
     },
     {
-      title: "Employee",
-      dataIndex: "employeeID",
-      key: "employeeID",
-      render: (_text, record) => {
-        // Don't show this column for new users or non-employee users
-        if (record.id === newUser?.id || 
-            (record.userType !== UserType.Employee && record.userType !== UserType.SiteManager)) {
-          return null;
-        }
-
-        const employee = employees.find(e => e.id === record.employeeID);
-        return editingKey === record.key ? (
-          <Form.Item
-            name="employeeID"
-            style={{ margin: 0 }}
-            rules={[{ required: true, message: 'Employee is required for employee users' }]}
-          >
-            <Select
-              allowClear
-              placeholder="Select employee"
-              onChange={(value) => handleInputChange(record.key, "employeeID", value)}
-              style={{ width: '100%' }}
-            >
-              {employees.map(employee => (
-                <Select.Option key={employee.id} value={employee.id}>
-                  {employee.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        ) : (
-          employee?.name || '-'
-        );
-      },
-    },
-    {
       title: "Password",
       dataIndex: "password",
       key: "password",
-      render: (text, record) =>
+      width: '15%',
+      render: (_, record) =>
         editingKey === record.key ? (
           <Form.Item
             name="password"
             style={{ margin: 0 }}
-            rules={[{ required: record.id === newUser?.id, message: 'Password is required for new users' }]}
+            rules={[
+              {
+                required: record.id === newUser?.id,
+                message: 'Password is required for new users'
+              }
+            ]}
           >
             <Input.Password 
-              placeholder={record.id === newUser?.id ? "Enter password" : "Leave blank to keep current password"}
-              onChange={(e) => handleInputChange(record.key, "password", e.target.value)}
+              placeholder="Update"
+              iconRender={(visible) => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
+              style={{ width: '100%' }}
             />
           </Form.Item>
         ) : (
-          text ? "••••••••" : ""
+          <span style={{ color: '#999' }}>••••••••</span>
         ),
     },
     {
-      title: "User Type",
+      title: "Type",
       dataIndex: "userType",
       key: "userType",
+      width: '10%',
       filters: Object.entries(UserType)
         .filter(([key]) => isNaN(Number(key)))
         .map(([key, value]) => ({
@@ -508,27 +430,25 @@ const AdminUsers: React.FC = () => {
         const filterValue = Number(value);
         return recordType === filterValue;
       },
-      render: (type: UserType, record) => {
-        const numericType = Number(type);
+      render: (_, record) => {
+        const numericType = Number(record.userType);
         if (editingKey === record.key) {
           return (
             <Form.Item
               name="userType"
               style={{ margin: 0 }}
               rules={[{ required: true, message: 'User type is required' }]}
+              initialValue={numericType}
             >
               <Select
-                onChange={(value) => handleInputChange(record.key, "userType", value)}
                 style={{ width: '100%' }}
-              >
-                {Object.entries(UserType)
+                options={Object.entries(UserType)
                   .filter(([key]) => isNaN(Number(key)))
-                  .map(([key, value]) => (
-                    <Select.Option key={value} value={Number(value)}>
-                      {key}
-                    </Select.Option>
-                  ))}
-              </Select>
+                  .map(([key, value]) => ({
+                    label: key,
+                    value: Number(value)
+                  }))}
+              />
             </Form.Item>
           );
         }
@@ -538,31 +458,36 @@ const AdminUsers: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
+      width: '5%',
       render: (_, record) => {
         const editing = editingKey === record.key;
         return editing ? (
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 4 }}>
             <Button 
               type="text" 
+              size="small"
               icon={<CheckOutlined style={{ color: "green" }} />} 
               onClick={() => handleSave(record.key)}
             />
             <Button 
               type="text" 
+              size="small"
               icon={<CloseOutlined style={{ color: "red" }} />} 
               onClick={handleCancel}
             />
           </div>
         ) : (
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 4 }}>
             <Button 
               type="text" 
+              size="small"
               icon={<EditOutlined />} 
               disabled={editingKey !== ''} 
               onClick={() => handleEdit(record)}
             />
             <Button 
               type="text" 
+              size="small"
               icon={<MinusCircleOutlined style={{ color: "red" }} />} 
               onClick={() => handleDelete(record.key)}
             />
@@ -573,49 +498,43 @@ const AdminUsers: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "80%", padding: 20, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px", width: "100%" }}>
-          <h2 style={{ margin: 0, textAlign: "center", width: "100%" }}>System Users</h2>
-        </Header>
+    <Layout className="min-h-screen flex justify-center items-center p-4">
+      <Card className="responsive-card w-full max-w-[1200px]">
+        <h2 className="page-title mb-4">Users</h2>
 
-        <Content style={{ flex: 1, padding: 20, width: "100%" }}>
-          <Card title="All Users" style={{ width: "100%" }}>
-            <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
-              <Button 
-                type="primary" 
-                icon={<PlusOutlined />} 
-                onClick={handleAddUser} 
-                disabled={editingKey !== ''} // Only disable when editing, not when newUser exists
-              >
-                Add User
-              </Button>
-              <Search
-                placeholder="Search by name, email, or contact number"
-                allowClear
-                enterButton={<SearchOutlined />}
-                style={{ width: 300 }}
-                onChange={(e) => handleSearch(e.target.value)}
-              />
-            </div>
+        <Content className="flex flex-col gap-4">
+          <div className="flex justify-between items-center gap-4 mb-4">
+            <Search
+              placeholder="Search users..."
+              onSearch={handleSearch}
+              style={{ width: '100%', maxWidth: 300 }}
+              prefix={<SearchOutlined />}
+            />
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAddUser}
+              disabled={editingKey !== ''}
+            >
+              Add User
+            </Button>
+          </div>
 
-            <Form form={form} component={false}>
+          <Form form={form}>
+            <div className="responsive-table">
               <Table
-                columns={columns}
-                dataSource={[...filteredUsers, ...(newUser ? [newUser] : [])] /* Add new user at bottom */}
-                rowKey="id"
                 loading={loading}
+                dataSource={filteredUsers}
+                columns={columns}
                 pagination={{ 
-                  pageSize: 10,
+                  pageSize: 8,
                   position: ['bottomCenter']
                 }}
+                size="small"
+                bordered
               />
-            </Form>
-
-            <div style={{ marginTop: 16 }}>
-              <Button onClick={() => navigate(-1)}>Back</Button>
             </div>
-          </Card>
+          </Form>
         </Content>
       </Card>
 

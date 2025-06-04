@@ -4,7 +4,6 @@
 
 import type { User, UserSignUpResponse, UserSigninResponse } from "../../models/userModels";
 import { GetAsync, PostAsync, DeleteAsync, PatchAsync } from "./backend";
-import { UserType } from "../../enums/userTypes";
 
 /**
  * Sign in a user with the provided email and password.
@@ -97,16 +96,30 @@ export async function getUsersAsync(): Promise<User[]> {
 
 /**
  * Update a user's details.
- * @param {User} user - The user object with updated details.
+ * @param {any} user - The user object with updated details.
  * @returns {Promise<User>} The updated user.
  */
-export async function updateUserAsync(user: User): Promise<User> {
-    // Remove the password if it's empty to avoid overwriting with empty string
-    if (!user.password) {
-        const { password, ...userWithoutPassword } = user;
-        return await PatchAsync<User>('User', userWithoutPassword);
+export async function updateUserAsync(user: any): Promise<User> {
+    // First get the existing user to get their password
+    const existingUser = await GetAsync<User>(`User`);
+    if (!existingUser) {
+        throw new Error("User not found");
     }
-    return await PatchAsync<User>('User', user);
+
+    // Convert property names to match backend expectations
+    const payload = {
+        Id: user.id,
+        Name: user.name,
+        Email: user.email?.toLowerCase(), // Ensure email is lowercase
+        ContactNr: user.contactNr,
+        UserType: user.userType,
+        ClientID: user.clientID,
+        EmployeeID: user.employeeID,
+        Password: user.password || existingUser.password // Use new password if provided, otherwise use existing
+    };
+
+    // Send the update request with the payload
+    return await PatchAsync<User>(`User`, payload);
 }
 
 /**
