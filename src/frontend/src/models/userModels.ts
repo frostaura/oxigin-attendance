@@ -32,6 +32,7 @@ export interface UserSignUpValues {
     contactNr: string;
     email: string;
     password: string;
+    userType: UserType;
 }
 
 export interface UserSignUpResponse{

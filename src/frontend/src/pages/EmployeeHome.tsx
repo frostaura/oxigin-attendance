@@ -172,9 +172,8 @@ const EmployeeHome: React.FC = () => {
     <Layout style={{ minHeight: "100vh", padding: "20px" }}>
       <Card style={{ width: "100%", padding: "20px" }}>
         <Header style={{ textAlign: "center", marginBottom: "20px", background: "transparent" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2>Home Page</h2>
-            <Button onClick={() => navigate("/employeeupdate")}>Update Profile</Button>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
+            <h2 style={{ margin: 0, textAlign: "center" }}>Home Page</h2>
           </div>
         </Header>
 

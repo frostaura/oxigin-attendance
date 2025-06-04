@@ -12,7 +12,7 @@ const SiteManagerHome: React.FC = () => {
     <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
       <Card style={{ width: "30%", padding: 20 }}>
         <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px" }}>
-          <h2 style={{ margin: 0, alignItems: "center"}}>Home Page</h2>
+          <h2 style={{ margin: 0, textAlign: "center", width: "100%" }}>Home Page</h2>
         </Header>
 
         {/* Content Layout */}

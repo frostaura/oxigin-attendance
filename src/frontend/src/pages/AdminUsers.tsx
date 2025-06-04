@@ -10,6 +10,7 @@ import type { Client } from "../models/clientModels";
 import type { Employee } from "../models/employeeModels";
 import type { ColumnType } from "antd/es/table";
 import { UserType } from "../enums/userTypes";
+import { hashString } from "../utils/crypto";
 
 const { Header, Content } = Layout;
 const { Search } = Input;
@@ -130,18 +131,28 @@ const AdminUsers: React.FC = () => {
 
   const handleSave = async (key: string) => {
     try {
+      console.log('Validating form fields...');
       const values = await form.validateFields();
+      console.log('Form values:', values);
       
       const userType = Number(values.userType);
-      
+      console.log('UserType converted to:', userType);
+
       if (newUser && key === newUser.key) {
+        console.log('Creating new user...');
         if (!values.password || !values.email || !values.name || !values.contactNr) {
           message.error("All fields are required for new users");
           return;
         }
 
         try {
-          // For all user types, proceed with user creation directly
+          // If the user type is Employee or SiteManager, show the employee form modal
+          //if (userType === UserType.Employee || userType === UserType.SiteManager) {
+          //  setIsEmployeeModalVisible(true);
+          //  return;
+         // }
+
+          // For other user types, proceed with user creation
           await createUser(values, userType);
         } catch (error) {
           console.error('Error creating user:', error);
@@ -153,6 +164,7 @@ const AdminUsers: React.FC = () => {
         }
       } else {
         // Handle existing user update
+        console.log('Updating existing user...');
         const existingUser = users.find(u => u.key === key);
         if (!existingUser) {
           message.error("User not found");
@@ -193,55 +205,56 @@ const AdminUsers: React.FC = () => {
   };
 
   const createUser = async (values: any, userType: UserType) => {
-    // Send plain password to backend - it will handle hashing
-    const password = values.password || 'defaultPassword123'; // Default password if not provided
+    const hashedPassword = await hashString(values.password);
     
-    // Generate a random string for unique email
-    const randomString = Math.random().toString(36).substring(2, 8);
-    
-    // Set default values for required fields
-    const defaultValues = {
-      name: 'New User',  // Default name
-      contactNr: values.contactNr || '0000000000',  // Default contact number
-      email: values.email?.toLowerCase() || `user_${Date.now()}_${randomString}@oxigin.com`,  // Unique email with timestamp and random string
-    };
-
     // If creating an employee user, first create the employee record
     if (userType === UserType.Employee || userType === UserType.SiteManager) {
       try {
-        // Create employee record with minimal required fields
+        // Only validate required fields
+        const employeeValues = await employeeForm.validateFields(['idNumber', 'address', 'contactNo']);
+        
+        // Create employee record with optional bank details
         const newEmployee = await addEmployeeAsync({
-          name: defaultValues.name,
-          contactNo: defaultValues.contactNr
+          name: values.name,
+          idNumber: employeeValues.idNumber,
+          address: employeeValues.address,
+          contactNo: employeeValues.contactNo,
+          // Make bank details optional by using null if not provided
+          bankName: employeeForm.getFieldValue('bankName') || null,
+          accountHolderName: employeeForm.getFieldValue('accountHolderName') || null,
+          branchCode: employeeForm.getFieldValue('branchCode') || null,
+          accountNumber: employeeForm.getFieldValue('accountNumber') || null
         });
 
-        // Create user with all required fields
+        // Create user with employee ID
         await CreateUserAsAdmin(
-          defaultValues.name,
-          defaultValues.contactNr,
-          defaultValues.email,
-          password,
+          values.name,
+          values.contactNr,
+          values.email,
+          hashedPassword,
           userType,
           null, // No client ID for employee
           newEmployee.id // Link to the newly created employee
         );
 
-        message.success("Employee user created successfully. Please update details later.");
+        message.success("Employee user created successfully");
+        setIsEmployeeModalVisible(false);
+        employeeForm.resetFields();
       } catch (error) {
         console.error('Error creating employee user:', error);
         throw error;
       }
     } else {
-      // Create regular user with all required fields
+      // Create regular user
       await CreateUserAsAdmin(
-        defaultValues.name,
-        defaultValues.contactNr,
-        defaultValues.email,
-        password,
+        values.name,
+        values.contactNr,
+        values.email,
+        hashedPassword,
         userType,
         values.clientID
       );
-      message.success("User created successfully. Please update details later.");
+      message.success("User created successfully");
     }
 
     setNewUser(null);

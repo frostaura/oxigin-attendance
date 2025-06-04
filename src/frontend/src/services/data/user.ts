@@ -4,6 +4,7 @@
 
 import type { User, UserSignUpResponse, UserSigninResponse } from "../../models/userModels";
 import { GetAsync, PostAsync, DeleteAsync, PatchAsync } from "./backend";
+import { UserType } from "../../enums/userTypes";
 
 /**
  * Sign in a user with the provided email and password.
@@ -45,7 +46,7 @@ export async function SignUpAsync(
         contactNr, 
         email, 
         password,
-        userType: 0 
+        userType: 0
     });
     localStorage.setItem("session", JSON.stringify(response));
 

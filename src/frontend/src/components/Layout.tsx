@@ -3,6 +3,8 @@ import { Button, Layout, Avatar, Menu, Dropdown } from "antd";
 import { LeftOutlined, RobotOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { GetLoggedInUserContextAsync } from '../services/data/backend';
+import { UserType } from '../enums/userTypes';
+import type { UserSigninResponse } from '../models/userModels';
 
 const { Header, Content } = Layout;
 
@@ -18,6 +20,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const hideBackButtonOn = ["/", "/register"];
   const showBackButton = !hideBackButtonOn.includes(location.pathname) && !location.pathname.includes("home");
   const [userInitials, setUserInitials] = useState<string>("");
+  const [userContext, setUserContext] = useState<UserSigninResponse | null>(null);
 
   // Infer the card title from the currently-signed-in user, if any.
   useEffect(() => {
@@ -25,16 +28,28 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       var userContext = await GetLoggedInUserContextAsync();
 
       if (!!userContext) {
+        setUserContext(userContext);
         setUserInitials(userContext.user.name.split(" ").map((n: string) => n[0].toUpperCase()).join(""));
       }
     });
   }, []);
 
+  const getUpdateDetailsPath = () => {
+    if (userContext?.user.userType === UserType.Employee) {
+      return "/employeeupdate";
+    } else if (userContext?.user.userType === UserType.Client) {
+      return "/clientupdate";
+    }
+    return "";
+  };
+
   const menu = (
     <Menu>
-      <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => navigate("/clientupdate")}>
-        Update Details
-      </Menu.Item>
+      {(userContext?.user.userType === UserType.Employee || userContext?.user.userType === UserType.Client) && (
+        <Menu.Item key="edit" icon={<EditOutlined />} onClick={() => navigate(getUpdateDetailsPath())}>
+          Update Details
+        </Menu.Item>
+      )}
       <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={() => {
         localStorage.removeItem("session");
         navigate("/");
