@@ -1,5 +1,7 @@
 using Oxigin.Attendance.Shared.Models.Entities;
 
+using Oxigin.Attendance.Shared.Models.DTOs;
+
 namespace Oxigin.Attendance.Core.Interfaces.Managers;
 
 /// <summary>
@@ -26,14 +28,14 @@ public interface IJobRequestManager
     /// <param name="request">The job request entity to approve (should include the id and any relevant context).</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with approved status.</returns>
-    Task<Job> ApproveJobRequestAsync(Job request, CancellationToken token);
+    Task<Job> ApproveJobRequestAsync(JobStatusUpdate request, CancellationToken token);
     /// <summary>
     /// Reject a pending job request, typically by a client or site manager.
     /// </summary>
     /// <param name="request">The job request entity to reject (should include the id and any relevant context).</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with rejected status.</returns>
-    Task<Job> RejectJobRequestAsync(Job request, CancellationToken token);
+    Task<Job> RejectJobRequestAsync(JobStatusUpdate request, CancellationToken token);
     /// <summary>
     /// Get all jobs that require approval by the given user (e.g., site manager or client).
     /// </summary>

@@ -3,6 +3,7 @@ using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Datastore.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Oxigin.Attendance.Shared.Models.DTOs;
 
 namespace Oxigin.Attendance.Core.Services.Managers;
 
@@ -77,7 +78,7 @@ public class JobManager : IJobRequestManager
     /// <param name="request">The job request entity to approve (should include the id and any relevant context).</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with approved status.</returns>
-    public async Task<Job> ApproveJobRequestAsync(Job request, CancellationToken token)
+    public async Task<Job> ApproveJobRequestAsync(JobStatusUpdate request, CancellationToken token)
     {
         try
         {
@@ -100,7 +101,7 @@ public class JobManager : IJobRequestManager
     /// <param name="request">The job request entity to reject (should include the id and any relevant context).</param>
     /// <param name="token">A token for cancelling downstream operations.</param>
     /// <returns>The updated job request entity with rejected status.</returns>
-    public async Task<Job> RejectJobRequestAsync(Job request, CancellationToken token)
+    public async Task<Job> RejectJobRequestAsync(JobStatusUpdate request, CancellationToken token)
     {
         try
         {

@@ -12,11 +12,31 @@ export async function createJobAsync(request: Job): Promise<Job> {
 }
 
 /**
- * Gets all job requests for the current user.
- * @returns A list of job requests
+ * Gets all jobs.
+ * @returns A list of all jobs
  */
 export async function getJobsAsync(): Promise<Array<Job>> {
     const response = await GetAsync<Array<Job>>('Job');
+    return response;
+}
+
+/**
+ * Approve a job request.
+ * @param jobId The ID of the job to approve
+ * @returns The updated job
+ */
+export async function approveJobAsync(jobId: string): Promise<Job> {
+    const response = await PatchAsync<Job>(`Job/approve`, { id: jobId, approved: true } as Job);
+    return response;
+}
+
+/**
+ * Reject a job request.
+ * @param jobId The ID of the job to reject
+ * @returns The updated job
+ */
+export async function rejectJobAsync(jobId: string): Promise<Job> {
+    const response = await PatchAsync<Job>(`Job/reject`, { id: jobId, approved: false } as Job);
     return response;
 }
 

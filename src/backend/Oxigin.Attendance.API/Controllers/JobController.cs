@@ -5,6 +5,7 @@ using Oxigin.Attendance.Datastore.Interfaces;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Responses;
 using Oxigin.Attendance.Shared.Enums;
+using Oxigin.Attendance.Shared.Models.DTOs;
 
 namespace Oxigin.Attendance.API.Controllers;
 
@@ -96,7 +97,7 @@ public class JobController : BaseController
     [HttpPatch("approve")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Job))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
-    public async Task<IActionResult> ApproveJobRequestAsync([FromBody] Job request, CancellationToken token)
+    public async Task<IActionResult> ApproveJobRequestAsync([FromBody] JobStatusUpdate request, CancellationToken token)
     {
         var result = await _jobRequestManager.ApproveJobRequestAsync(request, token);
 
@@ -112,7 +113,7 @@ public class JobController : BaseController
     [HttpPatch("reject")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Job))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(StandardizedError))]
-    public async Task<IActionResult> RejectJobRequestAsync([FromBody] Job request, CancellationToken token)
+    public async Task<IActionResult> RejectJobRequestAsync([FromBody] JobStatusUpdate request, CancellationToken token)
     {
         var result = await _jobRequestManager.RejectJobRequestAsync(request, token);
 

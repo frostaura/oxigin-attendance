@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Layout, Card, Button, Table, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { getJobsAsync, getJobsRequiringApprovalAsync, updateJobApprovalAsync } from "../services/data/job";
+import { getJobsAsync, getJobsRequiringApprovalAsync, approveJobAsync, rejectJobAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
 
 const { Content } = Layout;
@@ -35,7 +35,11 @@ const AdminJobsHome: React.FC = () => {
       // Process all jobs
       for (const job of jobsToProcess) {
         if (job.id) {
-          await updateJobApprovalAsync(job.id, job.approved);
+          if (job.approved === true) {
+            await approveJobAsync(job.id);
+          } else {
+            await rejectJobAsync(job.id);
+          }
         }
       }
 
