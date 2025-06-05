@@ -85,9 +85,18 @@ const AdminUsers: React.FC = () => {
       contactNr: record.contactNr?.trim(),
       userType: userTypeValue,
       clientID: record.clientID,
-      password: record.password// Explicitly set password as undefined when editing
+      password: record.password
     });
     setEditingKey(record.key);
+  };
+
+  const handleUserTypeChange = (value: number) => {
+    // If the user type is not client, clear the client selection
+    if (value !== UserType.Client) {
+      form.setFieldValue('clientID', null);
+    }
+    // Force a re-render to update the client dropdown state
+    setUsers([...users]);
   };
 
   const handleSave = async (key: string) => {
@@ -125,35 +134,33 @@ const AdminUsers: React.FC = () => {
         return;
       }
 
+      // Validate client selection for client users
+      if (userType === UserType.Client && !values.clientID) {
+        message.error("Please select a client for client users");
+        return;
+      }
+
+      const userData = {
+        name: values.name.trim(),
+        email: values.email.toLowerCase().trim(),
+        contactNr: values.contactNr.trim(),
+        userType: userType,
+        clientID: userType === UserType.Client ? values.clientID : null,
+        employeeID: userType === UserType.Employee || userType === UserType.SiteManager ? values.employeeID : null,
+        password: values.password
+      };
+
       if (newUser && key === newUser.key) {
-        console.log('Creating new user...');
-        if (!values.password || !values.email || !values.name || !values.contactNr) {
-          message.error("All fields are required for new users");
-          return;
-        }
-
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(values.email)) {
-          message.error("Please enter a valid email address");
-          return;
-        }
-
-        // Validate password strength
-        if (values.password.length < 8) {
-          message.error("Password must be at least 8 characters long");
-          return;
-        }
-
+        console.log('Creating new user with data:', userData);
         try {
           await CreateUserAsAdmin(
-            values.name.trim(),
-            values.contactNr.trim(),
-            values.email.toLowerCase().trim(),
-            values.password,
-            userType,
-            userType === UserType.Client ? values.clientID : null,
-            userType === UserType.Employee || userType === UserType.SiteManager ? values.employeeID : null
+            userData.name,
+            userData.contactNr,
+            userData.email,
+            userData.password,
+            userData.userType,
+            userData.clientID,
+            userData.employeeID
           );
 
           message.success('User created successfully');
@@ -164,17 +171,11 @@ const AdminUsers: React.FC = () => {
           return;
         }
       } else if (existingUser) {
-        console.log('Updating existing user...');
+        console.log('Updating existing user with data:', { ...userData, id: existingUser.id });
         try {
           const updatedUser = await updateUserAsync({
             id: existingUser.id,
-            name: values.name.trim(),
-            email: values.email.toLowerCase().trim(),
-            contactNr: values.contactNr.trim(),
-            userType: userType,
-            clientID: userType === UserType.Client ? values.clientID : null,
-            employeeID: userType === UserType.Employee || userType === UserType.SiteManager ? values.employeeID : null,
-            password: values.password || undefined
+            ...userData
           });
           
           console.log('User updated successfully:', updatedUser);
@@ -199,6 +200,8 @@ const AdminUsers: React.FC = () => {
 
       setEditingKey('');
       form.resetFields();
+      // Refresh the users list to get the latest data
+      await fetchUsers();
     } catch (error) {
       console.error('Error saving user:', error);
       if (error instanceof Error) {
@@ -357,23 +360,27 @@ const AdminUsers: React.FC = () => {
       key: "clientID",
       width: '15%',
       render: (_text, record) => {
-        // Don't show this column for employee users
-        if (record.userType === UserType.Employee) {
-          return null;
-        }
-
+        // Get the current form values to check the current user type
+        const currentUserType = form.getFieldValue('userType');
+        const isClientType = currentUserType === UserType.Client;
         const client = clients.find(c => c.id === record.clientID);
-        return editingKey === record.key && record.userType === UserType.Client ? (
+        
+        return editingKey === record.key ? (
           <Form.Item
             name="clientID"
             style={{ margin: 0 }}
-            rules={[{ required: record.userType === UserType.Client, message: 'Client is required for client users' }]}
+            rules={[{ required: isClientType, message: 'Client is required for client users' }]}
             initialValue={record.clientID}
           >
             <Select
               allowClear
               placeholder="Select client"
               style={{ width: '100%' }}
+              disabled={!isClientType}
+              onChange={(value) => {
+                // Update the form value when selection changes
+                form.setFieldsValue({ clientID: value });
+              }}
             >
               {clients.map(client => (
                 <Select.Option key={client.id} value={client.id}>
@@ -442,6 +449,7 @@ const AdminUsers: React.FC = () => {
             >
               <Select
                 style={{ width: '100%' }}
+                onChange={handleUserTypeChange}
                 options={Object.entries(UserType)
                   .filter(([key]) => isNaN(Number(key)))
                   .map(([key, value]) => ({
