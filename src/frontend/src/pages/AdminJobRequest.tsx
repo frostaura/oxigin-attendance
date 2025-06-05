@@ -193,8 +193,16 @@ const AdminJobRequest: React.FC = () => {
         parsedData.time = dayjs(parsedData.time);
       }
       form.setFieldsValue(parsedData);
+
+      // Restore client selection if clientId exists
+      if (parsedData.clientId) {
+        const client = clients.find(c => c.id === parsedData.clientId);
+        if (client) {
+          setSelectedClient(client);
+        }
+      }
     }
-  }, [form]);
+  }, [form, clients]);
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", padding: 20 }}>

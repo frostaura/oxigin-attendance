@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
 import { getJobsAsync as getJobsAsync, getJobsRequiringApprovalAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
 
 const { Content } = Layout;
 
@@ -23,13 +24,7 @@ interface JobData {
 const ClientHome: React.FC = () => {
   const navigate = useNavigate();
   const [jobsPendingApproval, setJobsPendingApproval] = useState<JobData[]>([]);
-
-  const [upcomingJobData] = useState<JobData[]>([
-    { key: "1", jobId: "91011", purchaseOrder: "PO1112", jobName: "Roof Repair", location: "NYC", date: "2025-04-01" },
-    { key: "2", jobId: "13141", purchaseOrder: "PO1314", jobName: "Flooring", location: "LA", date: "2025-04-05" },
-  ]);
-
-  // Add state for jobs awaiting confirmation
+  const [upcomingJobData, setUpcomingJobData] = useState<JobData[]>([]);
   const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState<Job[]>([]);
 
   const handleApproveChange = (record: JobData) => {
@@ -76,26 +71,42 @@ const ClientHome: React.FC = () => {
     },
   ];
 
-  const upcomingJobColumns: ColumnsType<JobData> = [
-    { title: "Job ID", dataIndex: "jobId", key: "jobId" },
-    { title: "Purchase Order #", dataIndex: "purchaseOrder", key: "purchaseOrder" },
-    { title: "Job Name", dataIndex: "jobName", key: "jobName" },
-    { title: "Location", dataIndex: "location", key: "location" },
-    { title: "Date", dataIndex: "date", key: "date" },
-  ];
-
   // Fetch all data we need, and ensure the effect only runs once on mount ([]).
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        // Fetch jobs awaiting confirmation
+        // Get the current user context to get the client ID
+        const userContext = await GetLoggedInUserContextAsync();
+        if (!userContext?.user?.clientID) {
+          message.error('Unable to fetch client information');
+          return;
+        }
+
+        const clientId = userContext.user.clientID;
+
+        // Fetch jobs awaiting confirmation and filter by client ID
         const allJobs: Array<Job> = await getJobsAsync();
-        const awaitingConfirmation = allJobs.filter(job => !job.approved);
+        const clientJobs = allJobs.filter(job => job.clientID === clientId);
+        const awaitingConfirmation = clientJobs.filter(job => !job.approved);
         setJobsAwaitingConfirmation(awaitingConfirmation);
 
-        // Fetch jobs requiring approval
+        // Set upcoming jobs (approved jobs for this client)
+        const upcomingJobs = clientJobs
+          .filter(job => job.approved)
+          .map(job => ({
+            key: job.id || '',
+            jobId: job.id || '',
+            purchaseOrder: job.purchaseOrderNumber,
+            jobName: job.jobName,
+            location: job.location,
+            date: new Date(job.time).toLocaleDateString()
+          }));
+        setUpcomingJobData(upcomingJobs);
+
+        // Fetch jobs requiring approval and filter by client ID
         const jobsRequiringApproval = await getJobsRequiringApprovalAsync();
-        const formattedJobs: JobData[] = jobsRequiringApproval.map(job => ({
+        const clientJobsRequiringApproval = jobsRequiringApproval.filter(job => job.clientID === clientId);
+        const formattedJobs: JobData[] = clientJobsRequiringApproval.map(job => ({
           key: job.id || '',
           jobId: job.id || '',
           purchaseOrder: job.purchaseOrderNumber,
@@ -170,22 +181,6 @@ const ClientHome: React.FC = () => {
                   Process Selected Jobs
                 </Button>
               </div>
-            </div>
-          </Card>
-
-          <Card title="Upcoming Jobs">
-            <div className="responsive-table">
-              <Table 
-                columns={upcomingJobColumns} 
-                dataSource={upcomingJobData} 
-                pagination={{ 
-                  pageSize: 8,
-                  position: ['bottomCenter']
-                }}
-                scroll={{ x: 'max-content' }}
-                size="middle"
-                bordered
-              />
             </div>
           </Card>
         </Content>
