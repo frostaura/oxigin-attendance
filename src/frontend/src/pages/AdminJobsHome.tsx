@@ -15,14 +15,14 @@ const AdminJobsHome: React.FC = () => {
 
   const handleApproveChange = (record: Job) => {
     const updatedJobs = jobsPendingApproval.map((job) =>
-      job.id === record.id ? { ...job, approved: true } : job
+      job.id === record.id ? { ...job, approved: record.approved === null ? true : null as unknown as boolean } : job
     );
     setJobsPendingApproval(updatedJobs);
   };
 
   const handleRejectChange = (record: Job) => {
     const updatedJobs = jobsPendingApproval.map((job) =>
-      job.id === record.id ? { ...job, approved: false } : job
+      job.id === record.id ? { ...job, approved: record.approved === null ? false : null as unknown as boolean } : job
     );
     setJobsPendingApproval(updatedJobs);
   };
@@ -30,17 +30,17 @@ const AdminJobsHome: React.FC = () => {
   const processJobs = async () => {
     try {
       setProcessing(true);
-      const jobsToProcess = jobsPendingApproval.filter((job) => job.approved !== undefined);
+      const jobsToProcess = jobsPendingApproval.filter((job) => job.approved !== null);
 
       // Process all jobs
       for (const job of jobsToProcess) {
         if (job.id) {
-          await updateJobApprovalAsync(job.id, job.approved || false);
+          await updateJobApprovalAsync(job.id, job.approved);
         }
       }
 
       // Remove processed jobs from the list
-      setJobsPendingApproval(jobsPendingApproval.filter((job) => job.approved === undefined));
+      setJobsPendingApproval(jobsPendingApproval.filter((job) => job.approved === null));
       message.success('Jobs processed successfully');
     } catch (error) {
       console.error('Error processing jobs:', error);
@@ -70,7 +70,7 @@ const AdminJobsHome: React.FC = () => {
       key: "approve",
       render: (_, record) => (
         <Checkbox 
-          checked={record.approved === true} 
+          checked={record.approved === true}
           onChange={() => handleApproveChange(record)}
         />
       ),
@@ -80,7 +80,7 @@ const AdminJobsHome: React.FC = () => {
       key: "reject",
       render: (_, record) => (
         <Checkbox 
-          checked={record.approved === false} 
+          checked={record.approved === false}
           onChange={() => handleRejectChange(record)}
         />
       ),
@@ -96,9 +96,13 @@ const AdminJobsHome: React.FC = () => {
         const awaitingConfirmation = allJobs.filter(job => !job.approved);
         setJobsAwaitingConfirmation(awaitingConfirmation);
 
-        // Fetch jobs requiring approval
+        // Fetch jobs requiring approval and ensure approved is null initially
         const jobsRequiringApproval = await getJobsRequiringApprovalAsync();
-        setJobsPendingApproval(jobsRequiringApproval);
+        const jobsWithInitialApproval = jobsRequiringApproval.map(job => ({
+          ...job,
+          approved: null as unknown as boolean
+        }));
+        setJobsPendingApproval(jobsWithInitialApproval);
       } catch (error) {
         console.error("Error fetching jobs:", error);
         message.error('Failed to fetch jobs. Please try again later.');
@@ -150,7 +154,7 @@ const AdminJobsHome: React.FC = () => {
                   type="primary"
                   onClick={processJobs}
                   loading={processing}
-                  disabled={!jobsPendingApproval.some((job) => job.approved !== undefined)}
+                  disabled={!jobsPendingApproval.some((job) => job.approved !== null)}
                 >
                   Process Selected Jobs
                 </Button>
