@@ -67,6 +67,10 @@ const AdminUsers: React.FC = () => {
     setSearchValue(value.toLowerCase());
   };
 
+  const handleClearSearch = () => {
+    setSearchValue('');
+  };
+
   const filteredUsers = users.filter(user => 
     user.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -514,7 +518,9 @@ const AdminUsers: React.FC = () => {
           <div className="flex justify-between items-center gap-4 mb-4">
             <Search
               placeholder="Search users..."
-              onSearch={handleSearch}
+              onChange={(e) => handleSearch(e.target.value)}
+              value={searchValue}
+              allowClear
               style={{ width: '100%', maxWidth: 300 }}
               prefix={<SearchOutlined />}
             />
