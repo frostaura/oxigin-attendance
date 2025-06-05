@@ -17,18 +17,23 @@ const BASE_BACKEND_URL: string = "https://oxigin-staffing-backend.frostaura.net"
  */
 export async function PostAsync<T>(url: string, body: object, sessionId?: string | null): Promise<T>{
     if(!sessionId){
-        const userContext = await GetLoggedInUserContextAsync();
-        // If no sessionId is provided, use the one from userContext
-        sessionId = userContext?.sessionId || "";
+        try {
+            const userContext = await GetLoggedInUserContextAsync();
+            // If no sessionId is provided, use the one from userContext
+            sessionId = userContext?.sessionId || "";
+        }
+        catch (error) {
+            console.error("Error parsing session from localStorage:", error);
+        }
     }
 
     const finalUrl = `${BASE_BACKEND_URL}/${url}`;
     const request = await fetch(finalUrl, {
         method: "POST",
         headers:
-         {
+        {
             "Content-Type": "application/json",
-            "SessionId": sessionId,
+            "SessionId": sessionId || ""
         },
         body: JSON.stringify(body)
     });
