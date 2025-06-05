@@ -1,8 +1,179 @@
 #root {
-  max-width: 1280px;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  background-color: var(--background-color);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 1rem;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Form container styles */
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem 0.5rem;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 
+              0 2px 4px rgba(0, 0, 0, 0.03);
+  height: fit-content;
+}
+
+/* Ant Design overrides for consistency */
+.ant-layout {
+  background-color: var(--background-color) !important;
+}
+
+.ant-layout-header {
+  background-color: var(--background-color) !important;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 1rem;
+  height: 48px;
+  line-height: 48px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ant-layout-content {
+  background-color: var(--background-color) !important;
+  min-height: calc(100vh - 48px);
+}
+
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 
+              0 2px 4px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--border-color);
+}
+
+/* Form specific card styles */
+.ant-card.form-card {
+  height: fit-content;
+  margin: 0.5rem auto;
+}
+
+/* Form element styles */
+.ant-form-item {
+  margin-bottom: 12px;
+}
+
+.ant-form-item-label {
+  padding-bottom: 4px;
+}
+
+.ant-form-item-label > label {
+  height: 20px;
+}
+
+.ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.ant-input, .ant-input-password {
+  padding: 4px 8px;
+  height: 32px;
+}
+
+.ant-input-number {
+  width: 100%;
+  height: 32px;
+}
+
+.ant-picker {
+  padding: 4px 8px;
+  height: 32px;
+}
+
+/* Title styles */
+h1.ant-typography, 
+h2.ant-typography, 
+h3.ant-typography {
+  margin-bottom: 16px;
+}
+
+/* Button styles */
+.ant-btn {
+  height: 32px;
+  padding: 4px 15px;
+}
+
+/* Table styles */
+.ant-table-wrapper {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  margin: 12px 0;
+}
+
+.ant-table {
+  background-color: var(--background-color);
+}
+
+.ant-table-small .ant-table-thead > tr > th,
+.ant-table-small .ant-table-tbody > tr > td {
+  padding: 4px 8px;
+}
+
+.ant-btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--hover-color);
+  border-color: var(--hover-color);
+}
+
+/* Grid system for responsive layouts */
+.grid {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.grid-cols-1 { grid-template-columns: 1fr; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 1200px) {
+  .grid-cols-4 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 992px) {
+  .grid-cols-3, .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr; }
+  
+  .main-content {
+    padding: 0.5rem;
+  }
 }
 
 .logo {

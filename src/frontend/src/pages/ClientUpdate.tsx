@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, Input, Button, Typography, Card } from "antd";
-import type { ClientRegistrationFormValues } from "../types";
+import type { ClientRegistrationFormValues } from "../models/clientModels";
 
 const { Title } = Typography;
 

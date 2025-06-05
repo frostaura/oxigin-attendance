@@ -6,6 +6,7 @@ using Oxigin.Attendance.Shared.Exceptions;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Requests;
 using Oxigin.Attendance.Shared.Models.Responses;
+using Microsoft.EntityFrameworkCore;
 
 namespace Oxigin.Attendance.API.Controllers;
 
@@ -30,6 +31,25 @@ public class UserController : BaseController
         : base(logger, db)
     {
         _userManager = userManager;
+    }
+
+    /// <summary>
+    /// Get all users.
+    /// </summary>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>List of User entities.</returns>
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken token)
+    {
+        var signedInUser = await GetRequestingUserAsync(token);
+        if (signedInUser == null) return Forbid();
+        
+        var users = await datastoreContext.Users
+            .Include(u => u.Client)
+            .Where(u => !u.Deleted)
+            .ToListAsync(token);
+            
+        return Ok(users);
     }
 
     /// <summary>
@@ -145,5 +165,30 @@ public class UserController : BaseController
         {
             return BadRequest(e.Error);
         }
+    }
+
+    /// <summary>
+    /// Delete a user by ID.
+    /// </summary>
+    /// <param name="id">The User ID.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>No content if successful.</returns>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteUser(Guid id, CancellationToken token)
+    {
+        var signedInUser = await GetRequestingUserAsync(token);
+        if (signedInUser == null) return Forbid();
+
+        var user = await datastoreContext.Users.FirstOrDefaultAsync(u => u.Id == id, token);
+        if (user == null || user.Deleted) return NotFound();
+
+        // Soft delete the user
+        user.Deleted = true;
+        await datastoreContext.SaveChangesAsync(token);
+
+        return NoContent();
     }
 }

@@ -46,6 +46,21 @@ public class JobAllocationController : BaseController
     }
 
     /// <summary>
+    /// Get all allocations for a given employee.
+    /// </summary>
+    /// <param name="employeeId">The employee ID.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>List of JobAllocation entities.</returns>
+    [HttpGet("employee/{employeeId}")]
+    public async Task<IActionResult> GetAllocationsForEmployee(Guid employeeId, CancellationToken token)
+    {
+        var signedInUser = await GetRequestingUserAsync(token);
+        if (signedInUser == null) return Forbid();
+        var allocations = await _jobAllocationManager.GetAllocationsForEmployeeAsync(employeeId, token);
+        return Ok(allocations.Where(a => !a.Deleted));
+    }
+
+    /// <summary>
     /// Create a new allocation for a job.
     /// </summary>
     /// <param name="allocation">The JobAllocation entity to create.</param>

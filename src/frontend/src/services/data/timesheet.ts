@@ -12,15 +12,40 @@ export async function signInAsync(timesheet: Timesheet): Promise<Timesheet> {
 }
 
 /**
+ * Get all timesheets for a job.
+ * @param jobId The job ID
+ * @returns List of timesheets for the job
+ */
+export async function getTimesheetsForJobAsync(jobId: string): Promise<Timesheet[]> {
+    const response = await GetAsync<Timesheet[]>(`Timesheet/job/${jobId}`);
+    return response;
+}
+
+/**
  * Updates a timesheet with sign out (sets outTime).
  * @param timesheetId The timesheet ID
  * @param outTime The sign-out time (Date or ISO string)
  * @returns The updated timesheet from the server
  */
 export async function signOutAsync(timesheetId: string, outTime: Date | string): Promise<Timesheet> {
-    // Ensure the body is always an object, as required by fetch
-    const body = { outTime: typeof outTime === "string" ? outTime : outTime.toISOString() };
-    const response = await PutAsync<Timesheet>(`Timesheet/signout/${timesheetId}`, body);
+    // Convert to Date object if string
+    const date = typeof outTime === "string" ? new Date(outTime) : outTime;
+    
+    // Ensure the date is in UTC and format it without milliseconds
+    const utcDate = new Date(Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds()
+    ));
+    
+    // Format date in a way that ASP.NET Core can parse
+    const formattedDate = utcDate.toISOString().split('.')[0] + "Z";
+    
+    // Send the formatted date string
+    const response = await PutAsync<Timesheet>(`Timesheet/signout/${timesheetId}`, `"${formattedDate}"`);
     return response;
 }
 
@@ -30,15 +55,5 @@ export async function signOutAsync(timesheetId: string, outTime: Date | string):
  */
 export async function getAllTimesheetsAsync(): Promise<Array<Timesheet>> {
     const response = await GetAsync<Array<Timesheet>>("Timesheet");
-    return response;
-}
-
-/**
- * Gets all timesheets for a particular job.
- * @param jobId The job ID
- * @returns A list of timesheets for the job
- */
-export async function getTimesheetsForJobAsync(jobId: string): Promise<Array<Timesheet>> {
-    const response = await GetAsync<Array<Timesheet>>(`Timesheet/job/${jobId}`);
     return response;
 }

@@ -7,28 +7,43 @@ export interface Client {
      */
     id: string;
     /**
-     * The name of the client.
+     * The company name.
      */
-    name: string;
+    companyName: string;
     /**
-     * The registration number of the client (if applicable).
+     * The registration number of the client.
      */
-    registrationNo?: string;
+    regNo: string;
     /**
      * The address of the client.
      */
-    address?: string;
+    address: string;
     /**
      * The contact number for the client.
      */
-    contact?: string;
-    /**
-     * The email address for the client.
-     */
-    email?: string;
-    /**
-     * The company name (if applicable).
-     */
-    company?: string;
-    // Add any other fields present in your backend Client model.
+    contactNo: string;
+}
+
+export interface ClientData {
+    key: string;
+    id: string;
+    name: string;
+    email: string;
+    company: string;
+    phone: string;
+    status?: string;
+    registrationNo?: string;
+    address?: string;
+    contactNo?: string;
+}
+
+export interface ClientRegistrationFormValues {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    companyName: string;
+    address: string;
 }

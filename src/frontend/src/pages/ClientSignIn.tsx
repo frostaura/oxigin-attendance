@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Typography, Card } from "antd";
+import { Form, Input, Button, Typography, Card, message } from "antd";
 import { SignInAsync } from "../services/data/user";
 import { useEffect, useState } from "react";
 import type { UserSigninResponse } from "../models/userModels";
@@ -14,7 +14,7 @@ interface LoginFormValues {
   password: string;
 }
 
-const ClientSignIn: React.FC = () => {
+const SignIn: React.FC = () => {
   // TODO: We should only have one sign in so renaming this to SignIn would be better.
   // Attempt to get the signed in user from localsotrage.
   const [userContext, setUserContext] = useState<UserSigninResponse | null>();
@@ -60,21 +60,21 @@ const ClientSignIn: React.FC = () => {
   // Add form instance for reset functionality
   const [form] = Form.useForm();
 
-  const handleLogin = async (values: LoginFormValues): Promise<void> => {
+  const onFinish = async (values: any) => {
     try {
-      setProcessing(true);
-      const userContext = await SignInAsync(values.email, values.password);
-
-      setUserContext(userContext);
+      await SignInAsync(values.email, values.password);
+      navigate('/client/home');
     } catch (error) {
-      const errorContext = JSON.parse((error as any).message || "{}");
-
-      alert(errorContext.message || "An error occurred during sign-in. Please try again.");
-      // Reset and focus the password field on login failure
-      form.resetFields(["password"]);
-      form.getFieldInstance("password")?.focus?.();
-    } finally{
-      setProcessing(false);
+      let errorMessage = 'Failed to sign in';
+      if (error instanceof Error) {
+        try {
+          const errorData = JSON.parse(error.message);
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          errorMessage = error.message;
+        }
+      }
+      message.error(errorMessage);
     }
   };
 
@@ -85,7 +85,7 @@ const ClientSignIn: React.FC = () => {
 
         <div style={{ width: 100, height: 100, borderRadius: "50%", backgroundImage: "url(icon.JPG)", margin: "10px auto", backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "contain" }}></div>
 
-        <Form<LoginFormValues> form={form} layout="vertical" onFinish={handleLogin}>
+        <Form<LoginFormValues> form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item label="Email" name="email" rules={[{ required: true, message: "Please enter your email!" }]}>
             <Input type="email" placeholder="Enter your email" />
           </Form.Item>
@@ -106,4 +106,4 @@ const ClientSignIn: React.FC = () => {
   );
 };
 
-export default ClientSignIn;
+export default SignIn;

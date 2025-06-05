@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, DatePicker, TimePicker, InputNumber, Button, Table, Select, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import type { Dayjs } from "dayjs";
 import { getClientsAsync } from "../services/data/clients";
-import type { ClientData } from "../types";
+import { createJobAsync } from "../services/data/job";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
+import { addAdditionalWorker } from "../services/data/additionalWorker";
+import type { AdditionalWorker } from "../models/additionalWorkerModels";
+import type { ClientData } from "../models/clientModels";
+import type { Job } from "../models/jobModels";
+import dayjs from "dayjs";
 
 interface Worker {
   key: string;
-  name: string;
-  role: string;
-}
-
-interface JobRequestForm {
-  jobName: string;
-  requestorName: string;
-  purchaseOrderNumber: string;
-  date: Dayjs;
-  time: Dayjs;
-  location: string;
-  numberOfWorkers: number;
-  numberOfHours: number;
-  clientId: string;
+  workerType: string;
+  workersNeeded: number;
+  hoursNeeded: number;
 }
 
 const AdminJobRequest: React.FC = () => {
   const navigate = useNavigate();
-  const [form] = Form.useForm<JobRequestForm>();
+  const location = useLocation();
+  const [form] = Form.useForm<Job>();
   const [clients, setClients] = useState<ClientData[]>([]);
   const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
+  const [additionalWorkers, setAdditionalWorkers] = useState<Worker[]>([]);
+
+  // Effect to handle returning from AdditionalWorkerType page
+  useEffect(() => {
+    const state = location.state as { additionalWorkers?: Worker[] };
+    if (state?.additionalWorkers) {
+      setAdditionalWorkers(state.additionalWorkers);
+    }
+  }, [location]);
 
   // Fetch clients when component mounts
   useEffect(() => {
@@ -37,6 +43,7 @@ const AdminJobRequest: React.FC = () => {
       try {
         setLoading(true);
         const fetchedClients = await getClientsAsync();
+        console.log('Fetched clients:', fetchedClients); // Debug clients data
         setClients(fetchedClients);
       } catch (error) {
         console.error("Error fetching clients:", error);
@@ -57,21 +64,137 @@ const AdminJobRequest: React.FC = () => {
     fetchClients();
   }, [navigate]);
 
-  // Sample table data
+  // Update the columns for the workers table
   const columns: ColumnsType<Worker> = [
-    { title: "Worker Name", dataIndex: "name", key: "name" },
-    { title: "Role", dataIndex: "role", key: "role" },
+    { 
+      title: "Worker Type", 
+      dataIndex: "workerType", 
+      key: "workerType" 
+    },
+    { 
+      title: "Workers Needed", 
+      dataIndex: "workersNeeded", 
+      key: "workersNeeded" 
+    },
+    { 
+      title: "Hours Needed", 
+      dataIndex: "hoursNeeded", 
+      key: "hoursNeeded" 
+    }
   ];
 
-  const dataSource: Worker[] = [
-    { key: "1", name: "John Doe", role: "Electrician" },
-    { key: "2", name: "Jane Smith", role: "Plumber" },
-  ];
+  const handleSubmit = async (values: any) => {
+    try {
+      setProcessing(true);
 
-  const handleSubmit = (values: JobRequestForm) => {
-    console.log("Form values:", values);
-    navigate("/adminjobshome");
+      // Validate client selection
+      if (!selectedClient?.id) {
+        message.error('Please select a client');
+        return;
+      }
+
+      // Check if user is logged in
+      const userContext = await GetLoggedInUserContextAsync();
+      if (!userContext) {
+        message.error('You must be logged in to submit a job request');
+        navigate('/');
+        return;
+      }
+
+      console.log('User context:', userContext); // Debug user context
+
+      const dateTime = new Date(
+        values.date.year(),
+        values.date.month(),
+        values.date.date(),
+        values.time.hour(),
+        values.time.minute()
+      );
+      
+      // Convert form values to JobRequest format
+      const jobRequest = {
+        jobName: values.jobName,
+        purchaseOrderNumber: values.purchaseOrderNumber,
+        time: dateTime,
+        location: values.location,
+        numWorkers: values.numWorkers,
+        numHours: values.numHours,
+        approved: false,
+        clientID: selectedClient.id,
+        request: values.requestorName
+      };
+
+      console.log('Submitting job request:', jobRequest); // Debug logging
+      const createdJob = await createJobAsync(jobRequest as Job);
+
+      // If we have additional workers, add them to the job
+      if (additionalWorkers.length > 0) {
+        try {
+          // Add each additional worker with minimal data
+          const additionalWorkerPromises = additionalWorkers.map(worker => {
+            const additionalWorkerRequest: AdditionalWorker = {
+              workerType: worker.workerType,
+              numWorkers: worker.workersNeeded,
+              numHours: worker.hoursNeeded,
+              jobID: createdJob.id || '', // Ensure jobID is set
+            };
+            return addAdditionalWorker(additionalWorkerRequest);
+          });
+
+          await Promise.all(additionalWorkerPromises);
+          console.log('Additional workers added successfully');
+        } catch (error) {
+          console.error('Error adding additional workers:', error);
+          message.warning('Job created but failed to add some additional workers. Please contact support.');
+        }
+      }
+      
+      // Clear the saved form data after successful submission
+      localStorage.removeItem('jobRequestFormData');
+      
+      message.success('Job request submitted successfully');
+      navigate("/adminjobshome");
+    } catch (error) {
+      console.error('Failed to submit job request:', error);
+      if (error instanceof Error) {
+        message.error(error.message);
+      } else {
+        message.error('Failed to submit job request. Please try again.');
+      }
+    } finally {
+      setProcessing(false);
+    }
   };
+
+  const handleClientChange = (value: string) => {
+    const client = clients.find(c => c.id === value) || null;
+    setSelectedClient(client);
+  };
+
+  const handleNavigateToAdditionalWorkers = () => {
+    // Save current form values to localStorage before navigating
+    const currentFormValues = form.getFieldsValue();
+    localStorage.setItem('jobRequestFormData', JSON.stringify(currentFormValues));
+    navigate("/adminadditionalworkertype", { 
+      state: { existingWorkers: additionalWorkers } 
+    });
+  };
+
+  // Effect to restore form data when component mounts
+  useEffect(() => {
+    const savedFormData = localStorage.getItem('jobRequestFormData');
+    if (savedFormData) {
+      const parsedData = JSON.parse(savedFormData);
+      // Convert string dates back to moment objects if needed
+      if (parsedData.date) {
+        parsedData.date = dayjs(parsedData.date);
+      }
+      if (parsedData.time) {
+        parsedData.time = dayjs(parsedData.time);
+      }
+      form.setFieldsValue(parsedData);
+    }
+  }, [form]);
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", padding: 20 }}>
@@ -97,6 +220,7 @@ const AdminJobRequest: React.FC = () => {
             placeholder="Select client" 
             loading={loading}
             disabled={loading}
+            onChange={handleClientChange}
           >
             {clients.map(client => (
               <Select.Option key={client.id} value={client.id}>
@@ -152,7 +276,7 @@ const AdminJobRequest: React.FC = () => {
         </Form.Item>
 
         <Form.Item 
-          name="numberOfWorkers" 
+          name="numWorkers" 
           label="Number of Workers Needed" 
           rules={[{ required: true, message: "Please enter number of workers" }]}
           style={{ marginBottom: 20 }}
@@ -161,7 +285,7 @@ const AdminJobRequest: React.FC = () => {
         </Form.Item>
 
         <Form.Item 
-          name="numberOfHours" 
+          name="numHours" 
           label="Number of Hours Needed" 
           rules={[{ required: true, message: "Please enter number of hours" }]}
           style={{ marginBottom: 20 }}
@@ -173,18 +297,26 @@ const AdminJobRequest: React.FC = () => {
         <Button
           type="dashed"
           icon={<PlusOutlined />}
-          onClick={() => navigate("/adminadditionalworkertype")}
+          onClick={handleNavigateToAdditionalWorkers}
           style={{ width: "100%", marginBottom: 20 }}
         >
           Additional Workers Needed
         </Button>
 
-        {/* Small Table at the Bottom */}
-        <Table columns={columns} dataSource={dataSource} size="small" pagination={false} />
+        {/* Table showing additional workers */}
+        {additionalWorkers.length > 0 && (
+          <Table 
+            columns={columns} 
+            dataSource={additionalWorkers} 
+            size="small" 
+            pagination={false}
+            style={{ marginBottom: 20 }}
+          />
+        )}
 
         {/* Submit Request Button */}
-        <Button type="primary" htmlType="submit" style={{ marginTop: 20, width: "100%" }}>
-          Submit Request
+        <Button type="primary" htmlType="submit" style={{ marginTop: 20, width: "100%" }} loading={processing}>
+          {processing ? "Submitting Request..." : "Submit Request"}
         </Button>
       </Form>
     </div>

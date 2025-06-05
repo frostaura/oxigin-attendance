@@ -5,7 +5,10 @@ namespace Oxigin.Attendance.Shared.Enums;
 /// </summary>
 public enum UserType
 {
-    Worker,
-    Client,
-    Admin
+    Unassigned = 0,
+    Employee = 1,
+    Client = 2,
+    Admin = 3,
+    SiteManager = 4,
+    BaseUser = 5
 }

@@ -1,9 +1,17 @@
-import React, { useState } from "react";
-import { Layout, Card, Button, Table, Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { Layout, Card, Button, Table, Select, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
+import { getJobsAsync } from "../services/data/job";
+import { getAllocationsForJobAsync } from "../services/data/jobAllocation";
+import { signInAsync } from "../services/data/timesheet";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
+import type { Job } from "../models/jobModels";
+import type { Employee } from "../models/employeeModels";
+import type { Timesheet } from "../models/timesheetModels";
+import { getTimesheetsForJobAsync } from "../services/data/timesheet";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Option } = Select;
 
 interface CheckInRecord {
@@ -16,24 +24,132 @@ interface CheckInRecord {
 
 const SiteManagerCheckIn: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState<string>("Job ID");
-  const [selectedEmployee, setSelectedEmployee] = useState<string>("Employee ID");
-  const [checkInHistory, setCheckInHistory] = useState<CheckInRecord[]>([
-    { key: "1", jobId: "J001", employeeId: "E001", employeeName: "John Doe", timeIn: "2025-03-20 08:00" },
-    { key: "2", jobId: "J002", employeeId: "E002", employeeName: "Jane Smith", timeIn: "2025-03-20 08:30" },
-  ]);
+  const [selectedJob, setSelectedJob] = useState<string>("");
+  const [selectedEmployee, setSelectedEmployee] = useState<string>("");
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [allocatedEmployees, setAllocatedEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [checkInHistory, setCheckInHistory] = useState<CheckInRecord[]>([]);
 
-  const handleCheckIn = () => {
-    const newCheckIn: CheckInRecord = {
-      key: `${checkInHistory.length + 1}`,
-      jobId: selectedJob,
-      employeeId: selectedEmployee,
-      employeeName: "John Doe", // This can be dynamic if needed
-      timeIn: new Date().toLocaleString(),
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const jobsData = await getJobsAsync();
+        setJobs(jobsData);
+      } catch (error) {
+        console.error("Failed to fetch jobs:", error);
+        message.error("Failed to fetch jobs");
+      } finally {
+        setLoading(false);
+      }
     };
-    setCheckInHistory([...checkInHistory, newCheckIn]);
-    setSelectedJob("Job ID");
-    setSelectedEmployee("Employee ID");
+    fetchJobs();
+  }, []);
+
+  const fetchAllocatedEmployees = async (jobId: string) => {
+    try {
+      setLoadingEmployees(true);
+      const [allocations, timesheets] = await Promise.all([
+        getAllocationsForJobAsync(jobId),
+        getTimesheetsForJobAsync(jobId)
+      ]);
+      
+      // Get list of employees who are already checked in
+      const checkedInEmployeeIds = new Set(
+        timesheets
+          .filter(timesheet => 
+            !timesheet.deleted && 
+            timesheet.timeIn && 
+            timesheet.timeOut === "0001-01-01T00:00:00" // Not checked out
+          )
+          .map(timesheet => timesheet.employeeID)
+      );
+      
+      // Filter for valid allocations and exclude already checked-in employees
+      const validAllocations = allocations
+        .filter(allocation => 
+          !allocation.deleted && 
+          allocation.employee &&
+          !checkedInEmployeeIds.has(allocation.employee.id)
+        );
+      
+      // Remove duplicate employees by keeping the most recent allocation for each employee
+      const uniqueEmployees = validAllocations.reduce((acc, current) => {
+        const existing = acc.find(a => a.employee?.id === current.employee?.id);
+        if (!existing || new Date(current.time) > new Date(existing.time)) {
+          const filtered = acc.filter(a => a.employee?.id !== current.employee?.id);
+          return [...filtered, current];
+        }
+        return acc;
+      }, [] as typeof validAllocations);
+
+      // Map to employee objects
+      const employees = uniqueEmployees
+        .map(allocation => allocation.employee as Employee);
+      
+      setAllocatedEmployees(employees);
+    } catch (error) {
+      console.error("Failed to fetch allocated employees:", error);
+      message.error("Failed to fetch allocated employees");
+    } finally {
+      setLoadingEmployees(false);
+    }
+  };
+
+  const handleCheckIn = async () => {
+    if (!selectedJob || !selectedEmployee) {
+      message.error("Please select both a job and an employee");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const userContext = await GetLoggedInUserContextAsync();
+      if (!userContext?.user?.id) {
+        message.error("No site manager ID found. Please sign in again.");
+        return;
+      }
+
+      const selectedEmployeeData = allocatedEmployees.find(emp => emp.id === selectedEmployee);
+      if (!selectedEmployeeData) {
+        message.error("Selected employee not found");
+        return;
+      }
+
+      // Create the timesheet with required fields
+      const timesheet: Timesheet = {
+        timeIn: new Date().toISOString(),
+        jobID: selectedJob,
+        employeeID: selectedEmployee,
+        siteManagerID: userContext.user.id
+      };
+
+      // Submit the timesheet
+      await signInAsync(timesheet);
+      
+      // Add to check-in history
+      const newCheckIn: CheckInRecord = {
+        key: `${checkInHistory.length + 1}`,
+        jobId: selectedJob,
+        employeeId: selectedEmployee,
+        employeeName: selectedEmployeeData.accountHolderName || "Unknown",
+        timeIn: new Date().toLocaleString(),
+      };
+      setCheckInHistory(prev => [...prev, newCheckIn]);
+
+      // Reset selections
+      setSelectedJob("");
+      setSelectedEmployee("");
+      message.success("Successfully checked in employee!");
+    } catch (error) {
+      console.error("Failed to check in:", error);
+      message.error("Failed to check in employee. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const columns: ColumnsType<CheckInRecord> = [
@@ -45,6 +161,12 @@ const SiteManagerCheckIn: React.FC = () => {
 
   const handleJobChange = (value: string) => {
     setSelectedJob(value);
+    setSelectedEmployee("");
+    if (value) {
+      fetchAllocatedEmployees(value);
+    } else {
+      setAllocatedEmployees([]);
+    }
   };
 
   const handleEmployeeChange = (value: string) => {
@@ -52,46 +174,74 @@ const SiteManagerCheckIn: React.FC = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "80%", padding: 20 }}>
-        {/* Page Header */}
-        <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", padding: "0 20px" }}>
-          <h2 style={{ margin: 0, textAlign: "center" }}>Check In Page</h2>
-        </Header>
+    <Layout className="min-h-screen flex justify-center items-center p-4">
+      <Card className="responsive-card w-full max-w-[1200px]">
+        <h2 className="page-title mb-4">Check In</h2>
 
-        {/* Main Content */}
-        <Content style={{ flex: 1, padding: 20 }}>
-          {/* Job ID and Employee ID inputs with Check In button */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <div style={{ display: "flex", gap: 10, flex: 1 }}>
-              <div style={{ flex: 1, minWidth: "70px" }}>
+        <Content className="flex flex-col gap-4">
+          <div className="flex justify-between items-center gap-4 mb-4">
+            <div className="flex gap-4 flex-1">
+              <div className="flex-1 min-w-[70px]">
                 <Select
-                  value={selectedJob}
+                  placeholder="Job"
+                  allowClear
+                  showSearch={false}
+                  value={selectedJob || undefined}
                   onChange={handleJobChange}
-                  style={{ width: "100%", marginBottom: "20px" }}
+                  style={{ width: "100%" }}
+                  loading={loading}
                 >
-                  <Option value="Job 1">Job 1</Option>
-                  <Option value="Job 2">Job 2</Option>
+                  {jobs.map(job => (
+                    <Option key={job.id} value={job.id || ''}>
+                      {job.jobName} ({job.purchaseOrderNumber})
+                    </Option>
+                  ))}
                 </Select>
               </div>
-              <div style={{ flex: 1, minWidth: "70px" }}>
+              <div className="flex-1 min-w-[70px]">
                 <Select
-                  value={selectedEmployee}
+                  placeholder="Employee"
+                  allowClear
+                  showSearch={false}
+                  value={selectedEmployee || undefined}
                   onChange={handleEmployeeChange}
-                  style={{ width: "100%", marginBottom: "20px" }}
+                  style={{ width: "100%" }}
+                  loading={loadingEmployees}
+                  disabled={!selectedJob}
                 >
-                  <Option value="E001">Employee 1</Option>
-                  <Option value="E002">Employee 2</Option>
+                  {allocatedEmployees.map(employee => (
+                    <Option key={employee.id} value={employee.id || ''}>
+                      {employee.accountHolderName} ({employee.idNumber || 'No ID'})
+                    </Option>
+                  ))}
                 </Select>
               </div>
             </div>
-            <Button type="primary" onClick={handleCheckIn} style={{ marginLeft: "20px" }}>Check In</Button>
+            <Button 
+              type="primary" 
+              onClick={handleCheckIn} 
+              loading={submitting}
+              disabled={!selectedJob || !selectedEmployee}
+            >
+              Check In
+            </Button>
           </div>
 
-          {/* Check-in History Table */}
           <Card title="Check-in History">
-            <Table columns={columns} dataSource={checkInHistory} pagination={false} />
-            <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end" }}>
+            <div className="responsive-table">
+              <Table 
+                columns={columns} 
+                dataSource={checkInHistory} 
+                pagination={{ 
+                  pageSize: 8,
+                  position: ['bottomCenter']
+                }}
+                scroll={{ x: 'max-content' }}
+                size="middle"
+                bordered
+              />
+            </div>
+            <div className="mt-4 text-right">
               <Button onClick={() => navigate(-1)}>Back</Button>
             </div>
           </Card>

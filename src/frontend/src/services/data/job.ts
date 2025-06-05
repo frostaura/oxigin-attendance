@@ -1,5 +1,5 @@
 import type { Job } from "../../models/jobModels";
-import { PostAsync, GetAsync } from "./backend";
+import { PostAsync, GetAsync, PatchAsync } from "./backend";
 
 /**
  * Creates a new job request.
@@ -21,22 +21,13 @@ export async function getJobsAsync(): Promise<Array<Job>> {
 }
 
 /**
- * Approves a pending job request.
- * @param request The job request to approve (must include id)
- * @returns The updated job request with approved status
+ * Updates a job's approval status.
+ * @param jobId The ID of the job to update
+ * @param approved Whether the job is approved or rejected
+ * @returns The updated job
  */
-export async function approveJobAsync(request: Job): Promise<Job> {
-    const response = await PostAsync<Job>('Job/approve', request);
-    return response;
-}
-
-/**
- * Rejects a pending job request.
- * @param request The job request to reject (must include id)
- * @returns The updated job request with rejected status
- */
-export async function rejectJobAsync(request: Job): Promise<Job> {
-    const response = await PostAsync<Job>('Job/reject', request);
+export async function updateJobApprovalAsync(jobId: string, approved: boolean): Promise<Job> {
+    const response = await PatchAsync<Job>(`Job/${jobId}`, { approved });
     return response;
 }
 

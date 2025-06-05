@@ -35,8 +35,7 @@ public class User : BaseNamedEntity
     /// <summary>
     /// User password, typically hashed.
     /// </summary>
-    [Required(AllowEmptyStrings = false, ErrorMessage = $"A valid password is required.")]
-    public string Password { get; set; }
+    public string? Password { get; set; }
 
     /// <summary>
     /// A collection of the user's sessions.

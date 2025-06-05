@@ -1,5 +1,5 @@
-import { GetAsync } from './backend';
-import type { ClientData } from '../../types';
+import { GetAsync, PostAsync, DeleteAsync, PutAsync } from './backend';
+import type { ClientData } from '../../models/clientModels';
 
 /**
  * Gets all clients from the database.
@@ -21,12 +21,87 @@ export async function getClientsAsync(): Promise<Array<ClientData>> {
             email: '',
             company: client.companyName || '',
             phone: client.contactNo || '',
-            status: client.deleted ? 'Inactive' : 'Active'
+            registrationNo: client.regNo || '',
+            address: client.address || ''
         }));
     } catch (error) {
         console.error('Error in getClientsAsync:', error);
         if (error instanceof Error) {
             throw new Error(`Failed to fetch clients: ${error.message}`);
+        }
+        throw error;
+    }
+}
+
+/**
+ * Adds a new client to the database.
+ * @param client The client data to add
+ * @returns The created client
+ */
+export async function addClientAsync(client: Partial<ClientData>): Promise<ClientData> {
+    if (!client.registrationNo) {
+        throw new Error("Registration number is required");
+    }
+    
+    try {
+        const response = await PostAsync<any>('Client', {
+            companyName: client.company,
+            contactNo: client.phone,
+            address: client.address,
+            regNo: client.registrationNo
+        });
+        return response;
+    } catch (error) {
+        console.error('Error in addClientAsync:', error);
+        if (error instanceof Error) {
+            throw new Error(`Failed to add client: ${error.message}`);
+        }
+        throw error;
+    }
+}
+
+/**
+ * Updates an existing client in the database.
+ * @param client The client data to update
+ * @returns The updated client
+ */
+export async function updateClientAsync(client: ClientData): Promise<ClientData> {
+    if (!client.registrationNo) {
+        throw new Error("Registration number is required");
+    }
+
+    try {
+        // Map to backend model format
+        const backendClient = {
+            id: client.id,
+            CompanyName: client.company,
+            ContactNo: client.phone,
+            Address: client.address,
+            RegNo: client.registrationNo
+        };
+        
+        const response = await PutAsync<any>('Client', backendClient);
+        return response;
+    } catch (error) {
+        console.error('Error details:', error);
+        if (error instanceof Error) {
+            throw new Error(`Failed to update client: ${error.message}`);
+        }
+        throw error;
+    }
+}
+
+/**
+ * Deletes a client from the database.
+ * @param id The ID of the client to delete
+ */
+export async function deleteClientAsync(id: string): Promise<void> {
+    try {
+        await DeleteAsync(`Client/${id}`);
+    } catch (error) {
+        console.error('Error in deleteClientAsync:', error);
+        if (error instanceof Error) {
+            throw new Error(`Failed to delete client: ${error.message}`);
         }
         throw error;
     }

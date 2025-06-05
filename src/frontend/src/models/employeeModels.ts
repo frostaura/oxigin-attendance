@@ -1,6 +1,9 @@
 // employeeModels.ts
 // Model representing an Employee entity, matching the backend C# model.
 
+//match the below interface with the style of the above interface
+
+
 export interface Employee {
     /**
      * The unique identifier for the employee.
@@ -9,11 +12,7 @@ export interface Employee {
     /**
      * The name of the employee.
      */
-    name: string;
-    /**
-     * The surname of the employee.
-     */
-    surname?: string;
+    name?: string;
     /**
      * The ID number of the employee.
      */
@@ -25,14 +24,21 @@ export interface Employee {
     /**
      * The contact number for the employee.
      */
-    contact?: string;
+    contactNo?: string;
     /**
-     * The email address for the employee.
+     * Bank name for payment details
      */
-    email?: string;
+    bankName?: string;
     /**
-     * The company or department (if applicable).
+     * Account holder name for payment details
      */
-    company?: string;
-    // Add any other fields present in your backend Employee model.
+    accountHolderName?: string;
+    /**
+     * Branch code for payment details
+     */
+    branchCode?: string;
+    /**
+     * Account number for payment details
+     */
+    accountNumber?: string;
 }

@@ -14,6 +14,15 @@ public interface IJobAllocationManager
     /// <param name="token">Cancellation token.</param>
     /// <returns>List of JobAllocation entities.</returns>
     Task<IEnumerable<Allocation>> GetAllocationsForJobAsync(Guid jobId, CancellationToken token);
+
+    /// <summary>
+    /// Get all allocations for a given employee.
+    /// </summary>
+    /// <param name="employeeId">The employee ID.</param>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>List of JobAllocation entities.</returns>
+    Task<IEnumerable<Allocation>> GetAllocationsForEmployeeAsync(Guid employeeId, CancellationToken token);
+
     /// <summary>
     /// Create a new allocation for a job.
     /// </summary>
@@ -21,6 +30,7 @@ public interface IJobAllocationManager
     /// <param name="token">Cancellation token.</param>
     /// <returns>The created JobAllocation entity.</returns>
     Task<Allocation> CreateAllocationAsync(Allocation allocation, CancellationToken token);
+
     /// <summary>
     /// Remove an allocation by ID.
     /// </summary>
@@ -28,6 +38,7 @@ public interface IJobAllocationManager
     /// <param name="token">Cancellation token.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
     Task RemoveAllocationAsync(Guid id, CancellationToken token);
+
     /// <summary>
     /// Get an allocation by ID.
     /// </summary>

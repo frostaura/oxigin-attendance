@@ -5,6 +5,7 @@ using Oxigin.Attendance.Core.Extensions;
 using Oxigin.Attendance.Core.Interfaces.Data;
 using Oxigin.Attendance.Core.Interfaces.Managers;
 using Oxigin.Attendance.Datastore.Interfaces;
+using Oxigin.Attendance.Shared.Enums;
 using Oxigin.Attendance.Shared.Exceptions;
 using Oxigin.Attendance.Shared.Models.Entities;
 using Oxigin.Attendance.Shared.Models.Requests;
@@ -116,6 +117,27 @@ public class UserManager : IUserManager
             // Hash the password before saving
             user.Password = user.Password.HashString();
             user.Email = user.Email.ToLower();
+
+            // If clientID is provided, verify it exists
+            if (user.ClientID.HasValue)
+            {
+                var client = await _db.Clients.FirstOrDefaultAsync(c => c.Id == user.ClientID && !c.Deleted, token);
+                if (client == null)
+                {
+                    throw new StandardizedErrorException
+                    {
+                        Error = new StandardizedError
+                        {
+                            Origin = nameof(UserManager),
+                            Message = "The specified client does not exist.",
+                            Data = new Dictionary<string, object>
+                            {
+                                { "ClientID", user.ClientID.Value }
+                            }
+                        }
+                    };
+                }
+            }
         
             _db.Users.Add(user);
             await _db.SaveChangesAsync(token);
@@ -242,6 +264,75 @@ public class UserManager : IUserManager
             user.ThrowIfNull(nameof(user));
             var dbUser = await _db.Users.SingleOrDefaultAsync(u => u.Id == user.Id, token);
             if (dbUser == null) throw new StandardizedErrorException { Error = new StandardizedError { Origin = nameof(UserManager), Message = "User not found." } };
+
+            // If clientID is provided and changed, verify it exists
+            if (user.ClientID != dbUser.ClientID && user.ClientID.HasValue)
+            {
+                var client = await _db.Clients.FirstOrDefaultAsync(c => c.Id == user.ClientID && !c.Deleted, token);
+                if (client == null)
+                {
+                    throw new StandardizedErrorException
+                    {
+                        Error = new StandardizedError
+                        {
+                            Origin = nameof(UserManager),
+                            Message = "The specified client does not exist.",
+                            Data = new Dictionary<string, object>
+                            {
+                                { "ClientID", user.ClientID.Value }
+                            }
+                        }
+                    };
+                }
+            }
+
+            // If employeeID is provided and changed, verify it exists
+            if (user.EmployeeID != dbUser.EmployeeID && user.EmployeeID.HasValue)
+            {
+                var employee = await _db.Employees.FirstOrDefaultAsync(e => e.Id == user.EmployeeID && !e.Deleted, token);
+                if (employee == null)
+                {
+                    throw new StandardizedErrorException
+                    {
+                        Error = new StandardizedError
+                        {
+                            Origin = nameof(UserManager),
+                            Message = "The specified employee does not exist.",
+                            Data = new Dictionary<string, object>
+                            {
+                                { "EmployeeID", user.EmployeeID.Value }
+                            }
+                        }
+                    };
+                }
+            }
+
+            // Handle user type changes and related foreign keys
+            if (user.UserType != dbUser.UserType)
+            {
+                // Clear both foreign keys when changing user type
+                dbUser.ClientID = null;
+                dbUser.EmployeeID = null;
+
+                // Set the appropriate foreign key based on new user type
+                switch (user.UserType)
+                {
+                    case UserType.Client:
+                        dbUser.ClientID = user.ClientID;
+                        break;
+                    case UserType.Employee:
+                    case UserType.SiteManager:
+                        dbUser.EmployeeID = user.EmployeeID;
+                        break;
+                }
+            }
+            else
+            {
+                // If user type hasn't changed, just update the foreign keys
+                dbUser.ClientID = user.ClientID;
+                dbUser.EmployeeID = user.EmployeeID;
+            }
+
             dbUser.Name = user.Name;
             dbUser.ContactNr = user.ContactNr;
             dbUser.Email = user.Email;
@@ -257,11 +348,11 @@ public class UserManager : IUserManager
                 Error = new StandardizedError
                 {
                     Origin = nameof(UserManager),
-                    Message = "Unable to update user, please try again later.",
+                    Message = "Failed to update user.",
                     Data = new Dictionary<string, object>
                     {
-                        { nameof(e.Message), e.Message },
-                        { nameof(e.StackTrace), e.StackTrace ?? string.Empty }
+                        { "UserId", user.Id },
+                        { "Error", e.Message }
                     }
                 }
             };

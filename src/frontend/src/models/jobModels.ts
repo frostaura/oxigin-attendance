@@ -11,4 +11,8 @@ export interface Job {
   numWorkers: number;
   numHours: number;
   approved: boolean;
+  client?: {
+    companyName: string;
+  };
+ 
 }

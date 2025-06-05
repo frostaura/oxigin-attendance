@@ -134,23 +134,18 @@ namespace Oxigin.Attendance.Datastore.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("AccountHolderName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("AccountNumber")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BankName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BranchCode")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ContactNo")
@@ -161,7 +156,6 @@ namespace Oxigin.Attendance.Datastore.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("IDNumber")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("TimeStamp")

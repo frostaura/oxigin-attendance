@@ -1,7 +1,7 @@
 export enum Routes {
-    ClientSignIn = "/",
-    AdminSignIn = "/adminsignin",
-    ClientRegister = "/clientregister",
+    SignIn = "/",
+    AdminSignIn = "/signin",
+    Register = "/register",
 
     ClientHome = "/clienthome",
     AdminHome = "/adminhome",
@@ -13,10 +13,10 @@ export enum Routes {
     AdminJobsHome = "/adminjobshome",
     AdminEmployeesHome = "/adminemployeeshome",
     AdminManageEmployees = "/adminmanageemployees",
-    EmployeeRegister = "/employeeregister",
     AdminJobAllocations = "/adminjoballocations",
     AdminClientHome = "/adminclienthome",
     AdminManageClients = "/adminmanageclients",
+    AdminUsers = "/adminusers",
 
     EmployeeHome = "/employeehome",
     SiteManagerHome = "/sitemanagerhome",

@@ -5,7 +5,7 @@ import type { ColumnsType } from "antd/es/table";
 import { getJobsAsync as getJobsAsync, getJobsRequiringApprovalAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 interface JobData {
   key: string;
@@ -23,6 +23,11 @@ interface JobData {
 const ClientHome: React.FC = () => {
   const navigate = useNavigate();
   const [jobsPendingApproval, setJobsPendingApproval] = useState<JobData[]>([]);
+
+  const [upcomingJobData] = useState<JobData[]>([
+    { key: "1", jobId: "91011", purchaseOrder: "PO1112", jobName: "Roof Repair", location: "NYC", date: "2025-04-01" },
+    { key: "2", jobId: "13141", purchaseOrder: "PO1314", jobName: "Flooring", location: "LA", date: "2025-04-05" },
+  ]);
 
   // Add state for jobs awaiting confirmation
   const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState<Job[]>([]);
@@ -71,6 +76,13 @@ const ClientHome: React.FC = () => {
     },
   ];
 
+  const upcomingJobColumns: ColumnsType<JobData> = [
+    { title: "Job ID", dataIndex: "jobId", key: "jobId" },
+    { title: "Purchase Order #", dataIndex: "purchaseOrder", key: "purchaseOrder" },
+    { title: "Job Name", dataIndex: "jobName", key: "jobName" },
+    { title: "Location", dataIndex: "location", key: "location" },
+    { title: "Date", dataIndex: "date", key: "date" },
+  ];
 
   // Fetch all data we need, and ensure the effect only runs once on mount ([]).
   useEffect(() => {
@@ -105,44 +117,77 @@ const ClientHome: React.FC = () => {
   }, []);
 
   return (
-    <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "80%", padding: 20 }}>
-        <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px" }}>
-          <h2 style={{ margin: 0, textAlign: "center" }}>Home Page</h2>
-        </Header>
+    <Layout className="min-h-screen flex justify-center items-center p-4">
+      <Card className="responsive-card w-full max-w-[1200px]">
+        <h2 className="page-title mb-4">Home Page</h2>
 
-        <Content style={{ flex: 1, padding: 20, display: "flex", flexDirection: "column", gap: 20 }}>
+        <Content className="flex flex-col gap-4">
           <Card title="Jobs Pending Confirmation">
-            <Table 
-              columns={[
-                { title: "Purchase Order #", dataIndex: "purchaseOrderNumber", key: "purchaseOrderNumber" },
-                { title: "Job Name", dataIndex: "jobName", key: "jobName" },
-                { title: "Location", dataIndex: "location", key: "location" },
-                { title: "Date", dataIndex: "time", key: "time", 
-                  render: (time: Date) => new Date(time).toLocaleDateString() 
-                },
-                { title: "Workers Needed", dataIndex: "numWorkers", key: "numWorkers" },
-                { title: "Hours Required", dataIndex: "numHours", key: "numHours" }
-              ]} 
-              dataSource={jobsAwaitingConfirmation} 
-              rowKey="id"
-              pagination={false} 
-            />
-          </Card>
-
-          <Card title="Jobs Pending My Approval">
-            <Table columns={jobColumns} dataSource={jobsPendingApproval} pagination={false} />
-            <div style={{ textAlign: "right", marginTop: 20 }}>
-              <Button
-                type="primary"
-                onClick={processJobs}
-                disabled={!jobsPendingApproval.some((job) => job.approved || job.declined)}
-              >
-                Process Selected Jobs
-              </Button>
+            <div className="responsive-table">
+              <Table 
+                columns={[
+                  { title: "Purchase Order #", dataIndex: "purchaseOrderNumber", key: "purchaseOrderNumber" },
+                  { title: "Job Name", dataIndex: "jobName", key: "jobName" },
+                  { title: "Location", dataIndex: "location", key: "location" },
+                  { title: "Date", dataIndex: "time", key: "time", 
+                    render: (time: Date) => new Date(time).toLocaleDateString() 
+                  },
+                  { title: "Workers Needed", dataIndex: "numWorkers", key: "numWorkers" },
+                  { title: "Hours Required", dataIndex: "numHours", key: "numHours" }
+                ]} 
+                dataSource={jobsAwaitingConfirmation} 
+                rowKey="id"
+                pagination={{ 
+                  pageSize: 8,
+                  position: ['bottomCenter']
+                }}
+                scroll={{ x: 'max-content' }}
+                size="middle"
+                bordered
+              />
             </div>
           </Card>
 
+          <Card title="Jobs Pending My Approval">
+            <div className="responsive-table">
+              <Table 
+                columns={jobColumns} 
+                dataSource={jobsPendingApproval} 
+                pagination={{ 
+                  pageSize: 8,
+                  position: ['bottomCenter']
+                }}
+                scroll={{ x: 'max-content' }}
+                size="middle"
+                bordered
+              />
+              <div className="mt-4 text-right">
+                <Button
+                  type="primary"
+                  onClick={processJobs}
+                  disabled={!jobsPendingApproval.some((job) => job.approved || job.declined)}
+                >
+                  Process Selected Jobs
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          <Card title="Upcoming Jobs">
+            <div className="responsive-table">
+              <Table 
+                columns={upcomingJobColumns} 
+                dataSource={upcomingJobData} 
+                pagination={{ 
+                  pageSize: 8,
+                  position: ['bottomCenter']
+                }}
+                scroll={{ x: 'max-content' }}
+                size="middle"
+                bordered
+              />
+            </div>
+          </Card>
         </Content>
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: "auto" }}>

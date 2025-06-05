@@ -1,180 +1,217 @@
-import React, { useState } from "react";
-import { Layout, Card, Table, Select, Button, Checkbox } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Layout, Card, Table, Select, message, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import { getAllocationsForEmployeeAsync } from "../services/data/jobAllocation";
+import { getTimesheetsForJobAsync } from "../services/data/timesheet";
+import type { Allocation } from "../models/jobAllocationModels";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
+import { signInAsync } from "../services/data/timesheet";
+import type { Timesheet } from "../models/timesheetModels";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Option } = Select;
 
-interface JobData {
-  key: string;
-  jobName: string;
-  location: string;
-  date: string;
-  time: string;
-  workerType: string;
-  checked?: boolean;
+interface AllocationWithCheckIn extends Allocation {
+  isCheckedIn?: boolean;
 }
 
 const EmployeeHome: React.FC = () => {
-  const navigate = useNavigate();
-  const [selectedJob, setSelectedJob] = useState<string>("Check in");
-  const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState<JobData[]>([
-    {
-      key: "1",
-      jobName: "Fix Plumbing",
-      location: "NYC",
-      date: "2025-04-01",
-      time: "10:00 AM",
-      workerType: "Plumber",
-      checked: false,
-    },
-    {
-      key: "2",
-      jobName: "Install Wiring",
-      location: "LA",
-      date: "2025-04-02",
-      time: "11:00 AM",
-      workerType: "Electrician",
-      checked: false,
-    },
-  ]);
+  const [selectedJob, setSelectedJob] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [allocations, setAllocations] = useState<AllocationWithCheckIn[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedAllocation, setSelectedAllocation] = useState<AllocationWithCheckIn | null>(null);
 
-  const [upcomingJobs, setUpcomingJobs] = useState<JobData[]>([
-    { key: "1", jobName: "Roof Repair", location: "NYC", date: "2025-04-03", time: "9:00 AM", workerType: "Roofer" },
-    { key: "2", jobName: "Flooring", location: "LA", date: "2025-04-05", time: "1:00 PM", workerType: "Floor Specialist" },
-  ]);
+  useEffect(() => {
+    const fetchAllocations = async () => {
+      setLoading(true);
+      try {
+        const userContext = await GetLoggedInUserContextAsync();
+        if (!userContext?.user?.employeeID) {
+          message.error("No employee ID found. Please contact support.");
+          return;
+        }
+
+        // Get all allocations for the employee
+        const allocationData = await getAllocationsForEmployeeAsync(userContext.user.employeeID);
+        
+        // For each job in the allocations, check if the employee is already checked in
+        const checkedJobs = await Promise.all(
+          allocationData.map(async (allocation) => {
+            if (!allocation.job?.id) return allocation;
+
+            const timesheets = await getTimesheetsForJobAsync(allocation.job.id);
+            const isCheckedIn = timesheets.some(timesheet => 
+              timesheet.employeeID === userContext.user.employeeID && 
+              !timesheet.deleted &&
+              timesheet.timeIn &&
+              timesheet.timeOut === "0001-01-01T00:00:00" // Not checked out
+            );
+
+            return {
+              ...allocation,
+              isCheckedIn
+            } as AllocationWithCheckIn;
+          })
+        );
+
+        // Filter out jobs where the employee is already checked in
+        const availableAllocations = checkedJobs.filter(
+          (allocation: AllocationWithCheckIn) => !allocation.isCheckedIn && !allocation.deleted
+        );
+
+        setAllocations(availableAllocations);
+      } catch (error) {
+        console.error("Failed to fetch allocations:", error);
+        message.error("Failed to fetch job allocations");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllocations();
+  }, []);
 
   const handleJobChange = (value: string) => {
+    if (!value) {
+      return;
+    }
+    
+    const allocation = allocations.find(a => a.job?.jobName === value);
+    
     setSelectedJob(value);
+    setSelectedAllocation(allocation || null);
+    
+    if (allocation) {
+      setIsModalVisible(true);
+    }
   };
 
-  const handleCheckboxChange = (record: JobData) => {
-    const updatedJobs = jobsAwaitingConfirmation.map((job) =>
-      job.key === record.key ? { ...job, checked: !job.checked } : job
-    );
-    setJobsAwaitingConfirmation(updatedJobs);
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    setSelectedAllocation(null);
+    setSelectedJob("");
   };
 
-  const approveJob = () => {
-    const approvedJobs = jobsAwaitingConfirmation.filter((job) => job.checked);
-    setUpcomingJobs([...upcomingJobs, ...approvedJobs]);
-    setJobsAwaitingConfirmation(jobsAwaitingConfirmation.filter((job) => !job.checked));
+  const handleCheckIn = async () => {
+    if (!selectedAllocation?.job?.id) {
+      message.error("No job selected");
+      return;
+    }
+
+    if (!selectedAllocation.job.requestorID) {
+      message.error("No site manager found for this job. Please contact support.");
+      return;
+    }
+
+    try {
+      const userContext = await GetLoggedInUserContextAsync();
+      if (!userContext?.user?.employeeID) {
+        message.error("No employee ID found. Please contact support.");
+        return;
+      }
+
+      // Create the timesheet with only the required fields
+      const timesheet: Timesheet = {
+        timeIn: new Date().toISOString(),
+        jobID: selectedAllocation.job.id,
+        employeeID: userContext.user.employeeID,
+        siteManagerID: selectedAllocation.job.requestorID
+      };
+
+      await signInAsync(timesheet);
+      
+      message.success("Successfully checked in!");
+      setIsModalVisible(false);
+      setSelectedAllocation(null);
+      setSelectedJob("");
+
+      // Refresh allocations to update the list
+      const userContextRefresh = await GetLoggedInUserContextAsync();
+      if (userContextRefresh?.user?.employeeID) {
+        const allocationData = await getAllocationsForEmployeeAsync(userContextRefresh.user.employeeID);
+        setAllocations(allocationData.filter(a => !a.deleted));
+      }
+    } catch (error) {
+      console.error("Failed to check in:", error);
+      message.error("Failed to check in. Please try again.");
+    }
   };
 
-  const jobColumns: ColumnsType<JobData> = [
+  const jobColumns: ColumnsType<Allocation> = [
     {
       title: "Job Name",
-      dataIndex: "jobName",
       key: "jobName",
+      render: (_, record) => record.job?.jobName || "N/A",
     },
     {
       title: "Job Location",
-      dataIndex: "location",
       key: "location",
+      render: (_, record) => record.job?.location || "N/A",
     },
     {
       title: "Date",
-      dataIndex: "date",
       key: "date",
+      render: (_, record) => new Date(record.time).toLocaleDateString(),
     },
     {
       title: "Time",
-      dataIndex: "time",
       key: "time",
+      render: (_, record) => new Date(record.time).toLocaleTimeString(),
     },
     {
-      title: "Worker Type",
-      dataIndex: "workerType",
-      key: "workerType",
-    },
-    {
-      title: "Select",
-      key: "select",
-      render: (_, record) => (
-        <Checkbox checked={record.checked} onChange={() => handleCheckboxChange(record)} />
-      ),
-    },
-  ];
-
-  const upcomingJobColumns: ColumnsType<JobData> = [
-    {
-      title: "Job Name",
-      dataIndex: "jobName",
-      key: "jobName",
-    },
-    {
-      title: "Job Location",
-      dataIndex: "location",
-      key: "location",
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-    },
-    {
-      title: "Time",
-      dataIndex: "time",
-      key: "time",
-    },
-    {
-      title: "Worker Type",
-      dataIndex: "workerType",
-      key: "workerType",
+      title: "Hours",
+      dataIndex: "hoursNeeded",
+      key: "hours",
     },
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh", padding: "20px" }}>
-      <Card style={{ width: "100%", padding: "20px" }}>
-        <Header style={{ textAlign: "center", marginBottom: "20px", background: "transparent" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h2>Home Page</h2>
-            <Button onClick={() => navigate("/employeeupdate")}>Update Profile</Button>
-          </div>
-        </Header>
+    <Layout className="min-h-screen p-4">
+      <Card className="responsive-card w-full">
+        <h2 className="page-title">Home Page</h2>
 
-        <Content>
+        <Content className="flex flex-col gap-4">
           <div style={{ width: "100%", marginBottom: "20px" }}>
             <Select
-              value={selectedJob}
+              placeholder="Job"
+              allowClear
+              showSearch={false}
+              value={selectedJob || undefined}
               onChange={handleJobChange}
               style={{ width: "100%", marginBottom: "20px" }}
+              loading={loading}
             >
-              <Option value="Check in">Check in</Option>
-              <Option value="Job 1">Job 1</Option>
-              <Option value="Job 2">Job 2</Option>
+              {allocations.map((allocation) => (
+                <Option 
+                  key={`${allocation.job?.id}-${allocation.time}`} 
+                  value={allocation.job?.jobName || ""}
+                >
+                  {allocation.job?.jobName || "N/A"}
+                </Option>
+              ))}
             </Select>
 
-            <Card title="Jobs Awaiting Confirmation" style={{ marginBottom: "20px" }}>
+            <Modal
+              title="Confirm Check In"
+              open={isModalVisible}
+              onOk={handleCheckIn}
+              onCancel={handleModalCancel}
+              okText="Check In"
+              cancelText="Cancel"
+            >
+              <p>Are you sure you want to check in to {selectedAllocation?.job?.jobName}?</p>
+              <p>Location: {selectedAllocation?.job?.location}</p>
+              <p>Hours Needed: {selectedAllocation?.hoursNeeded}</p>
+            </Modal>
+
+            <Card title="My Job Allocations" style={{ marginBottom: "20px" }}>
               <Table
                 columns={jobColumns}
-                dataSource={jobsAwaitingConfirmation}
-                rowKey="key"
+                dataSource={allocations}
+                rowKey="id"
                 pagination={false}
-              />
-            </Card>
-
-            <div style={{ width: "100%", textAlign: "right", marginBottom: "20px" }}>
-              <Button
-                type="primary"
-                onClick={approveJob}
-                disabled={!jobsAwaitingConfirmation.some((job) => job.checked)}
-              >
-                Approve Selected Jobs
-              </Button>
-            </div>
-          </div>
-
-          <div style={{ width: "100%", marginBottom: "20px" }}>
-            <Card title="Upcoming Jobs" style={{ height: "100%" }}>
-              <Table
-                columns={upcomingJobColumns}
-                dataSource={upcomingJobs}
-                rowKey="key"
-                pagination={false}
-                style={{ height: "100%" }}
+                loading={loading}
               />
             </Card>
           </div>

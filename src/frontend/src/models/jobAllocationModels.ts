@@ -1,14 +1,16 @@
 // Frontend model for job allocation, aligned with backend Allocation entity (inherits from BaseEntity)
 
+import type { Job } from "./jobModels";
+import type { Employee } from "./employeeModels";
+
 export interface Allocation {
-    id: string;
+    name: string;
+    description?: string;
+    time: Date;
+    hoursNeeded: number;
     jobID: string;
     employeeID: string;
-    allocationType: string; // Adjust type if you have an enum for allocation type
-    startTime: string; // ISO string
-    endTime: string | null; // ISO string or null
-    notes?: string | null;
-    deleted: boolean;
-    created: string; // ISO string
-    updated: string; // ISO string
+    job?: Job;
+    employee?: Employee;
+    deleted?: boolean;
 }

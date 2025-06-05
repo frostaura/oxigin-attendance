@@ -13,30 +13,31 @@ public class Employee : BaseEntity
     /// <summary>
     /// Employee ID Number
     /// </summary>
-    public string IDNumber { get; set; }
+    public string? IDNumber { get; set; }
     /// <summary>
     /// Employee address
     /// </summary>
-    public string Address { get; set; }
+    public string? Address { get; set; }
     /// <summary>
     /// Contact number for employee
     /// </summary>
     [Required(AllowEmptyStrings = false, ErrorMessage = $"Contact number is required.")]
-    public string ContactNo { get; set; }
+    public string? ContactNo { get; set; }
     /// <summary>
     /// Bank account details to pay employee
     /// </summary>
-    public string BankName { get; set; }
+    public string? BankName { get; set; }
     /// <summary>
     /// Bank account details to pay employee
     /// </summary>
-    public string AccountHolderName { get; set; }
+    public string? AccountHolderName { get; set; }
     /// <summary>
     /// Bank account details to pay employee
     /// </summary>
-    public string BranchCode { get; set; }
+    public string? BranchCode { get; set; }
     /// <summary>
     /// Bank account details to pay employee
     /// </summary>
-    public string AccountNumber { get; set; }
+    public string? AccountNumber { get; set; }
 }
+

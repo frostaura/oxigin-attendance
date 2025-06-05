@@ -18,8 +18,8 @@ const BASE_BACKEND_URL: string = "https://origin-backend.frostaura.net";//"http:
 export async function PostAsync<T>(url: string, body: object, sessionId?: string | null): Promise<T>{
     if(!sessionId){
         const userContext = await GetLoggedInUserContextAsync();
-        // If no sessionId is provided, use the one from userContext or localStorage.
-        sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
+        // If no sessionId is provided, use the one from userContext
+        sessionId = userContext?.sessionId || "";
     }
 
     const finalUrl = `${BASE_BACKEND_URL}/${url}`;
@@ -36,9 +36,22 @@ export async function PostAsync<T>(url: string, body: object, sessionId?: string
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
 
-    return await request.json() as T;
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**
@@ -51,7 +64,7 @@ export async function PostAsync<T>(url: string, body: object, sessionId?: string
 export async function GetAsync<T>(url: string, sessionId?: string | null): Promise<T> {
     if(!sessionId){
         const userContext = await GetLoggedInUserContextAsync();
-        sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
+        sessionId = userContext?.sessionId || "";
     }
 
     const finalUrl = `${BASE_BACKEND_URL}/${url}`;
@@ -66,9 +79,22 @@ export async function GetAsync<T>(url: string, sessionId?: string | null): Promi
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
 
-    return await request.json() as T;
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**
@@ -81,7 +107,7 @@ export async function GetAsync<T>(url: string, sessionId?: string | null): Promi
 export async function DeleteAsync<T>(url: string, sessionId?: string | null): Promise<T> {
     if(!sessionId){
         const userContext = await GetLoggedInUserContextAsync();
-        sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
+        sessionId = userContext?.sessionId || "";
     }
     const finalUrl = `${BASE_BACKEND_URL}/${url}`;
     const request = await fetch(finalUrl, {
@@ -94,10 +120,25 @@ export async function DeleteAsync<T>(url: string, sessionId?: string | null): Pr
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
-    // If the backend returns no content, just return undefined
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
+
+    // If the backend returns no content, just return undefined as T
     if(request.status === 204) return undefined as T;
-    return await request.json() as T;
+
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**
@@ -105,17 +146,60 @@ export async function DeleteAsync<T>(url: string, sessionId?: string | null): Pr
  * Automatically includes the session ID from localStorage in the headers.
  * @template T The expected response type.
  * @param {string} url - The endpoint to send the request to (relative to the backend base URL).
- * @param {object} body - The request payload to send as JSON.
+ * @param {object | string} body - The request payload to send as JSON. Can be a string for raw body.
  * @returns {Promise<T>} The parsed JSON response from the backend.
  */
-export async function PutAsync<T>(url: string, body: object, sessionId?: string | null): Promise<T> {
+export async function PutAsync<T>(url: string, body: object | string, sessionId?: string | null): Promise<T> {
     if(!sessionId){
         const userContext = await GetLoggedInUserContextAsync();
-        sessionId = userContext?.sessionId || localStorage.getItem("sessionId") || "";
+        sessionId = userContext?.sessionId || "";
     }
     const finalUrl = `${BASE_BACKEND_URL}/${url}`;
     const request = await fetch(finalUrl, {
         method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "SessionId": sessionId,
+        },
+        body: typeof body === "string" ? body : JSON.stringify(body)
+    });
+    if(request.status === 403) {
+        NavigateToSignInPage();
+    }
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
+
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
+}
+
+/**
+ * Send a PATCH request to the backend API with the provided URL and body.
+ * Automatically includes the session ID from localStorage in the headers.
+ * @template T The expected response type.
+ * @param {string} url - The endpoint to send the request to (relative to the backend base URL).
+ * @param {object} body - The request payload to send as JSON.
+ * @returns {Promise<T>} The parsed JSON response from the backend.
+ */
+export async function PatchAsync<T>(url: string, body: object, sessionId?: string | null): Promise<T> {
+    if(!sessionId){
+        const userContext = await GetLoggedInUserContextAsync();
+        sessionId = userContext?.sessionId || "";
+    }
+    const finalUrl = `${BASE_BACKEND_URL}/${url}`;
+    const request = await fetch(finalUrl, {
+        method: "PATCH",
         headers: {
             "Content-Type": "application/json",
             "SessionId": sessionId,
@@ -125,8 +209,22 @@ export async function PutAsync<T>(url: string, body: object, sessionId?: string 
     if(request.status === 403) {
         NavigateToSignInPage();
     }
-    if(!request.ok) throw new Error(await request.text());
-    return await request.json() as T;
+    
+    const responseText = await request.text();
+    if(!request.ok) {
+        try {
+            const errorData = JSON.parse(responseText);
+            throw new Error(JSON.stringify(errorData));
+        } catch {
+            throw new Error(responseText);
+        }
+    }
+
+    try {
+        return JSON.parse(responseText) as T;
+    } catch {
+        throw new Error("Invalid JSON response from server");
+    }
 }
 
 /**

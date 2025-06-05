@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/Layout";
-import ClientSignIn from "./pages/ClientSignIn";
-import ClientRegister from "./pages/ClientRegister";
+import SignIn from "./pages/SignIn";
+import Register from "./pages/Register";
 import ClientHome from "./pages/ClientHome";
 import ClientUpdate from "./pages/ClientUpdate";
 import ClientJobRequest from "./pages/ClientJobRequest"; 
@@ -13,10 +13,11 @@ import AdminHome from "./pages/AdminHome";
 import AdminJobsHome from "./pages/AdminJobsHome";
 import AdminEmployeesHome from "./pages/AdminEmployeesHome";
 import AdminManageEmployees from "./pages/AdminManageEmployees";
-import EmployeeRegister from "./pages/EmployeeRegister";
+import EmployeeRegister from "./pages/Register";
 import AdminJobAllocations from "./pages/AdminJobAllocations";
 import AdminClientHome from "./pages/AdminClientHome";
 import AdminManageClients from "./pages/AdminManageClients";
+import AdminUsers from "./pages/AdminUsers";
 import EmployeeHome from "./pages/EmployeeHome";
 import SiteManagerHome from "./pages/SiteManagerHome";
 import SiteManagerCheckIn from "./pages/SiteManagerCheckIn";
@@ -36,9 +37,8 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<ClientSignIn />} />
-        <Route path="/clntsignin" element={<ClientSignIn />} />
-        <Route path="/clientregister" element={<ClientRegister />} />
+        <Route path={AppRoutes.SignIn} element={<SignIn />} />
+        <Route path= {AppRoutes.Register} element={<Register />} />
         
         <Route
           path="/*"
@@ -60,6 +60,7 @@ const App: React.FC = () => {
                 <Route path="/adminjoballocations" element={<AdminJobAllocations/>}/>
                 <Route path="/adminclienthome" element={<AdminClientHome/>}/>
                 <Route path="/adminmanageclients" element={<AdminManageClients/>}/>
+                <Route path="/adminusers" element={<AdminUsers/>}/>
                 <Route path="/employeehome" element={<EmployeeHome/>}/>
                 <Route path="/sitemanagerhome" element={<SiteManagerHome/>}/>
                 <Route path="/sitemanagercheckin" element={<SiteManagerCheckIn/>}/>

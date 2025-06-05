@@ -1,11 +1,9 @@
 // additionalWorkerModels.ts
 // Model representing an AdditionalWorker entity, matching the backend C# model.
 
+import type { Job } from './jobModels';
+
 export interface AdditionalWorker {
-    /**
-     * The unique identifier for the additional worker.
-     */
-    id: string;
     /**
      * The type of worker (e.g., "Bartender", "Security").
      */
@@ -23,7 +21,7 @@ export interface AdditionalWorker {
      */
     jobID: string;
     /**
-     * (Optional) The related job entity, if included in the response.
+     * The job this additional worker is linked to.
      */
-    job?: any;
+    job?: Job;
 }

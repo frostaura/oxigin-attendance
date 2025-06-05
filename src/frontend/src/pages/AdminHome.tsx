@@ -1,26 +1,64 @@
 import React from "react";
 import { Layout, Card, Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { AppstoreAddOutlined, TeamOutlined, CustomerServiceOutlined } from "@ant-design/icons";
+import { AppstoreAddOutlined, TeamOutlined, CustomerServiceOutlined, UserOutlined } from "@ant-design/icons";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 const AdminHome: React.FC = () => {
   const navigate = useNavigate();
 
+  const buttonStyle = {
+    height: '100px',
+    fontSize: '18px',
+    maxWidth: '300px',
+    width: '100%'
+  };
+
   return (
-    <Layout style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Card style={{ width: "30%", padding: 20 }}>
-        <Header style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "none", borderBottom: "1px solid #ddd", padding: "0 20px" }}>
-          <h2 style={{ margin: 0, alignItems: "center"}}>Admin Home</h2>
-        </Header>
+    <Layout className="min-h-screen flex justify-center items-center">
+      <Card className="responsive-card w-full" style={{ maxWidth: '600px' }}>
+        <h2 className="page-title mb-8">Admin Home</h2>
 
         {/* Content Layout */}
-        <Content style={{ flex: 1, padding: 20, display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+        <Content className="flex flex-col items-center gap-4">
           {/* Vertical Buttons */}
-          <Button type="primary" block icon={<AppstoreAddOutlined/>} onClick={() => navigate("/adminjobshome")} style={{ width: "300px", height: "100px", fontSize: "18px"}} >Jobs</Button>
-          <Button type="primary" block icon={<TeamOutlined/>} onClick={() => navigate("/adminemployeeshome" )} style={{ width: "300px", height: "100px", fontSize: "18px" }} >Employees</Button>
-          <Button type="primary" block icon={<CustomerServiceOutlined/>} onClick={() => navigate("/adminclienthome")} style={{ width: "300px", height: "100px", fontSize: "18px" }} >Clients</Button>
+          <Button 
+            type="primary" 
+            block 
+            icon={<AppstoreAddOutlined/>} 
+            onClick={() => navigate("/adminjobshome")} 
+            style={buttonStyle}
+          >
+            Jobs
+          </Button>
+          <Button 
+            type="primary" 
+            block 
+            icon={<TeamOutlined/>} 
+            onClick={() => navigate("/adminemployeeshome")} 
+            style={buttonStyle}
+          >
+            Employees
+          </Button>
+          <Button 
+            type="primary" 
+            block 
+            icon={<CustomerServiceOutlined/>} 
+            onClick={() => navigate("/adminmanageclients")} 
+            style={buttonStyle}
+          >
+            Clients
+          </Button>
+          <Button 
+            type="primary" 
+            block 
+            icon={<UserOutlined/>} 
+            onClick={() => navigate("/adminusers")} 
+            style={buttonStyle}
+          >
+            Users
+          </Button>
         </Content>
       </Card>
     </Layout>
