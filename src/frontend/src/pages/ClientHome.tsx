@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Layout, Card, Button, Table, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { getJobsAsync as getJobsAsync, getJobsRequiringApprovalAsync } from "../services/data/job";
+import { getJobsAsync } from "../services/data/job";
 import type { Job } from "../models/jobModels";
 import { GetLoggedInUserContextAsync } from "../services/data/backend";
 
@@ -24,7 +24,6 @@ interface JobData {
 const ClientHome: React.FC = () => {
   const navigate = useNavigate();
   const [jobsPendingApproval, setJobsPendingApproval] = useState<JobData[]>([]);
-  const [upcomingJobData, setUpcomingJobData] = useState<JobData[]>([]);
   const [jobsAwaitingConfirmation, setJobsAwaitingConfirmation] = useState<Job[]>([]);
 
   const handleApproveChange = (record: JobData) => {
@@ -74,7 +73,7 @@ const ClientHome: React.FC = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        // Get the current user context to get the client ID
+        // Get the current user context to get the client ID and user ID
         const userContext = await GetLoggedInUserContextAsync();
         if (!userContext?.user?.clientID) {
           message.error('Unable to fetch client information');
@@ -82,30 +81,28 @@ const ClientHome: React.FC = () => {
         }
 
         const clientId = userContext.user.clientID;
+        const currentUserId = userContext.user.id;
 
-        // Fetch jobs awaiting confirmation and filter by client ID
+        // Fetch all jobs
         const allJobs: Array<Job> = await getJobsAsync();
+        
+        // Filter jobs for this client
         const clientJobs = allJobs.filter(job => job.clientID === clientId);
-        const awaitingConfirmation = clientJobs.filter(job => !job.approved);
+
+        // Jobs awaiting confirmation are jobs created by the current client user that aren't approved yet
+        const awaitingConfirmation = clientJobs.filter(job => 
+          !job.approved && 
+          job.requestorID === currentUserId // Only show jobs created by this client
+        );
         setJobsAwaitingConfirmation(awaitingConfirmation);
 
-        // Set upcoming jobs (approved jobs for this client)
-        const upcomingJobs = clientJobs
-          .filter(job => job.approved)
-          .map(job => ({
-            key: job.id || '',
-            jobId: job.id || '',
-            purchaseOrder: job.purchaseOrderNumber,
-            jobName: job.jobName,
-            location: job.location,
-            date: new Date(job.time).toLocaleDateString()
-          }));
-        setUpcomingJobData(upcomingJobs);
-
-        // Fetch jobs requiring approval and filter by client ID
-        const jobsRequiringApproval = await getJobsRequiringApprovalAsync();
-        const clientJobsRequiringApproval = jobsRequiringApproval.filter(job => job.clientID === clientId);
-        const formattedJobs: JobData[] = clientJobsRequiringApproval.map(job => ({
+        // Jobs pending approval are jobs assigned to this client but NOT created by them
+        const jobsPendingClientApproval = clientJobs.filter(job => 
+          !job.approved && 
+          job.requestorID !== currentUserId // Only show jobs NOT created by this client
+        );
+        
+        const formattedJobs: JobData[] = jobsPendingClientApproval.map(job => ({
           key: job.id || '',
           jobId: job.id || '',
           purchaseOrder: job.purchaseOrderNumber,
@@ -132,7 +129,7 @@ const ClientHome: React.FC = () => {
         <h2 className="page-title mb-4">Home Page</h2>
 
         <Content className="flex flex-col gap-4">
-          <Card title="Jobs Pending Confirmation">
+          <Card title="My Job Requests Awaiting Confirmation">
             <div className="responsive-table">
               <Table 
                 columns={[
@@ -158,7 +155,7 @@ const ClientHome: React.FC = () => {
             </div>
           </Card>
 
-          <Card title="Jobs Pending My Approval">
+          <Card title="Admin Job Requests Pending My Approval">
             <div className="responsive-table">
               <Table 
                 columns={jobColumns} 

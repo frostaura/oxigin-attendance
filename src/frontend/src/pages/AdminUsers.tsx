@@ -22,7 +22,6 @@ interface EditableUser extends User {
 
 const AdminUsers: React.FC = () => {
   const [form] = Form.useForm();
-  const [employeeForm] = Form.useForm();
   const [users, setUsers] = useState<EditableUser[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,10 +64,6 @@ const AdminUsers: React.FC = () => {
 
   const handleSearch = (value: string) => {
     setSearchValue(value.toLowerCase());
-  };
-
-  const handleClearSearch = () => {
-    setSearchValue('');
   };
 
   const filteredUsers = users.filter(user => 

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Layout, Card, Button, Table, Checkbox, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import type { ColumnsType } from "antd/es/table";
-import { getJobsAsync, getJobsRequiringApprovalAsync, approveJobAsync, rejectJobAsync } from "../services/data/job";
+import { getJobsAsync, approveJobAsync, rejectJobAsync } from "../services/data/job";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
 import type { Job } from "../models/jobModels";
 
 const { Content } = Layout;
@@ -95,13 +96,30 @@ const AdminJobsHome: React.FC = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        // Fetch jobs awaiting confirmation
+        // Get the current admin's user ID
+        const userContext = await GetLoggedInUserContextAsync();
+        if (!userContext?.user?.id) {
+          message.error('Unable to fetch user information');
+          return;
+        }
+        const currentAdminId = userContext.user.id;
+
+        // Fetch all jobs
         const allJobs = await getJobsAsync();
-        const awaitingConfirmation = allJobs.filter(job => !job.approved);
+        
+        // Jobs awaiting confirmation are jobs created by the current admin that aren't approved yet
+        const awaitingConfirmation = allJobs.filter(job => 
+          !job.approved && 
+          job.requestorID === currentAdminId // Only show jobs created by this admin
+        );
         setJobsAwaitingConfirmation(awaitingConfirmation);
 
-        // Fetch jobs requiring approval and ensure approved is null initially
-        const jobsRequiringApproval = await getJobsRequiringApprovalAsync();
+        // Jobs requiring approval are jobs created by clients (not by this admin)
+        const jobsRequiringApproval = allJobs.filter(job => 
+          !job.approved && 
+          job.requestorID !== currentAdminId // Only show jobs NOT created by this admin (i.e., created by clients)
+        );
+        
         const jobsWithInitialApproval = jobsRequiringApproval.map(job => ({
           ...job,
           approved: null as unknown as boolean
