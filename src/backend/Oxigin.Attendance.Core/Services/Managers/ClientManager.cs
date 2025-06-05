@@ -73,9 +73,20 @@ public class ClientManager : IClientManager
     /// <returns>The updated Client entity.</returns>
     public async Task<Client> UpdateAsync(Client client, CancellationToken token)
     {
-        _db.Clients.Update(client);
+        var existingClient = await _db.Clients.FirstOrDefaultAsync(c => c.Id == client.Id && !c.Deleted, token);
+        if (existingClient == null)
+        {
+            throw new InvalidOperationException($"Client with ID {client.Id} not found");
+        }
+
+        // Update the properties
+        existingClient.CompanyName = client.CompanyName;
+        existingClient.RegNo = client.RegNo;
+        existingClient.Address = client.Address;
+        existingClient.ContactNo = client.ContactNo;
+
         await _db.SaveChangesAsync(token);
-        return client;
+        return existingClient;
     }
 
     /// <summary>

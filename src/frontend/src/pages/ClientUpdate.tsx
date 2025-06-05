@@ -1,14 +1,82 @@
-import React from "react";
-import { Form, Input, Button, Typography, Card } from "antd";
-import type { ClientRegistrationFormValues } from "../models/clientModels";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Form, Input, Button, Typography, Card, message } from "antd";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
+import { getClientByIdAsync, updateClientAsync } from "../services/data/client";
+import type { Client } from "../models/clientModels";
 
 const { Title } = Typography;
 
-const UpdateClient: React.FC = () => {
-  const [form] = Form.useForm<ClientRegistrationFormValues>();
+interface ClientUpdateFormValues {
+  companyName: string;
+  registrationNumber: string;
+  name: string;
+  address: string;
+  contactNumber: string;
+  email: string;
+}
 
-  const handleRegister = (values: ClientRegistrationFormValues) => {
-    console.log("Updated Data:", values);
+const UpdateClient: React.FC = () => {
+  const navigate = useNavigate();
+  const [form] = Form.useForm<ClientUpdateFormValues>();
+
+  // Fetch client data when component mounts
+  useEffect(() => {
+    const fetchClientData = async () => {
+      try {
+        const userContext = await GetLoggedInUserContextAsync();
+        if (!userContext?.user.clientID) {
+          message.error("Client ID not found");
+          navigate(-1);
+          return;
+        }
+
+        const clientData = await getClientByIdAsync(userContext.user.clientID);
+        if (clientData) {
+          // Set form values - use the user's name from context
+          form.setFieldsValue({
+            companyName: clientData.companyName || "",
+            registrationNumber: clientData.regNo || "",
+            name: userContext.user.name || "", // Use the user's name from context
+            address: clientData.address || "",
+            contactNumber: clientData.contactNo || "",
+            email: userContext.user.email || "", // Use the user's email from context
+          });
+        }
+      } catch (error) {
+        message.error("Failed to fetch client data");
+        console.error("Error fetching client data:", error);
+      }
+    };
+
+    fetchClientData();
+  }, [form, navigate]);
+
+  const handleSubmit = async (values: ClientUpdateFormValues) => {
+    try {
+      const userContext = await GetLoggedInUserContextAsync();
+      if (!userContext?.user.clientID) {
+        message.error("Client ID not found");
+        return;
+      }
+
+      // Prepare the client data for update with correct property names and casing
+      const clientData: Client = {
+        id: userContext.user.clientID,
+        companyName: values.companyName,
+        regNo: values.registrationNumber,
+        address: values.address,
+        contactNo: values.contactNumber
+      };
+
+      console.log('Sending update request with data:', clientData);
+      await updateClientAsync(clientData);
+      message.success("Client details updated successfully");
+      navigate(-1);
+    } catch (error) {
+      message.error("Failed to update client details");
+      console.error("Error updating client:", error);
+    }
   };
 
   return (
@@ -32,7 +100,7 @@ const UpdateClient: React.FC = () => {
           Update Details
         </Title>
 
-        <Form form={form} layout="vertical" onFinish={handleRegister}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
             label="Company Name"
             name="companyName"
@@ -50,19 +118,10 @@ const UpdateClient: React.FC = () => {
           </Form.Item>
 
           <Form.Item
-            label="First Name"
-            name="firstName"
-            rules={[{ required: true, message: "First name is required." }]}
+            label="Contact Person Name"
+            name="name"
           >
-            <Input placeholder="First name" />
-          </Form.Item>
-
-          <Form.Item
-            label="Last Name"
-            name="lastName"
-            rules={[{ required: true, message: "Last name is required." }]}
-          >
-            <Input placeholder="Last name" />
+            <Input disabled placeholder="Contact person name" />
           </Form.Item>
 
           <Form.Item
@@ -75,7 +134,7 @@ const UpdateClient: React.FC = () => {
 
           <Form.Item
             label="Contact Number"
-            name="phone"
+            name="contactNumber"
             rules={[{ required: true, message: "Please enter your contact number!" }]}
           >
             <Input placeholder="Enter your contact number" />
@@ -84,12 +143,8 @@ const UpdateClient: React.FC = () => {
           <Form.Item
             label="Email"
             name="email"
-            rules={[
-              { required: true, message: "Please enter your email!" },
-              { type: "email", message: "Please enter a valid email!" },
-            ]}
           >
-            <Input type="email" placeholder="Enter your email" />
+            <Input disabled type="email" placeholder="Email address" />
           </Form.Item>
 
           <Button type="primary" htmlType="submit" block>

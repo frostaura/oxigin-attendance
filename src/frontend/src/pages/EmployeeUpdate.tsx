@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Button, Typography, Card } from "antd";
+import { Form, Input, Button, Typography, Card, message } from "antd";
+import { GetLoggedInUserContextAsync } from "../services/data/backend";
+import { getEmployeeByIdAsync, updateEmployeeAsync } from "../services/data/employee";
+import type { Employee } from "../models/employeeModels";
 
 const { Title } = Typography;
 
 interface EmployeeUpdateFormValues {
-  employeeNumber: string;
   name: string;
-  surname: string;
   idNumber: string;
   address: string;
   contactNumber: string;
@@ -21,9 +22,68 @@ const EmployeeUpdate: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm<EmployeeUpdateFormValues>();
 
-  const handleSubmit = (values: EmployeeUpdateFormValues) => {
-    console.log("Employee Data:", values);
-    navigate(-1); // Go back one page
+  // Fetch employee data when component mounts
+  useEffect(() => {
+    const fetchEmployeeData = async () => {
+      try {
+        const userContext = await GetLoggedInUserContextAsync();
+        if (!userContext?.user.employeeID) {
+          message.error("Employee ID not found");
+          navigate(-1);
+          return;
+        }
+
+        const employeeData = await getEmployeeByIdAsync(userContext.user.employeeID);
+        if (employeeData) {
+          // Set form values - use the user's name from the context
+          form.setFieldsValue({
+            name: userContext.user.name || "", // Use the user's name from context
+            idNumber: employeeData.idNumber || "",
+            address: employeeData.address || "",
+            contactNumber: employeeData.contactNo || "",
+            bankName: employeeData.bankName || "",
+            accountHolderName: employeeData.accountHolderName || "",
+            branchCode: employeeData.branchCode || "",
+            accountNumber: employeeData.accountNumber || "",
+          });
+        }
+      } catch (error) {
+        message.error("Failed to fetch employee data");
+        console.error("Error fetching employee data:", error);
+      }
+    };
+
+    fetchEmployeeData();
+  }, [form, navigate]);
+
+  const handleSubmit = async (values: EmployeeUpdateFormValues) => {
+    try {
+      const userContext = await GetLoggedInUserContextAsync();
+      if (!userContext?.user.employeeID) {
+        message.error("Employee ID not found");
+        return;
+      }
+
+      // Prepare the employee data for update
+      const employeeData: Employee = {
+        id: userContext.user.employeeID,
+        name: userContext.user.name || "", // Always use the user's name from context
+        idNumber: values.idNumber,
+        address: values.address,
+        contactNo: values.contactNumber,
+        bankName: values.bankName,
+        accountHolderName: values.accountHolderName,
+        branchCode: values.branchCode,
+        accountNumber: values.accountNumber,
+      };
+
+      await updateEmployeeAsync(employeeData);
+      message.success("Employee details updated successfully");
+      navigate(-1);
+    } catch (error) {
+      message.error("Failed to update employee details");
+      console.error("Error updating employee:", error);
+    }
   };
 
   return (
@@ -34,27 +94,10 @@ const EmployeeUpdate: React.FC = () => {
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           {/* Employee Information */}
           <Form.Item 
-            label="Employee Number" 
-            name="employeeNumber" 
-            rules={[{ required: true, message: "Employee Number is required." }]}
-          >
-            <Input placeholder="Employee Number" />
-          </Form.Item>
-
-          <Form.Item 
             label="Name" 
-            name="name" 
-            rules={[{ required: true, message: "Name is required." }]}
+            name="name"
           >
-            <Input placeholder="Enter Name" />
-          </Form.Item>
-
-          <Form.Item 
-            label="Surname" 
-            name="surname" 
-            rules={[{ required: true, message: "Surname is required." }]}
-          >
-            <Input placeholder="Enter Surname" />
+            <Input disabled placeholder="Name" />
           </Form.Item>
 
           <Form.Item 
@@ -86,32 +129,28 @@ const EmployeeUpdate: React.FC = () => {
 
           <Form.Item 
             label="Bank Name" 
-            name="bankName" 
-            rules={[{ required: true, message: "Bank Name is required." }]}
+            name="bankName"
           >
             <Input placeholder="Enter Bank Name" />
           </Form.Item>
 
           <Form.Item 
             label="Account Holder Name" 
-            name="accountHolderName" 
-            rules={[{ required: true, message: "Account Holder Name is required." }]}
+            name="accountHolderName"
           >
             <Input placeholder="Enter Account Holder Name" />
           </Form.Item>
 
           <Form.Item 
             label="Branch Code" 
-            name="branchCode" 
-            rules={[{ required: true, message: "Branch Code is required." }]}
+            name="branchCode"
           >
             <Input placeholder="Enter Branch Code" />
           </Form.Item>
 
           <Form.Item 
             label="Account Number" 
-            name="accountNumber" 
-            rules={[{ required: true, message: "Account Number is required." }]}
+            name="accountNumber"
           >
             <Input placeholder="Enter Account Number" />
           </Form.Item>

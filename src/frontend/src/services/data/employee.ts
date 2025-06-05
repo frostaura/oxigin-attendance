@@ -36,7 +36,7 @@ export async function addEmployeeAsync(employee: Partial<Employee>): Promise<Emp
  * @returns {Promise<Employee>} The updated Employee entity.
  */
 export async function updateEmployeeAsync(employee: Employee): Promise<Employee> {
-    return await PutAsync<Employee>("Employee", employee); // If your backend expects PUT, adjust accordingly
+    return await PutAsync<Employee>("Employee", employee);
 }
 
 /**

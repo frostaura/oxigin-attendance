@@ -2,7 +2,7 @@
 // Service functions for interacting with the ClientController backend API.
 // Provides utility methods for CRUD operations on clients.
 import type { Client } from "../../models/clientModels";
-import { GetAsync, PostAsync, DeleteAsync } from "./backend";
+import { GetAsync, PostAsync, DeleteAsync, PutAsync } from "./backend";
 
 /**
  * Get all clients.
@@ -36,7 +36,9 @@ export async function addClientAsync(client: Partial<Client>): Promise<Client> {
  * @returns {Promise<Client>} The updated Client entity.
  */
 export async function updateClientAsync(client: Client): Promise<Client> {
-    return await PostAsync<Client>("Client", client); // If your backend expects PUT, adjust accordingly
+    // Send the client object directly - property names already match the backend
+    console.log('Updating client with data:', client);
+    return await PutAsync<Client>("Client", client);
 }
 
 /**

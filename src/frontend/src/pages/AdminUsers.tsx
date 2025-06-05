@@ -4,6 +4,7 @@ import { EditOutlined, MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOu
 
 import { getUsersAsync, updateUserAsync, deleteUserAsync, CreateUserAsAdmin } from "../services/data/user";
 import { getClientsAsync } from "../services/data/client";
+import { addEmployeeAsync } from "../services/data/employee";
 import type { User } from "../models/userModels";
 import type { Client } from "../models/clientModels";
 import type { Employee } from "../models/employeeModels";
@@ -28,7 +29,6 @@ const AdminUsers: React.FC = () => {
   const [searchValue, setSearchValue] = useState<string>("");
   const [editingKey, setEditingKey] = useState('');
   const [newUser, setNewUser] = useState<EditableUser | null>(null);
-  const [isEmployeeModalVisible, setIsEmployeeModalVisible] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -144,13 +144,33 @@ const AdminUsers: React.FC = () => {
         return;
       }
 
+      let employeeID = values.employeeID;
+
+      // If user type is Employee or SiteManager, create a basic employee record
+      if ((userType === UserType.Employee || userType === UserType.SiteManager) && !employeeID) {
+        try {
+          // Create new employee with minimal required information
+          const newEmployee = await addEmployeeAsync({
+            name: values.name.trim(),
+            contactNo: values.contactNr.trim(), // Use the user's contact number
+            // Other fields will be null/empty and can be edited later
+          });
+
+          employeeID = newEmployee.id;
+        } catch (error) {
+          console.error('Error creating employee:', error);
+          message.error('Failed to create employee record');
+          return;
+        }
+      }
+
       const userData = {
         name: values.name.trim(),
         email: values.email.toLowerCase().trim(),
         contactNr: values.contactNr.trim(),
         userType: userType,
         clientID: userType === UserType.Client ? values.clientID : null,
-        employeeID: userType === UserType.Employee || userType === UserType.SiteManager ? values.employeeID : null,
+        employeeID: userType === UserType.Employee || userType === UserType.SiteManager ? employeeID : null,
         password: values.password
       };
 
@@ -214,11 +234,6 @@ const AdminUsers: React.FC = () => {
         message.error('Failed to save user');
       }
     }
-  };
-
-  const handleEmployeeModalCancel = () => {
-    setIsEmployeeModalVisible(false);
-    employeeForm.resetFields();
   };
 
   const handleCancel = () => {
@@ -551,65 +566,6 @@ const AdminUsers: React.FC = () => {
           </Form>
         </Content>
       </Card>
-
-      <Modal
-        title="Employee Details"
-        open={isEmployeeModalVisible}
-        onOk={() => handleSave(newUser?.key || '')}
-        onCancel={handleEmployeeModalCancel}
-        width={600}
-      >
-        <Form
-          form={employeeForm}
-          layout="vertical"
-        >
-          <Form.Item
-            name="idNumber"
-            label="ID Number"
-            rules={[{ required: true, message: 'ID Number is required' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="address"
-            label="Address"
-            rules={[{ required: true, message: 'Address is required' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="contactNo"
-            label="Contact Number"
-            rules={[{ required: true, message: 'Contact number is required' }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="bankName"
-            label="Bank Name (Optional)"
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="accountHolderName"
-            label="Account Holder Name (Optional)"
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="branchCode"
-            label="Branch Code (Optional)"
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="accountNumber"
-            label="Account Number (Optional)"
-          >
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
     </Layout>
   );
 };
