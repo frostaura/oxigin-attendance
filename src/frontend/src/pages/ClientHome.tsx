@@ -50,7 +50,6 @@ const ClientHome: React.FC = () => {
   };
 
   const jobColumns: ColumnsType<JobData> = [
-    { title: "Job ID", dataIndex: "jobId", key: "jobId" },
     { title: "Purchase Order #", dataIndex: "purchaseOrder", key: "purchaseOrder" },
     { title: "Job Name", dataIndex: "jobName", key: "jobName" },
     { title: "Location", dataIndex: "location", key: "location" },
